@@ -5,7 +5,7 @@ import ProjectCard from "../components/ProjectCard"; // We will create this comp
 
 // Define the base URL for your API
 // NOTE: This must match the port your Express server is running on (e.g., 5000)
-const API_URL = "http://localhost:5000/api/v1/projects";
+const API_URL = "https://portfolio-backend-1-sx2x.onrender.com/api/v1/projects";
 
 const Projects = () => {
   const [projects, setProjects] = useState([]);
