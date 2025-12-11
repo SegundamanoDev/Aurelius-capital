@@ -3,7 +3,7 @@ import axios from "axios";
 import { FiSend, FiMessageSquare } from "react-icons/fi";
 
 // Define the base URL for the contact API endpoint
-const API_URL = "http://localhost:5000/api/v1/contact";
+const API_URL = "https://portfolio-backend-1-sx2x.onrender.com/api/v1/contact";
 
 const Contact = () => {
   const [formData, setFormData] = useState({
