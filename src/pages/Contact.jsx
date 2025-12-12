@@ -18,7 +18,7 @@ const Contact = () => {
     type: "",
     text: "",
   });
-  console.log(responseMessage);
+
   // Handle form input changes
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
