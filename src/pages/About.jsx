@@ -153,7 +153,7 @@ const About = () => {
               },
             ].map((doc, i) => (
               <div key={i} className="group">
-                <div className="bg-white p-4 rounded-[2rem] shadow-md border border-gray-100 group-hover:shadow-2xl transition-all duration-500">
+                <div className="bg-white p-4 rounded-4xlshadow-md border border-gray-100 group-hover:shadow-2xl transition-all duration-500">
                   <div className="h-[400px] overflow-hidden rounded-2xl mb-6 bg-gray-50">
                     <img
                       src={doc.img}
