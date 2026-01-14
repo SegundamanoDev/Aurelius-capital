@@ -156,7 +156,7 @@ const Contact = () => {
           </div>
 
           {/* BUSINESS HOURS BOX */}
-          <div className="bg-[#1B4332] p-8 rounded-[2rem] text-white relative overflow-hidden shadow-xl">
+          <div className="bg-[#1B4332] p-8 rounded-4xl text-white relative overflow-hidden shadow-xl">
             <FaGlobeAfrica className="absolute -right-4 -bottom-4 text-white/5 text-9xl" />
             <div className="flex items-center gap-3 mb-4">
               <FaRegClock className="text-[#FFD600] text-xl" />
