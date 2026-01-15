@@ -1,18 +1,34 @@
-# React + Vite
+# Abrada-Biotech Enterprise Portal 🧬🔋
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+**Engineering a Cleaner, Greener Nigeria.** Abrada-Biotech Enterprise is a CAC-registered (BN 8941617) engineering firm specializing in advanced anaerobic digestive technology. We transform human waste into liquid manure and domestic biogas.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 🛠 The Technology Stack
+This portal is built using a modern **MERN-inspired** architecture for high performance and professional UI/UX:
+- **Frontend:** React.js (v18+)
+- **Styling:** Tailwind CSS (Modern utility-first framework)
+- **Icons:** React-Icons (HeroIcons, FontAwesome, GameIcons)
+- **Form Handling:** EmailJS Integration for professional client inquiries
+- **Deployment:** [Vercel/Netlify - *Insert your choice*]
 
-## React Compiler
+---
 
-The React Compiler is enabled on this template. See [this documentation](https://react.dev/learn/react-compiler) for more information.
+## 🔬 Scientific Breakthrough
+The core of this project is the **24-hour Anaerobic Digestive System** researched and developed by **Abraham Ada**. 
 
-Note: This will impact Vite dev & build performances.
+### Key Technical Specs:
+* **Digestion Cycle:** 24-Hour Micro-organism breakdown.
+* **By-products:** Organic Liquid Manure & Biogas (Methane).
+* **Maintenance:** 0% Evacuation required.
+* **Environmental Impact:** 100% Odorless & Insect-free.
 
-## Expanding the ESLint configuration
+---
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## 📂 Project Structure
+```text
+src/
+├── components/     # Reusable UI (Navbar, Footer, SectionWrappers)
+├── pages/          # Home, About, Contact, Training, Projects
+├── assets/         # Project images, CAC Certificates, Technical diagrams
+└── App.js          # Routing & Main Entry
