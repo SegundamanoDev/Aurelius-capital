@@ -92,7 +92,7 @@ const Training = () => {
           ].map((item, i) => (
             <div
               key={i}
-              className="p-8 rounded-[2rem] border border-gray-100 bg-gray-50 hover:bg-white hover:shadow-xl transition-all group"
+              className="p-8 rounded-4xl border border-gray-100 bg-gray-50 hover:bg-white hover:shadow-xl transition-all group"
             >
               <div className="text-4xl text-[#1B4332] mb-6 group-hover:scale-110 transition-transform">
                 {item.icon}
