@@ -65,7 +65,7 @@ const Home = () => {
                 alt="Biodigester"
                 className="rounded-4xl lg:rounded-[3rem] shadow-2xl border-4 lg:border-8 border-white w-full h-auto max-h-[350px] md:max-h-[500px] object-contain bg-gray-50 lg:object-cover"
               />
-              <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 bg-[#1B4332] text-white p-6 rounded-3xl shadow-2xl flex items-center gap-6 min-w-[280px]">
+              <div className="absolute -bottom-14 md:-bottom-8 left-1/2 -translate-x-1/2 bg-[#1B4332] text-white p-6 rounded-3xl shadow-2xl flex items-center gap-6 min-w-[280px]">
                 <div className="text-center border-r border-white/20 pr-6">
                   <p className="text-[#FFD600] font-black text-3xl">100%</p>
                   <p className="text-[10px] uppercase font-bold tracking-widest opacity-70">
@@ -260,7 +260,7 @@ const Home = () => {
                 Industrial Grade
               </p>
               <p className="text-lg font-bold leading-tight">
-                Eliminate Smells & Environmental Petitions.
+                Eliminate Smells & Environmental Polution.
               </p>
             </div>
           </div>
@@ -284,7 +284,7 @@ const Home = () => {
               "We manage the animal waste i.e poultry waste as well as piggery
               waste. Instead of regular evacuation, we can create a digestive
               system that can manage all animal waste in order to avoid public
-              pollution and incessant environmental petitioning."
+              pollution and incessant environmental polution."
             </blockquote>
             <div className="flex flex-col gap-4 pt-4">
               <div className="flex items-center gap-3 font-bold text-[#1B4332]">

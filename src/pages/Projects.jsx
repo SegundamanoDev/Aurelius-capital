@@ -1,140 +1,234 @@
 import React, { useState } from "react";
-import { projects } from "../data/projectData";
+import {
+  HiOutlineLocationMarker,
+  HiOutlineArrowRight,
+  HiX,
+  HiOutlineChartBar,
+  HiOutlineShieldCheck,
+  HiOutlineChip,
+} from "react-icons/hi";
 
 const Projects = () => {
-  const [activeTab, setActiveTab] = useState("All");
-  const categories = ["All", "Industrial", "Energy", "Scientific"];
+  const [selectedProject, setSelectedProject] = useState(null);
 
-  const filteredProjects =
-    activeTab === "All"
-      ? projects
-      : projects.filter((p) => p.category === activeTab);
+  const ProjectCard = ({
+    category,
+    title,
+    location,
+    description,
+    img,
+    specs,
+  }) => (
+    <div className="group bg-white rounded-[2.5rem] overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-500 border border-gray-100 flex flex-col h-full">
+      {/* Fixed Card Image Height */}
+      <div className="relative h-72 w-full overflow-hidden bg-gray-200">
+        <img
+          src={img}
+          alt={title}
+          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+        />
+        <div className="absolute top-6 left-6 backdrop-blur-md bg-black/30 text-white text-[9px] font-black px-4 py-1.5 rounded-full border border-white/20 uppercase tracking-[0.2em]">
+          {category}
+        </div>
+      </div>
+
+      <div className="p-8 flex flex-col grow">
+        <div className="flex items-center text-[#1B4332] text-[10px] font-black mb-4 uppercase tracking-[0.2em]">
+          <HiOutlineLocationMarker className="text-lg mr-2 text-[#FFD600]" />
+          {location}
+        </div>
+        <h3 className="text-2xl font-black text-gray-900 mb-4 group-hover:text-[#1B4332] transition-colors leading-tight">
+          {title}
+        </h3>
+        <p className="text-gray-500 leading-relaxed text-sm font-medium mb-8 grow">
+          {description}
+        </p>
+
+        <div className="pt-6 border-t border-gray-50">
+          <button
+            onClick={() =>
+              setSelectedProject({ title, location, img, ...specs })
+            }
+            className="w-full bg-gray-50 group-hover:bg-[#FFD600] group-hover:text-[#1B4332] text-gray-400 py-4 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all flex items-center justify-center gap-2 cursor-pointer"
+          >
+            View Technical Specs
+            <HiOutlineArrowRight className="text-lg" />
+          </button>
+        </div>
+      </div>
+    </div>
+  );
 
   return (
-    <div className="bg-gray-50 min-h-screen pb-20">
-      {/* Header Section */}
-      <div className="bg-[#1B4332] py-20 px-4">
-        <div className="max-w-7xl mx-auto text-center">
-          <h1 className="text-4xl md:text-6xl font-black text-white mb-6">
-            Our Engineering <span className="text-[#FFD600]">Impact</span>
+    <div className="bg-[#fcfcfc] min-h-screen pb-20">
+      {/* 1. Header Section */}
+      <div className="bg-[#1B4332] pt-32 pb-24 px-6 relative overflow-hidden">
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]"></div>
+        </div>
+        <div className="max-w-7xl mx-auto text-center relative z-10">
+          <span className="text-[#FFD600] text-[10px] font-black tracking-[0.4em] uppercase mb-4 block">
+            Nationwide Portfolio
+          </span>
+          <h1 className="text-5xl md:text-7xl font-black text-white mb-6 tracking-tighter">
+            Engineering <span className="text-[#FFD600]">Impact.</span>
           </h1>
-          <p className="text-green-100 text-lg max-w-3xl mx-auto leading-relaxed">
-            From residential biogas solutions to massive industrial
-            waste-to-energy plants. Explore our certified construction projects
-            across Nigeria.
+          <p className="text-green-100/80 text-lg max-w-2xl mx-auto leading-relaxed font-medium">
+            Deploying sustainable waste-to-energy systems across Nigeria's
+            industrial and residential sectors.
           </p>
         </div>
       </div>
 
-      {/* Modern Filter Bar */}
-      <div className="sticky top-20 z-40 bg-white shadow-sm py-6 mb-12">
-        <div className="max-w-7xl mx-auto px-4 flex flex-wrap justify-center gap-4">
-          {categories.map((cat) => (
-            <button
-              key={cat}
-              onClick={() => setActiveTab(cat)}
-              className={`px-8 py-3 rounded-xl font-bold transition-all duration-300 ${
-                activeTab === cat
-                  ? "bg-[#1B4332] text-[#FFD600] shadow-lg scale-105"
-                  : "bg-gray-100 text-gray-500 hover:bg-gray-200"
-              }`}
-            >
-              {cat}
-            </button>
-          ))}
+      {/* 2. Grid */}
+      <div className="max-w-7xl mx-auto px-6 mt-16">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
+          <ProjectCard
+            category="Industrial"
+            title="Industrial Piggery Digester"
+            location="Ogun State, Nigeria"
+            img="/animal-waste-gas.jpg"
+            description="High-capacity system designed to manage animal waste runoff and convert it into constant electricity."
+            specs={{
+              efficiency: "98.2% Output",
+              systemType: "Anaerobic",
+              safetyGrade: "Industrial",
+              lifespan: "25+ Years",
+              summary:
+                "This installation utilizes high-purity micro-organism cultures to facilitate rapid waste breakdown. The system features a custom-built H2S scrubber for 100% odorless gas output.",
+            }}
+          />
+          {/* Add more cards as needed using the same props */}
         </div>
       </div>
 
-      {/* Responsive Image Grid */}
-      <div className="max-w-7xl mx-auto px-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
-          {filteredProjects.map((project) => (
-            <div
-              key={project.id}
-              className="bg-white rounded-3xl overflow-hidden shadow-md hover:shadow-2xl transition-all group border border-gray-100"
+      {/* 3. FIXED MODAL COMPONENT */}
+      {selectedProject && (
+        <div className="fixed inset-0 z-100 flex items-center justify-center p-4 md:p-6">
+          {/* Backdrop */}
+          <div
+            className="absolute inset-0 bg-[#1B4332]/95 backdrop-blur-xl"
+            onClick={() => setSelectedProject(null)}
+          ></div>
+
+          {/* Modal Card */}
+          <div className="relative bg-white w-full max-w-5xl max-h-[90vh] rounded-4xl md:rounded-[3rem] shadow-2xl overflow-hidden flex flex-col md:flex-row animate-in fade-in zoom-in duration-300">
+            {/* Close Button - More visible */}
+            <button
+              onClick={() => setSelectedProject(null)}
+              className="absolute top-4 right-4 md:top-8 md:right-8 z-50 bg-white/90 hover:bg-red-500 hover:text-white p-3 rounded-full shadow-lg transition-all"
             >
-              {/* Image Container */}
-              <div className="relative h-80 overflow-hidden">
-                <img
-                  src={project.img}
-                  alt={project.title}
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                />
-                <div className="absolute top-4 left-4 bg-[#FFD600] text-[#1B4332] text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest shadow-lg">
-                  {project.category}
+              <HiX className="text-xl md:text-2xl" />
+            </button>
+
+            {/* FIXED MODAL IMAGE SECTION */}
+            <div className="w-full md:w-1/2 h-64 md:h-auto relative bg-gray-100">
+              <img
+                src={selectedProject.img}
+                className="w-full h-full object-cover"
+                alt="Technical View"
+              />
+              {/* Gradient overlay fixed to cover full image area */}
+              <div className="absolute inset-0 bg-linear-to-t from-[#1B4332] via-transparent to-transparent opacity-70"></div>
+            </div>
+
+            {/* MODAL CONTENT SECTION */}
+            <div className="w-full md:w-1/2 p-6 md:p-14 overflow-y-auto bg-white">
+              <div className="mb-8">
+                <span className="text-[#1B4332] text-[10px] font-black tracking-widest uppercase bg-green-50 px-3 py-1 rounded-md">
+                  Technical Documentation
+                </span>
+                <h2 className="text-3xl md:text-4xl font-black text-gray-900 mt-4 leading-tight">
+                  {selectedProject.title}
+                </h2>
+                <p className="text-gray-500 mt-3 flex items-center gap-2 font-bold text-sm">
+                  <HiOutlineLocationMarker className="text-[#FFD600] text-lg" />
+                  {selectedProject.location}
+                </p>
+              </div>
+
+              {/* Specs Grid */}
+              <div className="grid grid-cols-2 gap-4 mb-10">
+                <div className="bg-gray-50 p-4 md:p-5 rounded-2xl border border-gray-100">
+                  <HiOutlineChartBar className="text-[#1B4332] text-xl mb-2" />
+                  <p className="text-[8px] font-black text-gray-400 uppercase tracking-widest">
+                    Efficiency
+                  </p>
+                  <p className="text-sm md:text-base font-black text-[#1B4332]">
+                    {selectedProject.efficiency}
+                  </p>
+                </div>
+                <div className="bg-gray-50 p-4 md:p-5 rounded-2xl border border-gray-100">
+                  <HiOutlineChip className="text-[#1B4332] text-xl mb-2" />
+                  <p className="text-[8px] font-black text-gray-400 uppercase tracking-widest">
+                    System
+                  </p>
+                  <p className="text-sm md:text-base font-black text-[#1B4332]">
+                    {selectedProject.systemType}
+                  </p>
+                </div>
+                <div className="bg-gray-50 p-4 md:p-5 rounded-2xl border border-gray-100">
+                  <HiOutlineShieldCheck className="text-[#1B4332] text-xl mb-2" />
+                  <p className="text-[8px] font-black text-gray-400 uppercase tracking-widest">
+                    Safety
+                  </p>
+                  <p className="text-sm md:text-base font-black text-[#1B4332]">
+                    {selectedProject.safetyGrade}
+                  </p>
+                </div>
+                <div className="bg-[#1B4332] p-4 md:p-5 rounded-2xl shadow-lg">
+                  <p className="text-[8px] font-black text-white/50 uppercase tracking-widest">
+                    Lifespan
+                  </p>
+                  <p className="text-sm md:text-base font-black text-[#FFD600]">
+                    {selectedProject.lifespan}
+                  </p>
                 </div>
               </div>
 
-              {/* Text Content */}
-              <div className="p-8">
-                <div className="flex items-center text-gray-400 text-xs font-bold mb-3 uppercase tracking-widest">
-                  <svg
-                    className="w-4 h-4 mr-1 text-[#1B4332]"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                    />
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                    />
-                  </svg>
-                  {project.location}
+              {/* Engineering Summary */}
+              <div className="space-y-6">
+                <div className="border-l-4 border-[#FFD600] pl-4">
+                  <h4 className="font-black text-gray-900 uppercase text-xs tracking-widest mb-2">
+                    Engineering Summary
+                  </h4>
+                  <p className="text-gray-600 text-sm leading-relaxed">
+                    {selectedProject.summary}
+                  </p>
                 </div>
-                <h3 className="text-2xl font-black text-[#1B4332] mb-3">
-                  {project.title}
-                </h3>
-                <p className="text-gray-600 leading-relaxed text-sm">
-                  {project.description}
-                </p>
-                <div className="mt-6 pt-6 border-t border-gray-100">
-                  <button className="text-[#1B4332] font-black text-sm flex items-center hover:gap-2 transition-all">
-                    VIEW PROJECT DETAILS
-                    <svg
-                      className="w-4 h-4 ml-1"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M17 8l4 4m0 0l-4 4m4-4H3"
-                      />
-                    </svg>
-                  </button>
-                </div>
+
+                <a
+                  href="https://wa.me/2348053311594"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block w-full text-center bg-[#FFD600] text-[#1B4332] py-5 rounded-2xl font-black text-[11px] uppercase tracking-[0.2em] shadow-xl hover:shadow-[#FFD600]/20 hover:-translate-y-1 transition-all"
+                >
+                  Request Technical Blueprint
+                </a>
               </div>
             </div>
-          ))}
+          </div>
         </div>
-      </div>
+      )}
 
-      {/* Trust Banner at the bottom of the page */}
-      <div className="max-w-5xl mx-auto mt-24 px-4">
-        <div className="bg-[#FFD600] rounded-3xl p-10 flex flex-col md:flex-row items-center justify-between shadow-xl">
-          <div className="text-[#1B4332] mb-6 md:mb-0">
-            <h2 className="text-3xl font-black leading-none">
-              Ready for a similar project?
+      {/* 4. CTA Banner */}
+      <div className="max-w-7xl mx-auto mt-32 px-6">
+        <div className="bg-[#1B4332] rounded-[3rem] p-10 md:p-20 flex flex-col lg:flex-row items-center justify-between shadow-2xl relative overflow-hidden">
+          <div className="text-white relative z-10 max-w-2xl text-center lg:text-left">
+            <h2 className="text-4xl md:text-5xl font-black leading-tight mb-6">
+              Need a Custom <br />
+              <span className="text-[#FFD600]">Farm Waste System?</span>
             </h2>
-            <p className="font-bold mt-2">
-              Get a free survey and quotation from Abraham Ada.
+            <p className="text-green-100/70 font-medium text-lg">
+              Stop pollution and avoid environmental petitions today. Join the
+              biogas revolution.
             </p>
           </div>
           <a
             href="https://wa.me/2348053311594"
-            className="bg-[#1B4332] text-white px-10 py-4 rounded-2xl font-black hover:scale-105 transition shadow-lg text-center"
+            className="mt-12 lg:mt-0 bg-[#FFD600] text-[#1B4332] px-14 py-6 rounded-2xl font-black text-sm uppercase tracking-widest hover:scale-105 transition-all shadow-2xl"
           >
-            DISCUSS YOUR SITE
+            BOOK SITE SURVEY
           </a>
         </div>
       </div>
