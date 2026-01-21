@@ -49,7 +49,7 @@ const About = () => {
             </div>
 
             <div className="space-y-8 text-gray-600 text-lg leading-relaxed">
-              <div className="relative p-10 bg-[#f8faf9] rounded-[2.5rem] border-l-[12px] border-[#FFD600] shadow-sm">
+              <div className="relative p-10 bg-[#f8faf9] rounded-[2.5rem] border-l-12 border-[#FFD600] shadow-sm">
                 <FaQuoteLeft className="text-[#FFD600] text-4xl mb-6 opacity-30" />
                 <p className="italic font-bold text-[#1B4332] text-2xl leading-snug">
                   "After years of studying waste patterns in Nigeria, I
