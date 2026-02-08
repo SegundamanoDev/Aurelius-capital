@@ -22,7 +22,6 @@ const Home = () => {
       <Academy />
       <Affiliate />
       <FinalCTA />
-      {/* Next: About Section with image background */}
     </div>
   );
 };

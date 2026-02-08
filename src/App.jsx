@@ -40,6 +40,7 @@ import Market from "./pages/public/Market";
 import Portfolio from "./pages/public/Portfolio";
 import About from "./pages/public/About";
 import Academy from "./pages/public/Academy";
+import ScrollToTop from "./components/ScrollToTop";
 
 // --- PUBLIC LAYOUT WRAPPER ---
 const PublicLayout = () => (
@@ -89,6 +90,7 @@ const ProtectedAdminRoute = ({ children }) => {
 function App() {
   return (
     <Router>
+      <ScrollToTop />
       <div className="bg-[#05070A] min-h-screen font-inter text-slate-300 selection:bg-sky-500/30 selection:text-white">
         <Toaster
           position="top-right"
@@ -123,9 +125,9 @@ function App() {
           <Route
             path="/dashboard"
             element={
-              <ProtectedRoute>
-                <DashboardLayout />
-              </ProtectedRoute>
+              // <ProtectedRoute>
+              <DashboardLayout />
+              // </ProtectedRoute>
             }
           >
             <Route index element={<DashboardHome />} />
@@ -142,9 +144,9 @@ function App() {
           <Route
             path="/admin"
             element={
-              <ProtectedAdminRoute>
-                <AdminLayout />
-              </ProtectedAdminRoute>
+              // <ProtectedAdminRoute>
+              <AdminLayout />
+              // </ProtectedAdminRoute>
             }
           >
             <Route index element={<AdminDashboard />} />
