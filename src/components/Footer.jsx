@@ -1,158 +1,154 @@
+import React from "react";
 import { Link } from "react-router-dom";
-// Import professional icons
+import { RiCopperCoinLine } from "react-icons/ri";
 import {
-  HiOutlineMail,
-  HiOutlineLocationMarker,
-  HiOutlinePhone,
-  HiOutlineShieldCheck,
-} from "react-icons/hi";
+  FaTwitter,
+  FaTelegramPlane,
+  FaLinkedinIn,
+  FaInstagram,
+} from "react-icons/fa";
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="bg-[#0b1a14] text-gray-300 pt-16 pb-8 px-6 md:px-12 border-t border-white/5">
+    <footer className="bg-[#020408] pt-20 pb-10 border-t border-white/5 px-6">
       <div className="max-w-7xl mx-auto">
-        {/* Main Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
-          {/* Column 1: Brand & Logo */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
+          {/* Brand Identity */}
           <div className="space-y-6">
-            <Link to="/" className="flex items-center gap-3 group">
-              {/* Logo Icon Container */}
-              <div className="w-12 h-12 bg-white/5 rounded-xl flex items-center justify-center p-2 group-hover:bg-[#FFD600]/20 transition-all duration-300">
-                <img
-                  src="/logo.png"
-                  alt="Abrada Logo"
-                  className="w-full h-full object-contain rounded-lg"
-                />
+            <Link to="/" className="flex items-center gap-2">
+              <div className="bg-sky-500 p-1.5 rounded-lg">
+                <RiCopperCoinLine className="text-white text-xl" />
               </div>
-              <div className="flex flex-col">
-                <h3 className="text-white text-xl font-black tracking-tighter leading-none">
-                  ABRADA-BIOTECH
-                </h3>
-                <span className="text-[9px] font-bold text-[#FFD600] uppercase tracking-[0.2em] mt-1">
-                  ENGINEERING & VENTURES
-                </span>
-              </div>
-            </Link>
-
-            <p className="text-sm leading-relaxed text-gray-400">
-              Leading Nigeria's shift to sustainable waste management through
-              advanced anaerobic biotechnology. Turning waste into wealth.
-            </p>
-
-            <div className="pt-2">
-              <span className="flex items-center gap-2 text-[10px] bg-green-900/30 text-green-400 px-3 py-1 rounded-full border border-green-800 font-bold uppercase tracking-widest w-fit">
-                <HiOutlineShieldCheck className="text-xs" />
-                CAC: BN 8941617
+              <span className="text-xl font-bold text-white uppercase tracking-wider">
+                Aurelius
               </span>
+            </Link>
+            <p className="text-gray-500 text-sm leading-relaxed">
+              Global headquarters in Zurich, Switzerland. Empowering private
+              investors with institutional-grade AI trading technology since
+              2018.
+            </p>
+            <div className="flex gap-4 text-gray-400">
+              <FaTwitter className="hover:text-sky-400 cursor-pointer transition-colors" />
+              <FaTelegramPlane className="hover:text-sky-400 cursor-pointer transition-colors" />
+              <FaLinkedinIn className="hover:text-sky-400 cursor-pointer transition-colors" />
+              <FaInstagram className="hover:text-sky-400 cursor-pointer transition-colors" />
             </div>
           </div>
 
-          {/* Column 2: Quick Navigation */}
+          {/* Quick Links */}
           <div>
-            <h4 className="text-white font-bold mb-6 uppercase text-xs tracking-widest border-l-2 border-[#FFD600] pl-3">
-              Navigation
-            </h4>
-            <ul className="space-y-4 text-sm font-medium">
+            <h4 className="text-white font-bold mb-6">Platform</h4>
+            <ul className="space-y-4 text-sm text-gray-500">
               <li>
                 <Link
-                  to="/"
-                  className="hover:text-[#FFD600] transition-colors flex items-center gap-2"
+                  to="/invest"
+                  className="hover:text-sky-400 transition-colors"
                 >
-                  <span className="w-1.5 h-1.5 bg-green-800 rounded-full"></span>
-                  Home Experience
+                  Investment Tiers
                 </Link>
               </li>
               <li>
                 <Link
-                  to="/projects"
-                  className="hover:text-[#FFD600] transition-colors flex items-center gap-2"
+                  to="/academy"
+                  className="hover:text-sky-400 transition-colors"
                 >
-                  <span className="w-1.5 h-1.5 bg-green-800 rounded-full"></span>
-                  Technical Projects
+                  Aurelius Academy
                 </Link>
               </li>
+              <li>
+                <Link
+                  to="/markets"
+                  className="hover:text-sky-400 transition-colors"
+                >
+                  Live Markets
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/security"
+                  className="hover:text-sky-400 transition-colors"
+                >
+                  Security Protocol
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* Company */}
+          <div>
+            <h4 className="text-white font-bold mb-6">Company</h4>
+            <ul className="space-y-4 text-sm text-gray-500">
               <li>
                 <Link
                   to="/about"
-                  className="hover:text-[#FFD600] transition-colors flex items-center gap-2"
+                  className="hover:text-sky-400 transition-colors"
                 >
-                  <span className="w-1.5 h-1.5 bg-green-800 rounded-full"></span>
-                  About the Proprietor
+                  About Us
                 </Link>
               </li>
               <li>
                 <Link
-                  to="/training"
-                  className="hover:text-[#FFD600] transition-colors flex items-center gap-2"
+                  to="/careers"
+                  className="hover:text-sky-400 transition-colors"
                 >
-                  <span className="w-1.5 h-1.5 bg-green-800 rounded-full"></span>
-                  Training Academy
+                  Careers
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/legal"
+                  className="hover:text-sky-400 transition-colors"
+                >
+                  Terms of Service
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/privacy"
+                  className="hover:text-sky-400 transition-colors"
+                >
+                  Privacy Policy
                 </Link>
               </li>
             </ul>
           </div>
 
-          {/* Column 3: Contact & Support */}
+          {/* Contact Info */}
           <div>
-            <h4 className="text-white font-bold mb-6 uppercase text-xs tracking-widest border-l-2 border-[#FFD600] pl-3">
-              Contact Office
-            </h4>
-            <ul className="space-y-4 text-sm">
-              <li className="flex items-start gap-3">
-                <HiOutlineLocationMarker className="text-[#FFD600] text-xl mt-0.5 shrink-0" />
-                <span className="text-gray-400">
-                  20, Ogie Street, Off Akure Road, Benin City, Edo State.
-                </span>
-              </li>
-              <li className="flex items-center gap-3">
-                <HiOutlinePhone className="text-[#FFD600] text-lg shrink-0" />
-                <span className="text-gray-400">08053311594 • 08135700782</span>
-              </li>
-              <li className="flex items-center gap-3">
-                <HiOutlineMail className="text-[#FFD600] text-lg shrink-0" />
-                <span className="text-gray-400 break-all">
-                  abradabiotechnology@gmail.com
-                </span>
+            <h4 className="text-white font-bold mb-6">Global Support</h4>
+            <ul className="space-y-4 text-sm text-gray-500">
+              <li>support@aurelius.capital</li>
+              <li>+41 44 123 45 67</li>
+              <li className="pt-2">
+                <div className="bg-white/5 border border-white/10 p-4 rounded-xl">
+                  <p className="text-[10px] text-sky-400 font-bold uppercase mb-1">
+                    Status
+                  </p>
+                  <p className="text-white font-medium text-xs">
+                    All Systems Operational
+                  </p>
+                </div>
               </li>
             </ul>
           </div>
-
-          {/* Column 4: Legal & Tax */}
-          <div className="bg-white/5 p-6 rounded-2xl border border-white/10 hover:border-[#FFD600]/30 transition-colors">
-            <h4 className="text-white font-bold mb-4 uppercase text-[10px] tracking-widest">
-              Legal Verification
-            </h4>
-            <div className="space-y-4">
-              <div>
-                <p className="text-[9px] text-gray-500 uppercase font-black tracking-wider">
-                  Tax Identification (TIN)
-                </p>
-                <p className="text-sm font-mono text-[#FFD600] mt-0.5">
-                  33641157-0001
-                </p>
-              </div>
-              <div className="pt-2 border-t border-white/5">
-                <p className="text-[9px] text-gray-500 uppercase font-black tracking-wider">
-                  Registration Body
-                </p>
-                <p className="text-[11px] text-gray-200 uppercase mt-0.5 font-bold">
-                  Fed. Republic of Nigeria (CAC)
-                </p>
-              </div>
-            </div>
-          </div>
         </div>
 
-        {/* Bottom Bar */}
-        <div className="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center text-[10px] uppercase tracking-[0.2em] font-bold text-gray-600 text-center md:text-left">
-          <p>© {currentYear} Abrada-Biotech Enterprise. All Rights Reserved.</p>
-          <p className="mt-4 md:mt-0">
-            Engineered by{" "}
-            <span className="text-gray-400">
-              WELLINGTON OLUWASEGUN AKITIKORI
-            </span>
+        {/* Risk Disclaimer - Crucial for Financial Design */}
+        <div className="pt-8 border-t border-white/5 text-[11px] text-gray-600 leading-relaxed text-center">
+          <p className="max-w-5xl mx-auto">
+            RISK DISCLOSURE: Trading foreign exchange, cryptocurrencies, and
+            other digital assets on margin carries a high level of risk and may
+            not be suitable for all investors. Past performance is not
+            indicative of future results. Aurelius Capital is an AI-driven
+            management platform and does not guarantee profits. Please consult
+            with a financial advisor before allocating capital.
+          </p>
+          <p className="mt-6 font-medium uppercase tracking-[0.2em]">
+            &copy; {currentYear} Aurelius Capital Management. All Rights
+            Reserved.
           </p>
         </div>
       </div>

@@ -1,109 +1,96 @@
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { HiMenuAlt3, HiX } from "react-icons/hi";
+import { RiCopperCoinLine } from "react-icons/ri"; // Example Logo Icon
 
 const Navbar = () => {
-  const [isOpen, setIsOpen] = useState(false);
+  const [nav, setNav] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const links = [
+    { name: "Home", path: "/" },
+    { name: "Portfolios", path: "/portfolio" },
+    { name: "Academy", path: "/academy" },
+    { name: "Company", path: "/about" },
+  ];
 
   return (
-    <nav className="bg-white shadow-sm sticky top-0 z-50 border-b border-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-20 items-center">
-          {/* LOGO SECTION */}
-          <Link
-            to="/"
-            className="flex items-center gap-3 group focus:outline-none"
-          >
-            <div className="w-10 h-10 md:w-12 md:h-12 bg-green-50 rounded-xl flex items-center justify-center p-1 group-hover:bg-[#FFD600] transition-colors duration-300">
-              {/* If you have the image in assets, use: src="/logo.png" or your imported variable */}
-              <img
-                src="/logo.png"
-                alt="Abrada Biotech Logo"
-                className="w-full h-full object-contain rounded-lg"
-              />
-            </div>
-            <div className="flex flex-col">
-              <span className="text-lg md:text-xl font-black text-[#1B4332] leading-none tracking-tight">
-                ABRADA-BIOTECH
-              </span>
-              <span className="text-[8px] md:text-[9px] font-bold text-gray-400 tracking-[0.2em] uppercase">
-                ENGINEERING & VENTURES
-              </span>
-            </div>
-          </Link>
+    <nav
+      className={`fixed w-full z-[100] transition-all duration-500 ${scrolled ? "bg-[#05070A]/90 backdrop-blur-lg border-b border-white/5 py-3" : "bg-transparent py-5"}`}
+    >
+      <div className="max-w-7xl mx-auto px-6 flex justify-between items-center">
+        {/* Logo Section */}
+        <Link to="/" className="flex items-center gap-2 group">
+          <div className="bg-sky-500 p-1.5 rounded-lg group-hover:rotate-12 transition-transform">
+            <RiCopperCoinLine className="text-white text-2xl" />
+          </div>
+          <span className="text-xl font-bold tracking-tight text-white uppercase">
+            Aurelius
+          </span>
+        </Link>
 
-          {/* DESKTOP MENU */}
-          <div className="hidden lg:flex items-center space-x-10">
-            {["Home", "Projects", "About", "Contact"].map((item) => (
+        {/* Desktop Navigation */}
+        <ul className="hidden md:flex items-center space-x-10">
+          {links.map((link) => (
+            <li key={link.name}>
               <Link
-                key={item}
-                to={item === "Home" ? "/" : `/${item.toLowerCase()}`}
-                className="text-sm font-bold text-gray-500 hover:text-[#1B4332] transition-all relative group"
+                to={link.path}
+                className="text-sm font-medium text-gray-400 hover:text-sky-400 transition-colors"
               >
-                {item}
-                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-[#FFD600] transition-all group-hover:w-full"></span>
+                {link.name}
               </Link>
-            ))}
-            <Link
-              to="/training"
-              className="bg-[#1B4332] text-[#FFD600] px-6 py-2.5 rounded-full text-sm font-black tracking-wide hover:bg-green-800 transition shadow-md hover:shadow-xl active:scale-95"
-            >
-              ENROLL NOW
-            </Link>
-          </div>
+            </li>
+          ))}
+          <Link
+            to="/register"
+            className="bg-white text-black px-6 py-2.5 rounded-full text-sm font-bold hover:bg-sky-400 hover:text-white transition-all"
+          >
+            Get Started
+          </Link>
+        </ul>
 
-          {/* MOBILE MENU BUTTON */}
-          <div className="lg:hidden">
-            <button
-              onClick={() => setIsOpen(!isOpen)}
-              className="text-[#1B4332] p-2 focus:outline-none"
-            >
-              <div className="w-6 h-5 flex flex-col justify-between items-end relative">
-                <span
-                  className={`h-0.5 bg-[#1B4332] transition-all duration-300 ${
-                    isOpen ? "w-6 rotate-45 translate-y-2" : "w-6"
-                  }`}
-                ></span>
-                <span
-                  className={`h-0.5 bg-[#1B4332] transition-all duration-300 ${
-                    isOpen ? "opacity-0" : "w-4"
-                  }`}
-                ></span>
-                <span
-                  className={`h-0.5 bg-[#1B4332] transition-all duration-300 ${
-                    isOpen ? "w-6 -rotate-45 -translate-y-2.5" : "w-5"
-                  }`}
-                ></span>
-              </div>
-            </button>
-          </div>
+        {/* Mobile Menu Button */}
+        <div
+          className="md:hidden text-white z-[110]"
+          onClick={() => setNav(!nav)}
+        >
+          {nav ? <HiX size={28} /> : <HiMenuAlt3 size={28} />}
         </div>
       </div>
 
-      {/* MOBILE DROPDOWN */}
+      {/* Mobile Menu - Top to Bottom Slide */}
       <div
-        className={`lg:hidden bg-white border-t border-gray-100 transition-all duration-500 ease-in-out ${
-          isOpen ? "max-h-[500px] opacity-100" : "max-h-0 opacity-0"
-        } overflow-hidden`}
+        className={`fixed top-0 left-0 w-full bg-[#05070A] transition-all duration-500 ease-in-out z-[105] flex flex-col items-center justify-center overflow-hidden ${nav ? "h-screen opacity-100" : "h-0 opacity-0"}`}
       >
-        <div className="p-6 space-y-4">
-          {["Home", "Projects", "About", "Contact"].map((item) => (
-            <Link
-              key={item}
-              onClick={() => setIsOpen(false)}
-              to={item === "Home" ? "/" : `/${item.toLowerCase()}`}
-              className="block text-xl font-bold text-gray-800 hover:text-[#1B4332]"
+        <ul className="flex flex-col items-center space-y-8">
+          {links.map((link) => (
+            <li
+              key={link.name}
+              className={`transform transition-all duration-700 delay-150 ${nav ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"}`}
             >
-              {item}
-            </Link>
+              <Link
+                to={link.path}
+                onClick={() => setNav(false)}
+                className="text-4xl font-semibold text-white hover:text-sky-500"
+              >
+                {link.name}
+              </Link>
+            </li>
           ))}
-          <Link
-            onClick={() => setIsOpen(false)}
-            to="/training"
-            className="block bg-[#1B4332] text-[#FFD600] p-4 rounded-2xl text-center font-black tracking-widest"
+          <li
+            className={`pt-6 transform transition-all duration-700 delay-300 ${nav ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"}`}
           >
-            START TRAINING
-          </Link>
-        </div>
+            <button className="bg-sky-500 text-white px-12 py-4 rounded-full text-xl font-bold">
+              Join Aurelius
+            </button>
+          </li>
+        </ul>
       </div>
     </nav>
   );
