@@ -13,7 +13,6 @@ import { Toaster } from "react-hot-toast";
 import DashboardLayout from "./layouts/DashboardLayout";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
-
 // Pages
 import Home from "./pages/public/Home";
 import Login from "./pages/public/Login";
@@ -41,6 +40,10 @@ import Portfolio from "./pages/public/Portfolio";
 import About from "./pages/public/About";
 import Academy from "./pages/public/Academy";
 import ScrollToTop from "./components/ScrollToTop";
+import CopyTradingPage from "./components/CopyTradingPage";
+import InvestmentPlans from "./components/InvestmentPlans";
+import AMLPolicy from "./components/AMLPolicy";
+import FAQ from "./components/FAQ";
 
 // --- PUBLIC LAYOUT WRAPPER ---
 const PublicLayout = () => (
@@ -119,6 +122,10 @@ function App() {
             <Route path="/portfolio" element={<Portfolio />} />
             <Route path="/about" element={<About />} />
             <Route path="/academy" element={<Academy />} />
+            <Route path="/copy-trading" element={<CopyTradingPage />} />
+            <Route path="/plans" element={<InvestmentPlans />} />
+            <Route path="/aml-policy" element={<AMLPolicy />} />
+            <Route path="/faqs" element={<FAQ />} />
           </Route>
 
           {/* 2. USER DASHBOARD ROUTES */}

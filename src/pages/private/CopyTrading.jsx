@@ -7,7 +7,7 @@ import {
   HiOutlineCheckCircle,
 } from "react-icons/hi2";
 
-const CopyTrading = () => {
+const CopyTradingPage = () => {
   const [myCopies, setMyCopies] = useState([]);
 
   const masterTraders = [
@@ -216,4 +216,4 @@ const CopyTrading = () => {
   );
 };
 
-export default CopyTrading;
+export default CopyTradingPage;

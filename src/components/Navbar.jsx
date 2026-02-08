@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { HiMenuAlt3, HiX } from "react-icons/hi";
-import { RiCopperCoinLine } from "react-icons/ri"; // Example Logo Icon
+import { HiMenuAlt2, HiX } from "react-icons/hi"; // Using Alt2 for a left-aligned feel
+import { RiCopperCoinLine } from "react-icons/ri";
 
 const Navbar = () => {
   const [nav, setNav] = useState(false);
@@ -13,86 +13,118 @@ const Navbar = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  // Updated link list with your new agenda
   const links = [
     { name: "Home", path: "/" },
     { name: "Portfolios", path: "/portfolio" },
+    { name: "Copy Trading", path: "/copy-trading" },
+    { name: "Investment Plans", path: "/plans" },
     { name: "Academy", path: "/academy" },
+    { name: "Insurance", path: "/insurance" },
+    { name: "AML Policy", path: "/aml-policy" },
+    { name: "FAQs", path: "/faqs" },
     { name: "Company", path: "/about" },
+    { name: "Contact", path: "/contact" },
   ];
 
   return (
-    <nav
-      className={`fixed w-full z-[100] transition-all duration-500 ${scrolled ? "bg-[#05070A]/90 backdrop-blur-lg border-b border-white/5 py-3" : "bg-transparent py-5"}`}
-    >
-      <div className="max-w-7xl mx-auto px-6 flex justify-between items-center">
-        {/* Logo Section */}
-        <Link to="/" className="flex items-center gap-2 group">
-          <div className="bg-sky-500 p-1.5 rounded-lg group-hover:rotate-12 transition-transform">
-            <RiCopperCoinLine className="text-white text-2xl" />
-          </div>
-          <span className="text-xl font-bold tracking-tight text-white uppercase">
-            Aurelius
-          </span>
-        </Link>
-
-        {/* Desktop Navigation */}
-        <ul className="hidden md:flex items-center space-x-10">
-          {links.map((link) => (
-            <li key={link.name}>
-              <Link
-                to={link.path}
-                className="text-sm font-medium text-gray-400 hover:text-sky-400 transition-colors"
-              >
-                {link.name}
-              </Link>
-            </li>
-          ))}
-          <Link
-            to="/register"
-            className="bg-white text-black px-6 py-2.5 rounded-full text-sm font-bold hover:bg-sky-400 hover:text-white transition-all"
-          >
-            Get Started
-          </Link>
-        </ul>
-
-        {/* Mobile Menu Button */}
-        <div
-          className="md:hidden text-white z-[110]"
-          onClick={() => setNav(!nav)}
-        >
-          {nav ? <HiX size={28} /> : <HiMenuAlt3 size={28} />}
-        </div>
-      </div>
-
-      {/* Mobile Menu - Top to Bottom Slide */}
-      <div
-        className={`fixed top-0 left-0 w-full bg-[#05070A] transition-all duration-500 ease-in-out z-[105] flex flex-col items-center justify-center overflow-hidden ${nav ? "h-screen opacity-100" : "h-0 opacity-0"}`}
+    <>
+      {/* 1. MAIN NAVIGATION BAR (Static Top) */}
+      <nav
+        className={`fixed w-full z-[100] transition-all duration-500 ${
+          scrolled || nav
+            ? "bg-[#05070A]/90 backdrop-blur-lg border-b border-white/5 py-4"
+            : "bg-transparent py-6"
+        }`}
       >
-        <ul className="flex flex-col items-center space-y-8">
-          {links.map((link) => (
-            <li
-              key={link.name}
-              className={`transform transition-all duration-700 delay-150 ${nav ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"}`}
-            >
-              <Link
-                to={link.path}
-                onClick={() => setNav(false)}
-                className="text-4xl font-semibold text-white hover:text-sky-500"
-              >
-                {link.name}
-              </Link>
-            </li>
-          ))}
-          <li
-            className={`pt-6 transform transition-all duration-700 delay-300 ${nav ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"}`}
+        <div className="max-w-7xl mx-auto px-6 flex justify-between items-center">
+          {/* Logo */}
+          <Link to="/" className="flex items-center gap-2 group z-[110]">
+            <div className="bg-sky-500 p-1.5 rounded-lg group-hover:rotate-12 transition-transform">
+              <RiCopperCoinLine className="text-white text-2xl" />
+            </div>
+            <span className="text-xl font-black tracking-tighter text-white uppercase italic">
+              Aurelius
+            </span>
+          </Link>
+
+          {/* Toggle Button - Visible on all screens */}
+          <button
+            onClick={() => setNav(!nav)}
+            className="text-white z-[110] p-2 hover:bg-white/5 rounded-full transition-all"
           >
-            <button className="bg-sky-500 text-white px-12 py-4 rounded-full text-xl font-bold">
-              Join Aurelius
-            </button>
-          </li>
-        </ul>
-      </div>
-    </nav>
+            {nav ? <HiX size={30} /> : <HiMenuAlt2 size={30} />}
+          </button>
+        </div>
+      </nav>
+
+      {/* 2. SIDEBAR OVERLAY (The Background Dimmer) */}
+      <div
+        className={`fixed inset-0 bg-black/60 backdrop-blur-sm z-[101] transition-opacity duration-500 ${
+          nav
+            ? "opacity-100 pointer-events-auto"
+            : "opacity-0 pointer-events-none"
+        }`}
+        onClick={() => setNav(false)}
+      />
+
+      {/* 3. SIDEBAR DRAWER (Slides from Left) */}
+      <aside
+        className={`fixed top-0 left-0 h-screen w-full md:w-[450px] bg-[#05070A] border-r border-white/5 z-[102] transition-transform duration-700 ease-[cubic-bezier(0.77,0,0.175,1)] ${
+          nav ? "translate-x-0" : "-translate-x-full"
+        }`}
+      >
+        <div className="flex flex-col h-full p-10 pt-32">
+          <p className="text-[10px] font-black text-sky-500 uppercase tracking-[0.4em] mb-10">
+            Navigation Protocol
+          </p>
+
+          <ul className="space-y-4 overflow-y-auto no-scrollbar pb-10">
+            {links.map((link, i) => (
+              <li
+                key={link.name}
+                style={{ transitionDelay: `${i * 50}ms` }}
+                className={`transform transition-all duration-700 ${
+                  nav
+                    ? "translate-x-0 opacity-100"
+                    : "-translate-x-10 opacity-0"
+                }`}
+              >
+                <Link
+                  to={link.path}
+                  onClick={() => setNav(false)}
+                  className="text-3xl md:text-4xl font-black text-white/40 hover:text-white hover:italic transition-all flex items-center gap-4 group"
+                >
+                  <span className="text-xs font-mono text-sky-500/40 group-hover:text-sky-500 italic">
+                    0{i + 1}
+                  </span>
+                  {link.name}
+                </Link>
+              </li>
+            ))}
+          </ul>
+
+          {/* Sidebar Footer */}
+          <div
+            className={`mt-auto pt-10 border-t border-white/5 transition-all duration-700 delay-500 ${
+              nav ? "opacity-100" : "opacity-0"
+            }`}
+          >
+            <Link
+              to="/register"
+              onClick={() => setNav(false)}
+              className="block w-full bg-white text-black py-5 rounded-2xl text-center font-black uppercase text-xs tracking-widest hover:bg-sky-500 transition-all"
+            >
+              Start Trading Now
+            </Link>
+            <div className="mt-6 flex justify-between text-[9px] font-black text-gray-600 uppercase tracking-widest">
+              <span>V3.0 ALPHA PROTOCOL</span>
+              <span>© 2026</span>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </>
   );
 };
 

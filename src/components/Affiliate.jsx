@@ -10,11 +10,11 @@ const Affiliate = () => {
           <HiOutlineUserGroup className="absolute -right-10 -bottom-10 text-white/2 text-[300px] pointer-events-none" />
 
           <div className="flex-1 space-y-6">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[10px] font-bold uppercase tracking-widest">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-sky-500 text-[10px] font-bold uppercase tracking-widest">
               Partnership Program
             </div>
             <h3 className="text-4xl md:text-5xl font-bold text-white leading-tight">
-              Earn <span className="text-emerald-400 text-6xl">6%</span> <br />
+              Earn <span className="text-sky-500 text-6xl">6%</span> <br />
               in Passive Rewards.
             </h3>
             <p className="text-gray-400 text-lg">
@@ -23,11 +23,11 @@ const Affiliate = () => {
               successful portfolio allocation in your circle.
             </p>
             <div className="flex flex-wrap gap-4 pt-4">
-              <button className="bg-emerald-500 hover:bg-emerald-400 text-black px-8 py-4 rounded-xl font-bold transition-all shadow-lg shadow-emerald-500/10">
+              <button className="bg-sky-500 hover:bg-sky-500 text-black px-8 py-4 rounded-xl font-bold transition-all shadow-lg shadow-emerald-500/10">
                 Get Referral Link
               </button>
               <div className="flex items-center gap-3 text-white/60 px-4">
-                <HiOutlineCurrencyDollar className="text-emerald-400 text-2xl" />
+                <HiOutlineCurrencyDollar className="text-sky-500 text-2xl" />
                 <span className="text-sm font-medium">
                   Instant Payouts to Wallet
                 </span>

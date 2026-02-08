@@ -1,63 +1,91 @@
 import React from "react";
 import {
   HiOutlineShieldCheck,
-  HiOutlineLightBulb,
+  HiOutlineCpuChip, // Changed for a more tech feel
   HiOutlineGlobeAlt,
-  HiOutlineArrowTrendingUp, // Corrected name for hi2
+  HiOutlineChartBar, // Changed for a terminal feel
 } from "react-icons/hi2";
 
 const features = [
   {
-    title: "Military-Grade Security",
-    desc: "Your assets are shielded by multi-sig cold storage and end-to-end encryption protocols.",
-    icon: <HiOutlineShieldCheck className="text-sky-400" />,
-    bg: "bg-sky-500/5",
+    title: "Institutional Security",
+    desc: "Your capital is shielded by multi-sig cold storage and enterprise-grade end-to-end encryption protocols.",
+    icon: <HiOutlineShieldCheck />,
+    tag: "Secured",
   },
   {
-    title: "AI-Driven Insights",
-    desc: "Proprietary neural networks analyze 24/7 market sentiment to identify high-yield opportunities.",
-    icon: <HiOutlineLightBulb className="text-emerald-400" />,
-    bg: "bg-emerald-500/5",
+    title: "Alpha Intelligence",
+    desc: "Proprietary neural networks analyze global market sentiment 24/7 to identify high-probability entry points.",
+    icon: <HiOutlineCpuChip />,
+    tag: "AI-Powered",
   },
   {
     title: "Global Compliance",
-    desc: "Fully regulated frameworks ensure your investments are handled with absolute transparency.",
-    icon: <HiOutlineGlobeAlt className="text-purple-400" />,
-    bg: "bg-purple-500/5",
+    desc: "Operating within fully regulated frameworks to ensure absolute transparency and investor protection.",
+    icon: <HiOutlineGlobeAlt />,
+    tag: "Regulated",
   },
   {
-    title: "Compound Growth",
-    desc: "Our automated rebalancing engine optimizes your portfolio to maximize long-term wealth.",
-    icon: <HiOutlineArrowTrendingUp className="text-amber-400" />, // Updated here
-    bg: "bg-amber-500/5",
+    title: "Neural Rebalancing",
+    desc: "Our automated engine optimizes your portfolio in real-time, capturing growth while mitigating downside risk.",
+    icon: <HiOutlineChartBar />,
+    tag: "High Yield",
   },
 ];
 
 const Features = () => {
   return (
-    <section className="py-24 bg-[#05070A] px-6">
+    <section className="py-32 bg-[#05070A] px-6 relative overflow-hidden">
+      {/* Background visual element */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+
       <div className="max-w-7xl mx-auto">
-        <div className="text-center mb-20">
-          <h2 className="text-sky-400 font-bold uppercase tracking-widest text-sm mb-4">
-            Why Aurelius?
-          </h2>
-          <h3 className="text-4xl md:text-5xl font-bold text-white max-w-2xl mx-auto leading-tight">
-            Built for the modern investor who demands{" "}
-            <span className="text-gray-500">superior performance.</span>
-          </h3>
+        <div className="flex flex-col lg:flex-row lg:items-end justify-between mb-20 gap-8">
+          <div className="space-y-4">
+            <h2 className="text-sky-500 font-black uppercase tracking-[0.4em] text-[10px]">
+              The Alpha Protocol
+            </h2>
+            <h3 className="text-4xl md:text-6xl font-black text-white leading-[0.9] uppercase italic tracking-tighter">
+              Engineered for <br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-500">
+                Performance.
+              </span>
+            </h3>
+          </div>
+          <p className="max-w-md text-gray-500 text-sm font-medium leading-relaxed border-l border-white/10 pl-8">
+            Aurelius provides the infrastructure of the elite. Move away from
+            retail noise and execute with the precision of a Tier-1 institution.
+          </p>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-px bg-white/5 border border-white/5 rounded-[2rem] overflow-hidden">
           {features.map((f, i) => (
             <div
               key={i}
-              className={`p-8 rounded-3xl border border-white/5 ${f.bg} hover:border-white/10 transition-all group`}
+              className="p-10 bg-[#05070A] hover:bg-white/[0.02] transition-all duration-500 group relative"
             >
-              <div className="text-4xl mb-6 transform group-hover:scale-110 transition-transform">
-                {f.icon}
+              {/* Top Row: Icon & Tag */}
+              <div className="flex justify-between items-start mb-12">
+                <div className="text-sky-500 text-3xl group-hover:scale-110 transition-transform duration-500">
+                  {f.icon}
+                </div>
+                <span className="font-mono text-[9px] font-black text-gray-600 uppercase tracking-widest border border-white/10 px-2 py-1 rounded">
+                  {f.tag}
+                </span>
               </div>
-              <h4 className="text-xl font-bold text-white mb-3">{f.title}</h4>
-              <p className="text-gray-500 leading-relaxed text-sm">{f.desc}</p>
+
+              {/* Text Content */}
+              <div className="space-y-4">
+                <h4 className="text-lg font-black text-white uppercase italic tracking-tight group-hover:text-sky-500 transition-colors">
+                  {f.title}
+                </h4>
+                <p className="text-gray-500 leading-relaxed text-xs font-medium">
+                  {f.desc}
+                </p>
+              </div>
+
+              {/* Hover Decoration */}
+              <div className="absolute bottom-0 left-0 w-0 h-1 bg-sky-500 group-hover:w-full transition-all duration-700" />
             </div>
           ))}
         </div>

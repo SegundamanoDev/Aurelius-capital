@@ -1,29 +1,58 @@
 import React from "react";
+import {
+  HiOutlineArrowRight,
+  HiOutlineChatBubbleLeftRight,
+} from "react-icons/hi2";
 
 const FinalCTA = () => {
   return (
-    <section className="py-20 bg-[#05070A] px-6">
-      <div className="max-w-5xl mx-auto relative overflow-hidden rounded-[40px] bg-linear-to-r from-sky-600 to-indigo-600 p-12 md:p-20 text-center">
-        {/* Background Decorative Circles */}
-        <div className="absolute top-0 left-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2" />
-        <div className="absolute bottom-0 right-0 w-64 h-64 bg-black/20 rounded-full blur-3xl translate-x-1/2 translate-y-1/2" />
+    <section className="py-32 bg-[#05070A] px-6 relative overflow-hidden">
+      {/* Subtle Background Glows to maintain depth */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] bg-sky-500/5 blur-[120px] rounded-full" />
 
-        <div className="relative z-10">
-          <h2 className="text-3xl md:text-5xl font-bold text-white mb-6">
-            Ready to redefine your <br className="hidden md:block" /> financial
-            future?
-          </h2>
-          <p className="text-sky-100 text-lg mb-10 max-w-xl mx-auto opacity-90">
-            Join over 124,000 investors leveraging our proprietary AI to build
-            sustainable, long-term wealth.
-          </p>
-          <div className="flex flex-col sm:flex-row justify-center gap-4">
-            <button className="bg-white text-sky-600 px-10 py-4 rounded-xl font-bold text-lg hover:bg-opacity-90 transition-all shadow-xl">
-              Get Started Now
-            </button>
-            <button className="bg-sky-700/30 backdrop-blur-md border border-sky-400/30 text-white px-10 py-4 rounded-xl font-bold text-lg hover:bg-sky-700/50 transition-all">
-              Contact Advisor
-            </button>
+      <div className="max-w-6xl mx-auto relative group">
+        {/* The Outer Border Glow Effect */}
+        <div className="absolute -inset-px bg-gradient-to-r from-sky-500/20 via-indigo-500/20 to-emerald-500/20 rounded-[3rem] blur-sm opacity-50 group-hover:opacity-100 transition-opacity duration-1000" />
+
+        {/* Main Card Container */}
+        <div className="relative overflow-hidden rounded-[3rem] bg-[#0A0C10] border border-white/5 p-12 md:p-24 text-center">
+          {/* Decorative Grid Pattern Overlay */}
+          <div
+            className="absolute inset-0 opacity-[0.03] pointer-events-none"
+            style={{
+              backgroundImage: `url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='1' fill-rule='evenodd'%3E%3Cpath d='M0 40L40 0H20L0 20M40 40V20L20 40'/%3E%3C/g%3E%3C/svg%3E")`,
+            }}
+          />
+
+          <div className="relative z-10 space-y-8">
+            <h2 className="text-4xl md:text-7xl font-black text-white leading-[0.85] uppercase italic tracking-tighter">
+              Ready to redefine your <br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-indigo-400">
+                financial future?
+              </span>
+            </h2>
+
+            <p className="text-gray-500 text-sm md:text-lg max-w-2xl mx-auto font-medium leading-relaxed">
+              Join <span className="text-white">124,000+ investors</span>{" "}
+              utilizing the Alpha Protocol to navigate volatility and secure
+              institutional-grade returns in the digital age.
+            </p>
+
+            <div className="flex flex-col sm:flex-row justify-center items-center gap-6 pt-6">
+              <button className="group w-full sm:w-auto bg-white text-black px-12 py-5 rounded-2xl font-black uppercase text-[11px] tracking-[0.2em] hover:bg-sky-500 transition-all active:scale-95 flex items-center justify-center gap-3 shadow-2xl shadow-sky-500/10">
+                Get Started Now{" "}
+                <HiOutlineArrowRight className="group-hover:translate-x-1 transition-transform" />
+              </button>
+
+              <button className="w-full sm:w-auto bg-white/5 border border-white/10 text-white px-12 py-5 rounded-2xl font-black uppercase text-[11px] tracking-[0.2em] hover:bg-white/10 transition-all backdrop-blur-md flex items-center justify-center gap-3">
+                <HiOutlineChatBubbleLeftRight size={18} /> Contact Advisor
+              </button>
+            </div>
+
+            {/* Subtle disclaimer below buttons */}
+            <p className="pt-8 text-[9px] text-gray-700 font-black uppercase tracking-[0.3em]">
+              Aurelius Alpha Terminal • Secured Access Only
+            </p>
           </div>
         </div>
       </div>
