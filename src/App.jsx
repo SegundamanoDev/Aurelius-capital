@@ -44,6 +44,7 @@ import CopyTradingPage from "./components/CopyTradingPage";
 import InvestmentPlans from "./components/InvestmentPlans";
 import AMLPolicy from "./components/AMLPolicy";
 import FAQ from "./components/FAQ";
+import MadeToTradeVideo from "./pages/private/Invest";
 
 // --- PUBLIC LAYOUT WRAPPER ---
 const PublicLayout = () => (
@@ -138,7 +139,7 @@ function App() {
             }
           >
             <Route index element={<DashboardHome />} />
-            <Route path="trade" element={<Invest />} />
+            <Route path="trade" element={<MadeToTradeVideo />} />
             <Route path="profile" element={<Profile />} />
             <Route path="deposit" element={<Deposit />} />
             <Route path="withdraw" element={<Withdraw />} />

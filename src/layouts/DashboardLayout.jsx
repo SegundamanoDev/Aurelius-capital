@@ -1,5 +1,7 @@
 import React, { useState } from "react";
-import { Link, Outlet, useLocation } from "react-router-dom";
+import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
+import { logOut } from "../features/authSlice";
 import {
   HiOutlineHome,
   HiOutlineCreditCard,
@@ -16,6 +18,23 @@ import { HiOutlineArrowsRightLeft } from "react-icons/hi2";
 const DashboardLayout = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  // 1. Pull real user data from Redux
+  const { user } = useSelector((state) => state.auth);
+
+  // 2. Helper to get user initials (e.g., "John Doe" -> "JD")
+  const getInitials = () => {
+    if (!user) return "??";
+    return `${user.firstName?.charAt(0) || ""}${user.lastName?.charAt(0) || ""}`.toUpperCase();
+  };
+
+  // 3. Handle Logout
+  const handleLogout = () => {
+    dispatch(logOut());
+    navigate("/login");
+  };
 
   const menuItems = [
     { name: "Overview", icon: <HiOutlineHome />, path: "/dashboard" },
@@ -54,11 +73,7 @@ const DashboardLayout = () => {
     <div className="flex h-screen bg-[#020408] text-white overflow-hidden relative">
       {/* --- SIDEBAR --- */}
       <aside
-        className={`
-        fixed inset-y-0 left-0 z-100 w-64 bg-[#05070A] border-r border-white/5 transition-transform duration-300 transform
-        md:relative md:translate-x-0
-        ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"}
-      `}
+        className={`fixed inset-y-0 left-0 z-[100] w-64 bg-[#05070A] border-r border-white/5 transition-transform duration-300 transform md:relative md:translate-x-0 ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"}`}
       >
         <div className="p-6 flex items-center justify-between border-b border-white/5">
           <h1 className="text-xl font-bold bg-gradient-to-r from-sky-400 to-emerald-400 bg-clip-text text-transparent">
@@ -77,21 +92,17 @@ const DashboardLayout = () => {
                 key={item.name}
                 to={item.path}
                 onClick={() => setSidebarOpen(false)}
-                className={`flex items-center gap-4 p-4 rounded-xl transition-all font-medium group ${
-                  isActive
-                    ? "bg-sky-500/10 text-sky-400 border border-sky-500/20"
-                    : "text-gray-500 hover:bg-white/5 hover:text-white"
-                }`}
+                className={`flex items-center gap-4 p-4 rounded-xl transition-all font-medium group ${isActive ? "bg-sky-500/10 text-sky-400 border border-sky-500/20" : "text-gray-500 hover:bg-white/5 hover:text-white"}`}
               >
                 <span
-                  className={`text-xl transition-colors ${isActive ? "text-sky-400" : "group-hover:text-white"}`}
+                  className={`text-xl ${isActive ? "text-sky-400" : "group-hover:text-white"}`}
                 >
                   {item.icon}
                 </span>
                 <span className="text-sm">{item.name}</span>
-                {item.name === "Upgrade" && (
+                {item.name === "Upgrade" && user?.accountType === "vip" && (
                   <span className="ml-auto text-[8px] bg-emerald-500/20 text-emerald-400 px-1.5 py-0.5 rounded font-black uppercase">
-                    Pro
+                    VIP
                   </span>
                 )}
               </Link>
@@ -100,7 +111,10 @@ const DashboardLayout = () => {
         </nav>
 
         <div className="p-4 border-t border-white/5">
-          <button className="w-full flex items-center gap-4 p-4 text-red-400 hover:bg-red-500/5 rounded-xl transition-all group">
+          <button
+            onClick={handleLogout}
+            className="w-full flex items-center gap-4 p-4 text-red-400 hover:bg-red-500/5 rounded-xl transition-all group"
+          >
             <HiOutlineLogout
               size={24}
               className="group-hover:scale-110 transition-transform"
@@ -121,7 +135,8 @@ const DashboardLayout = () => {
               <HiMenuAlt3 size={24} />
             </button>
             <h2 className="hidden sm:block text-xs font-black uppercase tracking-[0.2em] text-gray-500">
-              Terminal <span className="text-sky-500/50">//</span> Institutional
+              Terminal <span className="text-sky-500/50">//</span>{" "}
+              {user?.accountType || "User"}
             </h2>
           </div>
 
@@ -130,10 +145,15 @@ const DashboardLayout = () => {
               <p className="text-[9px] text-gray-500 uppercase font-black tracking-widest">
                 Net Equity
               </p>
-              <p className="text-sky-400 font-bold text-sm">$12,450.00</p>
+              <p className="text-sky-400 font-bold text-sm">
+                $
+                {(user?.balance || 0).toLocaleString(undefined, {
+                  minimumFractionDigits: 2,
+                })}
+              </p>
             </div>
             <div className="h-10 w-10 rounded-full bg-gradient-to-tr from-sky-500 to-emerald-500 flex items-center justify-center font-bold text-white shadow-lg shadow-sky-500/20 text-xs">
-              JD
+              {getInitials()}
             </div>
           </div>
         </header>
@@ -147,7 +167,7 @@ const DashboardLayout = () => {
 
       {isSidebarOpen && (
         <div
-          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-90 md:hidden"
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[90] md:hidden"
           onClick={toggleSidebar}
         />
       )}

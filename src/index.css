@@ -47,3 +47,6 @@ html {
 .animate-in {
   animation: fadeIn 0.8s ease-out forwards;
 }
+.input {
+  @apply w-full bg-black/40 border border-white/10 p-4 rounded-xl text-white text-sm outline-none focus:border-sky-500 transition-all;
+}

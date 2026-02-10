@@ -1,27 +1,53 @@
 import React from "react";
-import { useSelector, useDispatch } from "react-redux";
-// Assume your userSlice/adminSlice has these actions
-// import { approveDeposit, approveWithdrawal } from '../../features/adminSlice';
+import {
+  useGetAllUsersQuery,
+  useGetAllTransactionsQuery,
+  useUpdateTransactionStatusMutation,
+} from "../../api/apiSlice";
+import toast from "react-hot-toast";
 
 const AdminDashboard = () => {
-  const { allUsers } = useSelector((state) => state.admin);
+  // 1. Fetch Real Data
+  const { data: allUsers = [], isLoading: usersLoading } =
+    useGetAllUsersQuery();
+  const { data: allTransactions = [], isLoading: txLoading } =
+    useGetAllTransactionsQuery();
+  const [updateStatus] = useUpdateTransactionStatusMutation();
 
-  // Example Stat Calculation
-  const totalBalance = allUsers.reduce((sum, u) => sum + u.balance, 0);
-  const pendingDeposits = 12; // This would come from your real state
-  const pendingWithdrawals = 5;
+  // 2. Real Calculations
+  const totalBalance = allUsers.reduce((sum, u) => sum + (u.balance || 0), 0);
+  const pendingDeposits = allTransactions.filter(
+    (tx) => tx.type === "deposit" && tx.status === "pending",
+  );
+  const pendingWithdrawals = allTransactions.filter(
+    (tx) => tx.type === "withdrawal" && tx.status === "pending",
+  );
+
+  const handleStatusUpdate = async (id, status) => {
+    try {
+      await updateStatus({ transactionId: id, status }).unwrap();
+      toast.success(`Transaction ${status}`);
+    } catch (err) {
+      toast.error("Failed to update status");
+    }
+  };
+
+  if (usersLoading || txLoading)
+    return (
+      <div className="p-10 text-white italic uppercase font-black">
+        Syncing Terminal Data...
+      </div>
+    );
 
   return (
     <div className="space-y-8 animate-in fade-in duration-700">
-      <div className="flex items-end justify-between">
-        <div>
-          <h1 className="text-3xl font-black text-white uppercase tracking-tighter">
-            Command Center
-          </h1>
-          <p className="text-gray-500 text-sm">
-            Real-time oversight of all platform liquidity and user actions.
-          </p>
-        </div>
+      <div>
+        <h1 className="text-3xl font-black text-white uppercase tracking-tighter">
+          Command Center
+        </h1>
+        <p className="text-gray-500 text-sm">
+          Real-time platform liquidity oversight.
+        </p>
       </div>
 
       {/* Summary Cards */}
@@ -39,20 +65,20 @@ const AdminDashboard = () => {
           },
           {
             label: "Pending Deposits",
-            val: pendingDeposits,
+            val: pendingDeposits.length,
             color: "text-amber-500",
           },
           {
             label: "Pending Withdrawals",
-            val: pendingWithdrawals,
+            val: pendingWithdrawals.length,
             color: "text-red-500",
           },
         ].map((stat, i) => (
           <div
             key={i}
-            className="bg-[#05070A] border border-white/5 p-6 rounded-3xl shadow-xl"
+            className="bg-[#05070A] border border-white/5 p-6 rounded-3xl"
           >
-            <p className="text-[10px] text-gray-500 font-black uppercase tracking-[0.2em]">
+            <p className="text-[10px] text-gray-500 font-black uppercase tracking-widest">
               {stat.label}
             </p>
             <h2 className={`text-2xl font-black mt-2 ${stat.color}`}>
@@ -63,7 +89,7 @@ const AdminDashboard = () => {
       </div>
 
       <div className="grid lg:grid-cols-2 gap-8">
-        {/* ACTION: Approve Deposits */}
+        {/* ACTION: Deposits */}
         <div className="bg-[#05070A] border border-white/5 rounded-[2.5rem] p-6">
           <h3 className="text-white font-bold mb-6 flex items-center justify-between">
             Awaiting Confirmation (Deposits)
@@ -72,29 +98,44 @@ const AdminDashboard = () => {
             </span>
           </h3>
           <div className="space-y-4">
-            {/* Map through pending deposits from state */}
-            <div className="flex items-center justify-between p-4 bg-white/5 rounded-2xl border border-white/5 hover:border-sky-500/30 transition-all">
-              <div>
-                <p className="text-sm font-bold text-white uppercase">
-                  John Doe
-                </p>
-                <p className="text-[10px] text-gray-500">
-                  Requested: $5,000.00 (BTC)
-                </p>
+            {pendingDeposits.map((tx) => (
+              <div
+                key={tx._id}
+                className="flex items-center justify-between p-4 bg-white/5 rounded-2xl border border-white/5"
+              >
+                <div>
+                  <p className="text-sm font-bold text-white uppercase">
+                    {tx.user?.name || "Unknown"}
+                  </p>
+                  <p className="text-[10px] text-gray-500">
+                    ${tx.amount.toLocaleString()} via {tx.method}
+                  </p>
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => handleStatusUpdate(tx._id, "completed")}
+                    className="px-4 py-2 bg-emerald-500 text-black text-[10px] font-black uppercase rounded-lg"
+                  >
+                    Approve
+                  </button>
+                  <button
+                    onClick={() => handleStatusUpdate(tx._id, "failed")}
+                    className="px-4 py-2 bg-white/5 text-white text-[10px] font-black uppercase rounded-lg"
+                  >
+                    Reject
+                  </button>
+                </div>
               </div>
-              <div className="flex gap-2">
-                <button className="px-4 py-2 bg-emerald-500 text-black text-[10px] font-black uppercase rounded-lg">
-                  Approve
-                </button>
-                <button className="px-4 py-2 bg-white/5 text-white text-[10px] font-black uppercase rounded-lg">
-                  Reject
-                </button>
-              </div>
-            </div>
+            ))}
+            {pendingDeposits.length === 0 && (
+              <p className="text-gray-600 text-xs italic">
+                No pending deposits.
+              </p>
+            )}
           </div>
         </div>
 
-        {/* ACTION: Approve Withdrawals */}
+        {/* ACTION: Withdrawals */}
         <div className="bg-[#05070A] border border-white/5 rounded-[2.5rem] p-6">
           <h3 className="text-white font-bold mb-6 flex items-center justify-between">
             Withdrawal Claims
@@ -103,19 +144,33 @@ const AdminDashboard = () => {
             </span>
           </h3>
           <div className="space-y-4">
-            <div className="flex items-center justify-between p-4 bg-white/5 rounded-2xl border border-white/5">
-              <div>
-                <p className="text-sm font-bold text-white uppercase">
-                  Sarah Smith
-                </p>
-                <p className="text-[10px] text-gray-500">
-                  Payout: $1,200.00 (PayPal)
-                </p>
+            {pendingWithdrawals.map((tx) => (
+              <div
+                key={tx._id}
+                className="flex items-center justify-between p-4 bg-white/5 rounded-2xl border border-white/5"
+              >
+                <div>
+                  <p className="text-sm font-bold text-white uppercase">
+                    {tx.user?.name || "Unknown"}
+                  </p>
+                  <p className="text-[10px] text-gray-500">
+                    ${tx.amount.toLocaleString()} to{" "}
+                    {tx.walletAddress || tx.method}
+                  </p>
+                </div>
+                <button
+                  onClick={() => handleStatusUpdate(tx._id, "completed")}
+                  className="px-4 py-2 bg-sky-500 text-black text-[10px] font-black uppercase rounded-lg"
+                >
+                  Confirm Payout
+                </button>
               </div>
-              <button className="px-4 py-2 bg-sky-500 text-black text-[10px] font-black uppercase rounded-lg">
-                Confirm Payout
-              </button>
-            </div>
+            ))}
+            {pendingWithdrawals.length === 0 && (
+              <p className="text-gray-600 text-xs italic">
+                No pending withdrawals.
+              </p>
+            )}
           </div>
         </div>
       </div>

@@ -1,5 +1,7 @@
 import React, { useState } from "react";
-import { Link, Outlet, useLocation } from "react-router-dom";
+import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux"; // Added
+// ... existing icons ...
 import {
   HiOutlineSquares2X2,
   HiOutlineUsers,
@@ -8,13 +10,23 @@ import {
   HiOutlineClipboardDocumentList,
   HiBars3,
   HiOutlineChartBarSquare,
-  HiOutlineCircleStack, // New Icon for Ledger
+  HiOutlineCircleStack,
+  HiOutlinePower, // Added for logout
 } from "react-icons/hi2";
-import { HiMenuAlt3 } from "react-icons/hi";
+import { HiOutlineMenuAlt3 } from "react-icons/hi";
 
 const AdminLayout = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
+
+  // 1. Get Auth State from Redux
+  const { user } = useSelector((state) => state.auth);
+
+  // 2. Initial logic for the avatar
+  const initials = user
+    ? `${user.firstName?.charAt(0)}${user.lastName?.charAt(0)}`.toUpperCase()
+    : "??";
 
   const menuItems = [
     { name: "Admin Console", icon: <HiOutlineSquares2X2 />, path: "/admin" },
@@ -23,7 +35,7 @@ const AdminLayout = () => {
       name: "Financial Ledger",
       icon: <HiOutlineCircleStack />,
       path: "/admin/ledger",
-    }, // NEW
+    },
     {
       name: "Master Traders",
       icon: <HiOutlineChartBarSquare />,
@@ -48,13 +60,7 @@ const AdminLayout = () => {
 
   return (
     <div className="flex h-screen bg-[#020408] text-white overflow-hidden font-sans">
-      {/* Mobile Sidebar Overlay */}
-      {isSidebarOpen && (
-        <div
-          className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[100] md:hidden"
-          onClick={() => setSidebarOpen(false)}
-        />
-      )}
+      {/* ... Mobile Sidebar Overlay remains same ... */}
 
       {/* SIDEBAR */}
       <aside
@@ -65,14 +71,9 @@ const AdminLayout = () => {
             AURELIUS{" "}
             <span className="text-white/20 not-italic font-light">|</span> ADMIN
           </span>
-          <button
-            className="md:hidden text-gray-400"
-            onClick={() => setSidebarOpen(false)}
-          >
-            <HiBars3 size={24} />
-          </button>
         </div>
-        <nav className="p-4 space-y-1.5 overflow-y-auto h-[calc(100vh-80px)] scrollbar-hide">
+
+        <nav className="p-4 space-y-1.5 overflow-y-auto h-[calc(100vh-160px)] scrollbar-hide">
           {menuItems.map((item) => (
             <Link
               key={item.name}
@@ -85,6 +86,19 @@ const AdminLayout = () => {
             </Link>
           ))}
         </nav>
+
+        {/* LOGOUT BUTTON IN SIDEBAR */}
+        <div className="absolute bottom-0 left-0 w-full p-4 border-t border-white/5 bg-[#05070A]">
+          <button
+            onClick={() => {
+              /* Add logout logic here */
+            }}
+            className="flex items-center gap-4 w-full p-3.5 rounded-xl text-[13px] font-bold text-red-500 hover:bg-red-500/10 transition-all"
+          >
+            <HiOutlinePower className="text-xl" />
+            Terminal Logout
+          </button>
+        </div>
       </aside>
 
       {/* MAIN CONTENT AREA */}
@@ -94,21 +108,23 @@ const AdminLayout = () => {
             className="md:hidden p-2.5 bg-white/5 rounded-xl text-sky-500"
             onClick={() => setSidebarOpen(true)}
           >
-            <HiMenuAlt3 size={24} />
+            <HiOutlineMenuAlt3 size={24} />
           </button>
 
           <div className="flex items-center gap-4 ml-auto">
             <div className="hidden sm:block text-right">
               <p className="text-[9px] text-gray-500 font-black uppercase tracking-widest">
-                Node Status
+                Operator
               </p>
-              <p className="text-emerald-500 text-[11px] font-bold flex items-center justify-end gap-1.5">
-                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                Operational
+              <p className="text-white text-[11px] font-bold">
+                {user
+                  ? `${user.firstName} ${user.lastName}`
+                  : "Authenticated Node"}
               </p>
             </div>
-            <div className="h-10 w-10 rounded-xl bg-linear-to-br from-sky-500 to-indigo-600 flex items-center justify-center font-black text-black shadow-lg shadow-sky-500/20">
-              AD
+            {/* REAL USER INITIALS */}
+            <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-sky-500 to-indigo-600 flex items-center justify-center font-black text-black shadow-lg shadow-sky-500/20">
+              {initials}
             </div>
           </div>
         </header>

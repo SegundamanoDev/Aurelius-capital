@@ -1,5 +1,7 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useRegisterMutation } from "../../api/apiSlice";
+import toast from "react-hot-toast";
 import {
   HiOutlineUser,
   HiOutlineLockClosed,
@@ -11,16 +13,77 @@ import {
 
 const Register = () => {
   const [step, setStep] = useState(1);
+  const navigate = useNavigate();
+  const [register, { isLoading, error }] = useRegisterMutation();
 
-  // Grouped Currencies for cleaner selection
+  // State for all fields
+  const [formData, setFormData] = useState({
+    username: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+    firstName: "",
+    middleName: "",
+    lastName: "",
+    sex: "Male",
+    maritalStatus: "Single",
+    address: "",
+    occupation: "",
+    currency: "USD",
+  });
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  // ... inside your Register component ...
+
+  const handleSubmit = async () => {
+    // 1. Frontend Check (This works fine)
+    if (formData.password !== formData.confirmPassword) {
+      toast.error("Passwords do not match!", {
+        style: { background: "#161B26", color: "#fff" },
+      });
+      return;
+    }
+
+    // 2. Reshape the data
+    const payload = {
+      firstName: formData.firstName,
+      lastName: formData.lastName,
+      middleName: formData.middleName,
+      email: formData.email,
+      password: formData.password,
+      confirmPassword: formData.confirmPassword, // <--- ADD THIS LINE
+      sex: formData.sex.toLowerCase(),
+      maritalStatus: formData.maritalStatus.toLowerCase(),
+      occupation: formData.occupation,
+      address: {
+        street: formData.address || "N/A",
+        city: "N/A",
+        state: "N/A",
+        country: "N/A",
+        zipCode: "N/A",
+      },
+    };
+
+    // 3. Fire the API call
+    toast.promise(register(payload).unwrap(), {
+      loading: "Initializing Secure Account...",
+      success: () => {
+        navigate("/login");
+        return <b>Account Created! Please Sign In.</b>;
+      },
+      error: (err) => {
+        // If it still fails, this will show the specific error from the backend
+        return `${err?.data?.message || "Registration failed"}`;
+      },
+    });
+  };
   const currencies = [
     { country: "America", code: "USD", symbol: "$" },
     { country: "United Kingdom", code: "GBP", symbol: "£" },
-    { country: "Euro Zone", code: "EUR", symbol: "€" },
     { country: "Nigeria", code: "NGN", symbol: "₦" },
-    { country: "Canada", code: "CAD", symbol: "$" },
-    { country: "Australia", code: "AUD", symbol: "$" },
-    // Add others from your list as needed
   ];
 
   return (
@@ -36,150 +99,174 @@ const Register = () => {
           ))}
         </div>
 
-        <div className="mb-10 text-center md:text-left">
-          <h1 className="text-3xl font-black text-white tracking-tighter uppercase">
-            Create Account
-          </h1>
-          <p className="text-gray-500 text-sm mt-2">
-            Join the elite trading circle at Aurelius Capital.
-          </p>
-        </div>
+        {error && (
+          <div className="mb-4 text-red-500 text-xs font-bold uppercase text-center p-3 bg-red-500/5 rounded-lg border border-red-500/20">
+            {error?.data?.message || "Registration Failed"}
+          </div>
+        )}
 
         <form className="space-y-6">
-          {/* STEP 1: SECURITY & IDENTITY */}
           {step === 1 && (
-            <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-500">
+            <div className="space-y-4 animate-in fade-in slide-in-from-right-4">
               <div className="grid md:grid-cols-2 gap-4">
                 <InputGroup
                   label="Username"
+                  name="username"
                   icon={<HiOutlineUser />}
-                  placeholder="johndoe_trader"
+                  value={formData.username}
+                  onChange={handleChange}
+                  placeholder="johndoe"
                 />
                 <InputGroup
                   label="Email Address"
-                  icon={<HiOutlineEnvelope />}
+                  name="email"
                   type="email"
+                  icon={<HiOutlineEnvelope />}
+                  value={formData.email}
+                  onChange={handleChange}
                   placeholder="john@example.com"
                 />
               </div>
               <div className="grid md:grid-cols-2 gap-4">
                 <InputGroup
                   label="Password"
-                  icon={<HiOutlineLockClosed />}
+                  name="password"
                   type="password"
+                  icon={<HiOutlineLockClosed />}
+                  value={formData.password}
+                  onChange={handleChange}
                   placeholder="••••••••"
                 />
                 <InputGroup
                   label="Confirm Password"
-                  icon={<HiOutlineLockClosed />}
+                  name="confirmPassword"
                   type="password"
+                  icon={<HiOutlineLockClosed />}
+                  value={formData.confirmPassword}
+                  onChange={handleChange}
                   placeholder="••••••••"
                 />
               </div>
             </div>
           )}
 
-          {/* STEP 2: PERSONAL PROFILING */}
           {step === 2 && (
-            <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-500">
+            <div className="space-y-4 animate-in fade-in slide-in-from-right-4">
               <div className="grid md:grid-cols-3 gap-4">
-                <InputGroup label="First Name" placeholder="John" />
-                <InputGroup label="Middle Name" placeholder="Quincy" />
-                <InputGroup label="Last Name" placeholder="Doe" />
+                <InputGroup
+                  label="First Name"
+                  name="firstName"
+                  value={formData.firstName}
+                  onChange={handleChange}
+                />
+                <InputGroup
+                  label="Middle Name"
+                  name="middleName"
+                  value={formData.middleName}
+                  onChange={handleChange}
+                />
+                <InputGroup
+                  label="Last Name"
+                  name="lastName"
+                  value={formData.lastName}
+                  onChange={handleChange}
+                />
               </div>
               <div className="grid md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <label className="text-[10px] text-gray-500 font-black uppercase tracking-widest">
-                    Sex
-                  </label>
-                  <select className="w-full bg-black/40 border border-white/10 p-4 rounded-xl text-white outline-none focus:border-sky-500 transition-all">
-                    <option>Male</option>
-                    <option>Female</option>
-                    <option>Other</option>
-                  </select>
-                </div>
-                <div className="space-y-2">
-                  <label className="text-[10px] text-gray-500 font-black uppercase tracking-widest">
-                    Marital Status
-                  </label>
-                  <select className="w-full bg-black/40 border border-white/10 p-4 rounded-xl text-white outline-none focus:border-sky-500 transition-all">
-                    <option>Single</option>
-                    <option>Married</option>
-                  </select>
-                </div>
+                <SelectGroup
+                  label="Sex"
+                  name="sex"
+                  options={["Male", "Female", "Other"]}
+                  value={formData.sex}
+                  onChange={handleChange}
+                />
+                <SelectGroup
+                  label="Marital Status"
+                  name="maritalStatus"
+                  options={["Single", "Married"]}
+                  value={formData.maritalStatus}
+                  onChange={handleChange}
+                />
               </div>
             </div>
           )}
 
-          {/* STEP 3: ADDRESS & FINANCIALS */}
           {step === 3 && (
-            <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-500">
+            <div className="space-y-4 animate-in fade-in slide-in-from-right-4">
               <InputGroup
                 label="Physical Address"
+                name="address"
                 icon={<HiOutlineMapPin />}
-                placeholder="123 Wall Street, NY"
+                value={formData.address}
+                onChange={handleChange}
               />
               <div className="grid md:grid-cols-2 gap-4">
                 <InputGroup
-                  label="Occupation / Work"
+                  label="Occupation"
+                  name="occupation"
                   icon={<HiOutlineBriefcase />}
-                  placeholder="Software Engineer"
+                  value={formData.occupation}
+                  onChange={handleChange}
                 />
                 <div className="space-y-2">
                   <label className="text-[10px] text-gray-500 font-black uppercase tracking-widest">
                     Base Currency
                   </label>
-                  <div className="relative">
-                    <HiOutlineGlobeAlt className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" />
-                    <select className="w-full bg-black/40 border border-white/10 p-4 pl-12 rounded-xl text-white outline-none focus:border-sky-500 transition-all appearance-none">
-                      {currencies.map((c) => (
-                        <option key={c.code} value={c.code}>
-                          {c.country} - {c.code} ({c.symbol})
-                        </option>
-                      ))}
-                    </select>
-                  </div>
+                  <select
+                    name="currency"
+                    onChange={handleChange}
+                    value={formData.currency}
+                    className="w-full bg-black/40 border border-white/10 p-4 rounded-xl text-white outline-none appearance-none"
+                  >
+                    {currencies.map((c) => (
+                      <option key={c.code} value={c.code}>
+                        {c.country} ({c.symbol})
+                      </option>
+                    ))}
+                  </select>
                 </div>
               </div>
             </div>
           )}
 
-          {/* Navigation Buttons */}
           <div className="flex gap-4 pt-6">
             {step > 1 && (
               <button
                 type="button"
                 onClick={() => setStep(step - 1)}
-                className="flex-1 py-4 bg-white/5 hover:bg-white/10 text-white font-bold rounded-2xl border border-white/10 transition-all"
+                className="flex-1 py-4 bg-white/5 text-white font-bold rounded-2xl border border-white/10"
               >
                 Back
               </button>
             )}
             <button
               type="button"
-              onClick={() =>
-                step < 3 ? setStep(step + 1) : alert("Account Created!")
-              }
-              className="flex-[2] py-4 bg-sky-500 hover:bg-sky-400 text-black font-black uppercase tracking-widest rounded-2xl shadow-lg shadow-sky-500/20 transition-all"
+              disabled={isLoading}
+              onClick={() => (step < 3 ? setStep(step + 1) : handleSubmit())}
+              className="flex-[2] py-4 bg-sky-500 text-black font-black uppercase rounded-2xl"
             >
-              {step === 3 ? "Complete Registration" : "Continue"}
+              {isLoading
+                ? "Processing..."
+                : step === 3
+                  ? "Complete Registration"
+                  : "Continue"}
             </button>
           </div>
         </form>
-
-        <p className="text-center mt-8 text-sm text-gray-500">
-          Already have an account?{" "}
-          <Link to="/login" className="text-sky-400 font-bold hover:underline">
-            Sign In
-          </Link>
-        </p>
       </div>
     </div>
   );
 };
 
-// Reusable Small Input Component
-const InputGroup = ({ label, icon, type = "text", placeholder }) => (
+const InputGroup = ({
+  label,
+  name,
+  icon,
+  type = "text",
+  value,
+  onChange,
+  placeholder,
+}) => (
   <div className="space-y-2 text-left">
     <label className="text-[10px] text-gray-500 font-black uppercase tracking-widest">
       {label}
@@ -192,10 +279,33 @@ const InputGroup = ({ label, icon, type = "text", placeholder }) => (
       )}
       <input
         type={type}
+        name={name}
+        value={value}
+        onChange={onChange}
         placeholder={placeholder}
-        className={`w-full bg-black/40 border border-white/10 p-4 ${icon ? "pl-12" : "px-4"} rounded-xl text-white text-sm outline-none focus:border-sky-500 transition-all placeholder:text-gray-700`}
+        className={`w-full bg-black/40 border border-white/10 p-4 ${icon ? "pl-12" : "px-4"} rounded-xl text-white outline-none focus:border-sky-500`}
       />
     </div>
+  </div>
+);
+
+const SelectGroup = ({ label, name, options, value, onChange }) => (
+  <div className="space-y-2">
+    <label className="text-[10px] text-gray-500 font-black uppercase tracking-widest">
+      {label}
+    </label>
+    <select
+      name={name}
+      value={value}
+      onChange={onChange}
+      className="w-full bg-black/40 border border-white/10 p-4 rounded-xl text-white outline-none"
+    >
+      {options.map((opt) => (
+        <option key={opt} value={opt}>
+          {opt}
+        </option>
+      ))}
+    </select>
   </div>
 );
 

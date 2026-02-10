@@ -1,83 +1,53 @@
 import React, { useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
+import { useGetMyTransactionsQuery } from "../../api/apiSlice";
 import {
   HiOutlineArrowTrendingUp,
   HiOutlineWallet,
   HiOutlineClock,
   HiOutlineArrowsRightLeft,
 } from "react-icons/hi2";
+import MarketTrading from "../../components/MarketSummary";
 
 const DashboardHome = () => {
   const container = useRef();
 
-  // Pulling real data from the Redux store we created
-  const { balance, activeInvestments, pendingWithdrawals, transactions } =
-    useSelector(
-      (state) =>
-        state.user || {
-          balance: 0,
-          activeInvestments: 0,
-          pendingWithdrawals: 0,
-          transactions: [],
-        },
-    );
+  // 1. Pull User data from the correct Redux state (auth)
+  const { user } = useSelector((state) => state.auth);
 
+  // 2. Fetch real transactions from the API
+  const { data: transactionsData, isLoading: txLoading } =
+    useGetMyTransactionsQuery();
+  const transactions = transactionsData || [];
+
+  // 3. Map real data to stats
+  // We use optional chaining (?.) in case data hasn't loaded yet
   const stats = [
     {
       label: "Total Balance",
-      value: `$${balance.toLocaleString(undefined, { minimumFractionDigits: 2 })}`,
+      value: `$${(user?.balance || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}`,
       subText: "Available for trade",
       icon: <HiOutlineWallet className="text-sky-400" size={24} />,
       color: "border-sky-500/20",
       glow: "shadow-sky-500/5",
     },
     {
-      label: "Active Investment",
-      value: `$${activeInvestments.toLocaleString(undefined, { minimumFractionDigits: 2 })}`,
-      subText: "Generating Returns",
+      label: "Trading Balance",
+      value: `$${(user?.tradingBalance || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}`,
+      subText: "Active in Market",
       icon: <HiOutlineArrowTrendingUp className="text-emerald-400" size={24} />,
       color: "border-emerald-500/20",
       glow: "shadow-emerald-500/5",
     },
     {
-      label: "Pending Withdrawal",
-      value: `$${pendingWithdrawals.toLocaleString(undefined, { minimumFractionDigits: 2 })}`,
-      subText: "Awaiting Approval",
+      label: "Staked Amount",
+      value: `$${(user?.stakedAmount || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}`,
+      subText: "Yield Generation",
       icon: <HiOutlineClock className="text-amber-400" size={24} />,
       color: "border-amber-500/20",
       glow: "shadow-amber-500/5",
     },
   ];
-
-  useEffect(() => {
-    // Inject TradingView Widget
-    const script = document.createElement("script");
-    script.src =
-      "https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js";
-    script.type = "text/javascript";
-    script.async = true;
-    script.innerHTML = JSON.stringify({
-      autosize: true,
-      symbol: "BINANCE:BTCUSDT",
-      interval: "D",
-      timezone: "Etc/UTC",
-      theme: "dark",
-      style: "1",
-      locale: "en",
-      enable_publishing: false,
-      hide_side_toolbar: false,
-      allow_symbol_change: true,
-      container_id: "tradingview_chart",
-    });
-
-    if (container.current) {
-      container.current.appendChild(script);
-    }
-
-    return () => {
-      if (container.current) container.current.innerHTML = "";
-    };
-  }, []);
 
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-1000">
@@ -140,18 +110,7 @@ const DashboardHome = () => {
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
         {/* TradingView Integrated Chart */}
         <div className="lg:col-span-3 bg-[#05070A] border border-white/5 rounded-3xl p-1 h-[600px] shadow-2xl overflow-hidden relative group">
-          <div className="absolute top-6 left-6 z-20 pointer-events-none">
-            <div className="bg-black/40 backdrop-blur-md border border-white/10 px-4 py-2 rounded-lg">
-              <p className="text-[10px] text-sky-400 font-black uppercase tracking-widest">
-                Advanced Charting
-              </p>
-            </div>
-          </div>
-          <div
-            id="tradingview_chart"
-            className="h-full w-full"
-            ref={container}
-          ></div>
+          <MarketTrading />
         </div>
 
         {/* Real-time Activity Feed */}
@@ -166,43 +125,51 @@ const DashboardHome = () => {
 
             <div className="space-y-6 flex-1 overflow-y-auto custom-scrollbar pr-2">
               {transactions.length > 0 ? (
-                transactions.map((tx) => (
-                  <div
-                    key={tx.id}
-                    className="flex items-center justify-between group cursor-default"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div
-                        className={`h-10 w-10 rounded-xl flex items-center justify-center border border-white/5 ${tx.amount > 0 ? "bg-emerald-500/10 text-emerald-500" : "bg-sky-500/10 text-sky-400"}`}
-                      >
-                        {tx.type === "Investment" ? (
-                          <HiOutlineArrowTrendingUp size={18} />
-                        ) : (
-                          <HiOutlineWallet size={18} />
-                        )}
+                transactions.slice(0, 5).map(
+                  (
+                    tx, // Show only last 5
+                  ) => (
+                    <div
+                      key={tx._id}
+                      className="flex items-center justify-between group cursor-default"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div
+                          className={`h-10 w-10 rounded-xl flex items-center justify-center border border-white/5 ${
+                            tx.type === "deposit" || tx.type === "profit"
+                              ? "bg-emerald-500/10 text-emerald-500"
+                              : "bg-red-500/10 text-red-400"
+                          }`}
+                        >
+                          {tx.type === "withdrawal" ? (
+                            <HiOutlineWallet size={18} />
+                          ) : (
+                            <HiOutlineArrowTrendingUp size={18} />
+                          )}
+                        </div>
+                        <div>
+                          <p className="text-sm text-white font-semibold group-hover:text-sky-400 transition-colors capitalize">
+                            {tx.type}
+                          </p>
+                          <p className="text-[10px] text-gray-500 uppercase tracking-tighter">
+                            {new Date(tx.createdAt).toLocaleDateString()}
+                          </p>
+                        </div>
                       </div>
-                      <div>
-                        <p className="text-sm text-white font-semibold group-hover:text-sky-400 transition-colors">
-                          {tx.type}
+                      <div className="text-right">
+                        <p
+                          className={`text-sm font-bold ${tx.type === "deposit" ? "text-emerald-500" : "text-gray-300"}`}
+                        >
+                          {tx.type === "deposit" ? "+" : "-"}$
+                          {tx.amount.toLocaleString()}
                         </p>
-                        <p className="text-[10px] text-gray-500 uppercase tracking-tighter">
-                          {tx.date}
+                        <p className="text-[9px] text-gray-600 font-bold uppercase">
+                          {tx.status}
                         </p>
                       </div>
                     </div>
-                    <div className="text-right">
-                      <p
-                        className={`text-sm font-bold ${tx.amount > 0 ? "text-emerald-500" : "text-gray-300"}`}
-                      >
-                        {tx.amount > 0 ? "+" : ""}
-                        {tx.amount.toLocaleString()}
-                      </p>
-                      <p className="text-[9px] text-gray-600 font-bold uppercase">
-                        {tx.status}
-                      </p>
-                    </div>
-                  </div>
-                ))
+                  ),
+                )
               ) : (
                 <div className="h-full flex flex-col items-center justify-center opacity-20 py-20">
                   <HiOutlineArrowsRightLeft size={48} />

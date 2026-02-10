@@ -3,6 +3,7 @@ import {
   HiOutlineArrowRight,
   HiOutlineChatBubbleLeftRight,
 } from "react-icons/hi2";
+import { Link } from "react-router-dom";
 
 const FinalCTA = () => {
   return (
@@ -25,28 +26,30 @@ const FinalCTA = () => {
           />
 
           <div className="relative z-10 space-y-8">
-            <h2 className="text-4xl md:text-7xl font-black text-white leading-[0.85] uppercase italic tracking-tighter">
-              Ready to redefine your <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-indigo-400">
-                financial future?
-              </span>
+            <h2 className="text-4xl md:text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-indigo-400 leading-[0.85] uppercase italic tracking-tighter">
+              Ready to trade?
             </h2>
 
-            <p className="text-gray-500 text-sm md:text-lg max-w-2xl mx-auto font-medium leading-relaxed">
-              Join <span className="text-white">124,000+ investors</span>{" "}
-              utilizing the Alpha Protocol to navigate volatility and secure
-              institutional-grade returns in the digital age.
+            <p className="text-white text-sm md:text-lg max-w-2xl mx-auto font-medium leading-relaxed">
+              Get started with an easy-to-follow guide to trading tools or head
+              straight to Supercharts and experience the power of chart trading.
             </p>
 
             <div className="flex flex-col sm:flex-row justify-center items-center gap-6 pt-6">
-              <button className="group w-full sm:w-auto bg-white text-black px-12 py-5 rounded-2xl font-black uppercase text-[11px] tracking-[0.2em] hover:bg-sky-500 transition-all active:scale-95 flex items-center justify-center gap-3 shadow-2xl shadow-sky-500/10">
+              <Link
+                to="/register"
+                className="group w-full sm:w-auto bg-white text-black px-12 py-5 rounded-2xl font-black uppercase text-[11px] tracking-[0.2em] hover:bg-sky-500 transition-all active:scale-95 flex items-center justify-center gap-3 shadow-2xl shadow-sky-500/10"
+              >
                 Get Started Now{" "}
                 <HiOutlineArrowRight className="group-hover:translate-x-1 transition-transform" />
-              </button>
+              </Link>
 
-              <button className="w-full sm:w-auto bg-white/5 border border-white/10 text-white px-12 py-5 rounded-2xl font-black uppercase text-[11px] tracking-[0.2em] hover:bg-white/10 transition-all backdrop-blur-md flex items-center justify-center gap-3">
+              <Link
+                to="/contact"
+                className="w-full sm:w-auto bg-white/5 border border-white/10 text-white px-12 py-5 rounded-2xl font-black uppercase text-[11px] tracking-[0.2em] hover:bg-white/10 transition-all backdrop-blur-md flex items-center justify-center gap-3"
+              >
                 <HiOutlineChatBubbleLeftRight size={18} /> Contact Advisor
-              </button>
+              </Link>
             </div>
 
             {/* Subtle disclaimer below buttons */}

@@ -1,5 +1,9 @@
 import React, { useState } from "react";
-import { useSelector, useDispatch } from "react-redux";
+import {
+  useGetAllUsersQuery,
+  useUpdateUserAdminMutation,
+  useDeleteUserMutation,
+} from "../../api/apiSlice";
 import {
   HiMagnifyingGlass,
   HiOutlineAdjustmentsHorizontal,
@@ -9,47 +13,75 @@ import {
 import toast from "react-hot-toast";
 
 const AdminUserList = () => {
-  const { allUsers } = useSelector((state) => state.admin);
-  const [searchTerm, setSearchTerm] = useState("");
+  // 1. RTK Query Hooks (Replaces useSelector)
+  const { data: allUsers = [], isLoading } = useGetAllUsersQuery();
+  const [updateUser] = useUpdateUserAdminMutation();
+  const [deleteUser] = useDeleteUserMutation();
 
-  // State for Modal and Editing
+  const [searchTerm, setSearchTerm] = useState("");
   const [isEditModalOpen, setEditModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
+
+  // 2. Form State (Mapped to your Model)
   const [editFormData, setEditFormData] = useState({
-    name: "",
+    firstName: "",
+    lastName: "",
     email: "",
     balance: 0,
-    profit: 0,
-    status: "",
+    totalProfits: 0,
+    accountType: "",
   });
 
+  // Filter Logic
   const filteredUsers = allUsers.filter(
     (user) =>
-      user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      `${user.firstName} ${user.lastName}`
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase()) ||
       user.email.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
   const handleEditClick = (user) => {
     setSelectedUser(user);
     setEditFormData({
-      name: user.name,
+      firstName: user.firstName,
+      lastName: user.lastName,
       email: user.email,
       balance: user.balance,
-      profit: user.profit,
-      status: user.status || "Verified",
+      totalProfits: user.totalProfits || 0,
+      accountType: user.accountType || "demo",
     });
     setEditModalOpen(true);
   };
 
-  const handleUpdateUser = (e) => {
+  const handleUpdateUser = async (e) => {
     e.preventDefault();
-    // FUTURE BACKEND CALL:
-    // dispatch(updateUser(selectedUser.id, editFormData));
-
-    console.log("Payload for Backend:", editFormData);
-    toast.success(`Profile for ${editFormData.name} updated.`);
-    setEditModalOpen(false);
+    try {
+      await updateUser({ id: selectedUser._id, ...editFormData }).unwrap();
+      toast.success(`Account for ${editFormData.firstName} updated.`);
+      setEditModalOpen(false);
+    } catch (err) {
+      toast.error(err.data?.message || "Update failed");
+    }
   };
+
+  const handleDelete = async (id) => {
+    if (window.confirm("Purge this user? This cannot be undone.")) {
+      try {
+        await deleteUser(id).unwrap();
+        toast.success("User removed.");
+      } catch (err) {
+        toast.error("Deletion failed.");
+      }
+    }
+  };
+
+  if (isLoading)
+    return (
+      <div className="p-20 text-center text-white font-black uppercase italic animate-pulse">
+        Accessing Encrypted Records...
+      </div>
+    );
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
@@ -62,7 +94,7 @@ const AdminUserList = () => {
           <HiMagnifyingGlass className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" />
           <input
             type="text"
-            placeholder="Search investors..."
+            placeholder="Search database..."
             className="w-full bg-[#05070A] border border-white/5 p-3 pl-12 rounded-xl text-sm outline-none focus:border-sky-500 transition-all text-white"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -70,48 +102,54 @@ const AdminUserList = () => {
         </div>
       </div>
 
-      {/* TABLE CONTAINER */}
+      {/* TABLE */}
       <div className="bg-[#05070A] border border-white/5 rounded-[2rem] overflow-x-auto shadow-2xl">
         <table className="w-full text-left min-w-[700px]">
-          <thead className="bg-white/[0.02] text-[10px] text-gray-500 uppercase font-black">
+          <thead className="bg-white/[0.02] text-[10px] text-gray-500 uppercase font-black tracking-widest">
             <tr>
               <th className="p-6">Investor</th>
-              <th className="p-6">Balance</th>
-              <th className="p-6">Profit</th>
-              <th className="p-6">Status</th>
-              <th className="p-6 text-right">Actions</th>
+              <th className="p-6">Capital</th>
+              <th className="p-6">Returns</th>
+              <th className="p-6">Tier</th>
+              <th className="p-6 text-right">Terminal</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-white/5">
             {filteredUsers.map((user) => (
               <tr
-                key={user.id}
+                key={user._id}
                 className="hover:bg-white/[0.01] transition-colors group"
               >
                 <td className="p-6">
                   <div className="flex items-center gap-3">
-                    <div className="h-10 w-10 rounded-full bg-gradient-to-tr from-sky-500 to-indigo-500 flex items-center justify-center font-bold text-black text-xs shrink-0">
-                      {user.name.charAt(0)}
+                    <div className="h-10 w-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center font-bold text-sky-500 text-xs shrink-0">
+                      {user.firstName.charAt(0)}
                     </div>
                     <div className="truncate">
-                      <p className="text-sm font-bold text-white truncate">
-                        {user.name}
+                      <p className="text-sm font-bold text-white uppercase">
+                        {user.firstName} {user.lastName}
                       </p>
-                      <p className="text-[10px] text-gray-500 uppercase font-bold truncate">
+                      <p className="text-[10px] text-gray-500 uppercase font-bold">
                         {user.email}
                       </p>
                     </div>
                   </div>
                 </td>
                 <td className="p-6 font-mono text-white text-sm font-bold">
-                  ${user.balance.toLocaleString()}
+                  ${(user.balance || 0).toLocaleString()}
                 </td>
                 <td className="p-6 font-mono text-emerald-500 text-sm font-bold">
-                  ${user.profit.toLocaleString()}
+                  +${(user.totalProfits || 0).toLocaleString()}
                 </td>
                 <td className="p-6">
-                  <span className="px-3 py-1 bg-sky-500/10 text-sky-400 text-[10px] font-black rounded-full border border-sky-500/20">
-                    {user.status || "Verified"}
+                  <span
+                    className={`px-3 py-1 text-[10px] font-black rounded-full border ${
+                      user.accountType === "vip"
+                        ? "bg-amber-500/10 text-amber-500 border-amber-500/20"
+                        : "bg-sky-500/10 text-sky-400 border-sky-500/20"
+                    }`}
+                  >
+                    {user.accountType || "basic"}
                   </span>
                 </td>
                 <td className="p-6 text-right space-x-2">
@@ -121,7 +159,10 @@ const AdminUserList = () => {
                   >
                     <HiOutlineAdjustmentsHorizontal size={18} />
                   </button>
-                  <button className="p-2 text-gray-500 hover:text-red-500 transition-colors">
+                  <button
+                    onClick={() => handleDelete(user._id)}
+                    className="p-2 text-gray-500 hover:text-red-500 transition-colors"
+                  >
                     <HiOutlineTrash size={18} />
                   </button>
                 </td>
@@ -131,18 +172,17 @@ const AdminUserList = () => {
         </table>
       </div>
 
-      {/* --- EDIT USER MODAL --- */}
+      {/* EDIT USER MODAL */}
       {isEditModalOpen && (
-        <div className=" inset-0 z-[200] flex items-center justify-center p-4 bg-black/90 backdrop-blur-sm">
-          <div className="bg-[#05070A] border border-white/10 w-full max-w-lg rounded-[2.5rem] shadow-2xl relative animate-in zoom-in-95 duration-200 max-h-[95vh] flex flex-col">
-            {/* Modal Header */}
+        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/95 backdrop-blur-md">
+          <div className="bg-[#05070A] border border-white/10 w-full max-w-lg rounded-[2.5rem] shadow-2xl relative animate-in zoom-in-95 duration-200">
             <div className="p-8 pb-0 flex justify-between items-start">
               <div>
                 <h3 className="text-xl font-black text-white uppercase italic tracking-tighter">
-                  Manage Investor
+                  Override Account
                 </h3>
-                <p className="text-gray-500 text-xs mt-1">
-                  ID: {String(selectedUser?.id).toUpperCase()}
+                <p className="text-gray-500 text-[10px] uppercase font-bold mt-1">
+                  Ref: {selectedUser?._id}
                 </p>
               </div>
               <button
@@ -153,45 +193,44 @@ const AdminUserList = () => {
               </button>
             </div>
 
-            {/* Modal Body (Scrollable) */}
-            <form
-              onSubmit={handleUpdateUser}
-              className="p-8 pt-6 space-y-5 overflow-y-auto scrollbar-hide"
-            >
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <form onSubmit={handleUpdateUser} className="p-8 pt-6 space-y-5">
+              <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1">
                   <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest">
-                    Full Name
+                    First Name
                   </label>
                   <input
                     className="w-full bg-white/5 border border-white/10 p-4 rounded-xl text-white text-sm outline-none focus:border-sky-500"
-                    value={editFormData.name}
+                    value={editFormData.firstName}
                     onChange={(e) =>
-                      setEditFormData({ ...editFormData, name: e.target.value })
+                      setEditFormData({
+                        ...editFormData,
+                        firstName: e.target.value,
+                      })
                     }
                   />
                 </div>
                 <div className="space-y-1">
                   <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest">
-                    Email Address
+                    Last Name
                   </label>
                   <input
                     className="w-full bg-white/5 border border-white/10 p-4 rounded-xl text-white text-sm outline-none focus:border-sky-500"
-                    value={editFormData.email}
+                    value={editFormData.lastName}
                     onChange={(e) =>
                       setEditFormData({
                         ...editFormData,
-                        email: e.target.value,
+                        lastName: e.target.value,
                       })
                     }
                   />
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1">
                   <label className="text-[10px] font-black text-sky-500 uppercase tracking-widest">
-                    Adjust Balance ($)
+                    Capital ($)
                   </label>
                   <input
                     type="number"
@@ -207,16 +246,16 @@ const AdminUserList = () => {
                 </div>
                 <div className="space-y-1">
                   <label className="text-[10px] font-black text-emerald-500 uppercase tracking-widest">
-                    Adjust Profit ($)
+                    Profits ($)
                   </label>
                   <input
                     type="number"
                     className="w-full bg-emerald-500/5 border border-emerald-500/20 p-4 rounded-xl text-white font-mono outline-none focus:border-emerald-500"
-                    value={editFormData.profit}
+                    value={editFormData.totalProfits}
                     onChange={(e) =>
                       setEditFormData({
                         ...editFormData,
-                        profit: Number(e.target.value),
+                        totalProfits: Number(e.target.value),
                       })
                     }
                   />
@@ -225,23 +264,26 @@ const AdminUserList = () => {
 
               <div className="space-y-1">
                 <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest">
-                  Investor Status
+                  Account Tier
                 </label>
                 <select
-                  className="w-full bg-white/5 border border-white/10 p-4 rounded-xl text-white text-sm outline-none focus:border-sky-500 appearance-none"
-                  value={editFormData.status}
+                  className="w-full bg-white/5 border border-white/10 p-4 rounded-xl text-white text-sm outline-none focus:border-sky-500"
+                  value={editFormData.accountType}
                   onChange={(e) =>
-                    setEditFormData({ ...editFormData, status: e.target.value })
+                    setEditFormData({
+                      ...editFormData,
+                      accountType: e.target.value,
+                    })
                   }
                 >
-                  <option value="Verified">Verified</option>
-                  <option value="Suspended">Suspended</option>
-                  <option value="Pending KYC">Pending KYC</option>
-                  <option value="Institutional">Institutional</option>
+                  <option value="demo">Demo Account</option>
+                  <option value="basic">Basic Tier</option>
+                  <option value="silver">Silver Tier</option>
+                  <option value="gold">Gold Tier</option>
+                  <option value="vip">VIP Institutional</option>
                 </select>
               </div>
 
-              {/* Action Buttons (Sticky at bottom of form) */}
               <div className="pt-6 flex gap-3">
                 <button
                   type="button"
@@ -252,9 +294,9 @@ const AdminUserList = () => {
                 </button>
                 <button
                   type="submit"
-                  className="flex-2 py-4 px-8 bg-sky-500 text-black font-black uppercase text-[10px] tracking-widest rounded-2xl shadow-lg shadow-sky-500/20 hover:bg-sky-400 transition-all"
+                  className="flex-2 py-4 px-8 bg-sky-500 text-black font-black uppercase text-[10px] tracking-widest rounded-2xl hover:bg-sky-400 transition-all"
                 >
-                  Apply Account Updates
+                  Commit Changes
                 </button>
               </div>
             </form>
