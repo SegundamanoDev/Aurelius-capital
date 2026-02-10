@@ -1,56 +1,81 @@
-import React from "react";
+import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import toast from "react-hot-toast";
 import {
   useGetTradersQuery,
   useStartCopyingMutation,
   useStopCopyingMutation,
-} from "../../api/apiSlice"; // Adjust path as needed
+  useGetMyProfileQuery, // Added to keep user data fresh
+} from "../../api/apiSlice";
 import {
   HiOutlineUsers,
   HiOutlineArrowTrendingUp,
   HiOutlineCheckCircle,
-  HiOutlineArrowPath,
+  HiOutlineXMark,
 } from "react-icons/hi2";
 
 const CopyTradingPage = () => {
-  // 1. Get current user data from Redux to see who they are already copying
-  const { user } = useSelector((state) => state.auth);
+  // 1. Get fresh user data from the API rather than just local state
+  const { data: userProfile, isLoading: isUserLoading } =
+    useGetMyProfileQuery();
+  const { data: traders = [], isLoading: isTradersLoading } =
+    useGetTradersQuery();
 
-  // 2. RTK Query Hooks
-  const { data: traders = [], isLoading } = useGetTradersQuery();
   const [startCopying, { isLoading: isStarting }] = useStartCopyingMutation();
   const [stopCopying, { isLoading: isStopping }] = useStopCopyingMutation();
 
-  // 3. Logic: Check if a trader is in the user's copiedTraders list
+  // Allocation Modal State
+  const [showModal, setShowModal] = useState(false);
+  const [selectedTrader, setSelectedTrader] = useState(null);
+  const [allocationAmount, setAllocationAmount] = useState("");
+
   const isFollowing = (traderId) => {
-    return user?.copiedTraders?.some((t) => t.traderId === traderId);
+    return userProfile?.copiedTraders?.some((t) => t.traderId === traderId);
   };
 
-  const handleCopy = async (trader) => {
-    const amount = window.prompt(
-      `Enter amount to allocate for ${trader.name}:`,
-      "1000",
-    );
-    if (!amount || isNaN(amount)) return;
+  const handleOpenModal = (trader) => {
+    setSelectedTrader(trader);
+    setShowModal(true);
+  };
+
+  const handleConfirmCopy = async (e) => {
+    e.preventDefault();
+    const amount = Number(allocationAmount);
+
+    if (!amount || amount <= 0) {
+      return toast.error("Please enter a valid allocation amount");
+    }
+
+    if (userProfile?.tradingBalance < amount) {
+      return toast.error("Insufficient Trading Balance");
+    }
 
     try {
       await startCopying({
-        traderId: trader._id,
-        amount: Number(amount),
+        traderId: selectedTrader._id,
+        amount: amount,
       }).unwrap();
-      toast.success(`Mirroring ${trader.name}'s institutional moves!`, {
+
+      toast.success(`Strategy synchronized: Mirroring ${selectedTrader.name}`, {
         icon: "🚀",
+        style: {
+          background: "#05070A",
+          color: "#fff",
+          border: "1px solid #10b981",
+        },
       });
+
+      setShowModal(false);
+      setAllocationAmount("");
     } catch (err) {
-      toast.error(err.data?.message || "Allocation failed");
+      toast.error(err.data?.message || "Connection to strategist failed");
     }
   };
 
   const handleStop = async (traderId, name) => {
     if (
       !window.confirm(
-        `Stop mirroring ${name}? Funds will return to trading balance.`,
+        `Stop mirroring ${name}? Funds will return to your balance.`,
       )
     )
       return;
@@ -62,138 +87,155 @@ const CopyTradingPage = () => {
     }
   };
 
-  if (isLoading)
+  if (isTradersLoading || isUserLoading)
     return (
       <div className="p-20 text-center text-gray-500 animate-pulse uppercase font-black tracking-widest">
-        Initialising Social Terminal...
+        Initialising Secure Social Terminal...
       </div>
     );
 
   return (
-    <div className="space-y-10 animate-in fade-in duration-700">
-      <div>
-        <h1 className="text-3xl font-black text-white uppercase tracking-tighter italic">
-          Social <span className="text-sky-500">Terminal</span>
-        </h1>
-        <p className="text-gray-500 text-sm italic">
-          Mirror institutional moves in real-time.
-        </p>
-      </div>
+    <div className="space-y-10 p-4 md:p-8 animate-in fade-in duration-700">
+      <header className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
+        <div>
+          <h1 className="text-3xl font-black text-white uppercase tracking-tighter italic">
+            Social <span className="text-sky-500">Terminal</span>
+          </h1>
+          <p className="text-gray-500 text-sm italic">
+            Mirror institutional moves in real-time.
+          </p>
+        </div>
+        <div className="bg-white/5 border border-white/10 px-6 py-3 rounded-2xl">
+          <p className="text-[10px] text-gray-500 uppercase font-black">
+            Available Trading Pool
+          </p>
+          <p className="text-xl font-black text-emerald-500">
+            ${userProfile?.tradingBalance?.toLocaleString()}
+          </p>
+        </div>
+      </header>
 
       {/* --- SECTION: ACTIVE PORTFOLIO --- */}
-      {user?.copiedTraders?.length > 0 && (
+      {userProfile?.copiedTraders?.length > 0 && (
         <section className="animate-in slide-in-from-top-4 duration-500">
-          <div className="bg-[#05070A] border border-sky-500/20 rounded-[2rem] overflow-hidden shadow-2xl shadow-sky-500/5">
-            <div className="p-6 border-b border-white/5 bg-sky-500/5 flex justify-between items-center">
+          <div className="bg-[#05070A] border border-sky-500/20 rounded-[2.5rem] overflow-hidden shadow-2xl">
+            <div className="p-6 border-b border-white/5 bg-sky-500/5">
               <h2 className="text-white font-black uppercase text-[10px] tracking-widest flex items-center gap-2">
-                <span className="h-2 w-2 rounded-full bg-sky-500 animate-ping" />
-                Live Mirroring Terminal
+                <span className="h-2 w-2 rounded-full bg-sky-500 animate-pulse" />
+                Your Active Strategists ({userProfile.copiedTraders.length})
               </h2>
-              <div className="text-right">
-                <p className="text-[8px] text-gray-500 uppercase font-black">
-                  Trading Balance
-                </p>
-                <p className="text-xs font-bold text-sky-400">
-                  ${user?.tradingBalance?.toLocaleString()}
-                </p>
-              </div>
             </div>
-
-            <table className="w-full text-left">
-              <thead className="text-[9px] text-gray-500 uppercase font-black bg-white/[0.01]">
-                <tr>
-                  <th className="p-5">Strategist</th>
-                  <th className="p-5">Allocated</th>
-                  <th className="p-5">Status</th>
-                  <th className="p-5 text-right">Action</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-white/5">
-                {user.copiedTraders.map((copy) => {
-                  const traderDetails = traders.find(
-                    (t) => t._id === copy.traderId,
-                  );
-                  return (
-                    <tr
-                      key={copy.traderId}
-                      className="hover:bg-white/[0.01] transition-colors group"
-                    >
-                      <td className="p-5">
-                        <span className="text-sm font-bold text-white uppercase italic">
-                          {traderDetails?.name || "Active Strategist"}
-                        </span>
-                      </td>
-                      <td className="p-5 font-mono text-xs text-emerald-500">
-                        ${copy.amountAllocated?.toLocaleString()}
-                      </td>
-                      <td className="p-5">
-                        <span className="text-[9px] font-black text-sky-500 uppercase bg-sky-500/10 px-2 py-1 rounded">
-                          Mirroring Live
-                        </span>
-                      </td>
-                      <td className="p-5 text-right">
-                        <button
-                          disabled={isStopping}
-                          onClick={() =>
-                            handleStop(copy.traderId, traderDetails?.name)
-                          }
-                          className="px-4 py-2 bg-red-500/10 text-red-500 rounded-xl text-[9px] font-black uppercase hover:bg-red-500 hover:text-white transition-all"
-                        >
-                          {isStopping ? "Closing..." : "Close Position"}
-                        </button>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+            <div className="overflow-x-auto">
+              <table className="w-full text-left">
+                <thead className="text-[9px] text-gray-400 uppercase font-black bg-white/[0.01]">
+                  <tr>
+                    <th className="p-6">Strategist</th>
+                    <th className="p-6">Capital Allocated</th>
+                    <th className="p-6">Performance</th>
+                    <th className="p-6 text-right">Terminal Action</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-white/5">
+                  {userProfile.copiedTraders.map((copy) => {
+                    const trader = traders.find((t) => t._id === copy.traderId);
+                    return (
+                      <tr
+                        key={copy.traderId}
+                        className="hover:bg-white/[0.01] transition-colors"
+                      >
+                        <td className="p-6 font-bold text-white uppercase italic">
+                          {trader?.name || "Strategist"}
+                        </td>
+                        <td className="p-6 font-mono text-emerald-500 text-sm">
+                          ${copy.amountAllocated?.toLocaleString()}
+                        </td>
+                        <td className="p-6">
+                          <span className="text-sky-500 font-black">
+                            {trader?.roi}
+                          </span>
+                        </td>
+                        <td className="p-6 text-right">
+                          <button
+                            disabled={isStopping}
+                            onClick={() =>
+                              handleStop(copy.traderId, trader?.name)
+                            }
+                            className="px-5 py-2.5 bg-rose-500/10 text-rose-500 rounded-xl text-[10px] font-black uppercase hover:bg-rose-500 hover:text-white transition-all"
+                          >
+                            {isStopping ? "Stopping..." : "Close Connection"}
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
           </div>
         </section>
       )}
 
       {/* --- SECTION: DISCOVERY GRID --- */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {traders.map((trader) => {
           const following = isFollowing(trader._id);
           return (
             <div
               key={trader._id}
-              className="bg-[#05070A] border border-white/5 rounded-[2.5rem] p-6 group hover:border-sky-500/30 transition-all"
+              className="bg-[#05070A] border border-white/5 rounded-[2.5rem] p-8 group hover:border-sky-500/30 transition-all shadow-xl"
             >
               <div className="flex justify-between items-start mb-6">
-                <div className="h-12 w-12 rounded-2xl bg-white/5 flex items-center justify-center font-black text-sky-500 border border-white/5 text-xl">
-                  {trader.avatar}
+                <div className="h-14 w-14 rounded-2xl bg-sky-500/10 flex items-center justify-center font-black text-sky-500 border border-sky-500/20 text-2xl uppercase italic">
+                  {trader.avatar.slice(0, 2)}
                 </div>
-                <div className="px-3 py-1 bg-emerald-500/10 rounded-full border border-emerald-500/20">
-                  <p className="text-[10px] font-black text-emerald-500 italic">
-                    {trader.roi} ROI
+                <div className="text-right">
+                  <p className="text-emerald-500 font-black text-lg">
+                    {trader.roi}
+                  </p>
+                  <p className="text-[9px] text-gray-600 font-black uppercase tracking-widest">
+                    Last 30D ROI
                   </p>
                 </div>
               </div>
 
-              <h3 className="text-white font-bold mb-1 uppercase tracking-tight">
+              <h3 className="text-white text-xl font-black uppercase italic mb-1">
                 {trader.name}
               </h3>
-              <p className="text-[10px] text-gray-500 font-bold uppercase mb-6 tracking-widest">
-                {trader.followers} Followers • {trader.winRate} Win Rate
-              </p>
+              <div className="flex gap-4 mb-8">
+                <div>
+                  <p className="text-gray-400 font-bold text-xs">
+                    {trader.followers.toLocaleString()}
+                  </p>
+                  <p className="text-[8px] text-gray-600 uppercase font-black">
+                    Followers
+                  </p>
+                </div>
+                <div className="border-l border-white/10 pl-4">
+                  <p className="text-sky-400 font-bold text-xs">
+                    {trader.winRate}
+                  </p>
+                  <p className="text-[8px] text-gray-600 uppercase font-black">
+                    Win Rate
+                  </p>
+                </div>
+              </div>
 
               <button
-                onClick={() => handleCopy(trader)}
+                onClick={() => handleOpenModal(trader)}
                 disabled={following || isStarting}
-                className={`w-full py-4 rounded-2xl font-black uppercase tracking-widest text-[10px] transition-all flex items-center justify-center gap-2 ${
+                className={`w-full py-4 rounded-2xl font-black uppercase tracking-[0.2em] text-[10px] transition-all flex items-center justify-center gap-2 ${
                   following
-                    ? "bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 cursor-default"
-                    : "bg-white/5 text-white hover:bg-sky-500 hover:text-black shadow-lg"
+                    ? "bg-emerald-500/10 text-emerald-500 border border-emerald-500/20"
+                    : "bg-sky-500 text-black hover:bg-sky-400 shadow-lg shadow-sky-500/10"
                 }`}
               >
                 {following ? (
                   <>
-                    <HiOutlineCheckCircle size={16} /> Mirroring
+                    <HiOutlineCheckCircle size={18} /> Mirroring
                   </>
                 ) : (
                   <>
-                    <HiOutlineArrowTrendingUp size={16} /> Start Mirroring
+                    <HiOutlineArrowTrendingUp size={18} /> Start Mirroring
                   </>
                 )}
               </button>
@@ -201,6 +243,64 @@ const CopyTradingPage = () => {
           );
         })}
       </div>
+
+      {/* ALLOCATION MODAL */}
+      {showModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md">
+          <form
+            onSubmit={handleConfirmCopy}
+            className="bg-[#0A0C12] border border-white/10 w-full max-w-md rounded-[2.5rem] p-8 space-y-6 shadow-2xl"
+          >
+            <div className="flex justify-between items-center">
+              <h2 className="text-xl font-black text-white uppercase italic">
+                Deploy <span className="text-sky-500">Capital</span>
+              </h2>
+              <button
+                type="button"
+                onClick={() => setShowModal(false)}
+                className="text-gray-500 hover:text-white"
+              >
+                <HiOutlineXMark size={24} />
+              </button>
+            </div>
+
+            <div className="p-4 bg-white/5 rounded-2xl border border-white/5">
+              <p className="text-[10px] text-gray-500 uppercase font-black mb-1">
+                Strategist
+              </p>
+              <p className="text-white font-bold">{selectedTrader?.name}</p>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-[10px] text-gray-500 uppercase font-black ml-1">
+                Allocation Amount ($)
+              </label>
+              <input
+                autoFocus
+                type="number"
+                value={allocationAmount}
+                onChange={(e) => setAllocationAmount(e.target.value)}
+                placeholder="Min. 500"
+                className="w-full bg-white/5 border border-white/10 p-5 rounded-2xl text-white font-mono outline-none focus:border-sky-500 transition-all"
+                required
+              />
+              <p className="text-[9px] text-gray-600 font-bold text-right italic">
+                Max: ${userProfile?.tradingBalance?.toLocaleString()}
+              </p>
+            </div>
+
+            <button
+              type="submit"
+              disabled={isStarting}
+              className="w-full py-5 bg-sky-500 text-black font-black uppercase rounded-2xl hover:bg-sky-400 transition-all shadow-xl shadow-sky-500/20"
+            >
+              {isStarting
+                ? "Establishing Connection..."
+                : "Initialize Mirroring"}
+            </button>
+          </form>
+        </div>
+      )}
     </div>
   );
 };
