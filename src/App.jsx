@@ -41,10 +41,10 @@ import About from "./pages/public/About";
 import Academy from "./pages/public/Academy";
 import ScrollToTop from "./components/ScrollToTop";
 import CopyTradingPage from "./components/CopyTradingPage";
-import InvestmentPlans from "./components/InvestmentPlans";
 import AMLPolicy from "./components/AMLPolicy";
 import FAQ from "./components/FAQ";
 import MadeToTradeVideo from "./pages/private/Invest";
+import PricingSection from "./components/InvestmentPlans";
 
 // --- PUBLIC LAYOUT WRAPPER ---
 const PublicLayout = () => (
@@ -124,7 +124,6 @@ function App() {
             <Route path="/about" element={<About />} />
             <Route path="/academy" element={<Academy />} />
             <Route path="/copy-trading" element={<CopyTradingPage />} />
-            <Route path="/plans" element={<InvestmentPlans />} />
             <Route path="/aml-policy" element={<AMLPolicy />} />
             <Route path="/faqs" element={<FAQ />} />
           </Route>
@@ -133,9 +132,9 @@ function App() {
           <Route
             path="/dashboard"
             element={
-              // <ProtectedRoute>
-              <DashboardLayout />
-              // </ProtectedRoute>
+              <ProtectedRoute>
+                <DashboardLayout />
+              </ProtectedRoute>
             }
           >
             <Route index element={<DashboardHome />} />
@@ -146,15 +145,16 @@ function App() {
             <Route path="transactions" element={<Transactions />} />
             <Route path="copy-trade" element={<CopyTrading />} />
             <Route path="upgrade" element={<Upgrade />} />
+            <Route path="pricing" element={<PricingSection />} />
           </Route>
 
           {/* 3. ADMIN PANEL ROUTES */}
           <Route
             path="/admin"
             element={
-              // <ProtectedAdminRoute>
-              <AdminLayout />
-              // </ProtectedAdminRoute>
+              <ProtectedAdminRoute>
+                <AdminLayout />
+              </ProtectedAdminRoute>
             }
           >
             <Route index element={<AdminDashboard />} />

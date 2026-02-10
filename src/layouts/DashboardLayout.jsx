@@ -48,6 +48,11 @@ const DashboardLayout = () => {
       icon: <HiOutlineCreditCard />,
       path: "/dashboard/withdraw",
     },
+    {
+      name: "Pricing",
+      icon: <HiOutlineCreditCard />,
+      path: "/dashboard/pricing",
+    },
     { name: "Trade", icon: <HiOutlineChartBar />, path: "/dashboard/trade" },
     {
       name: "Copy Trading",

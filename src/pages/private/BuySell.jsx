@@ -143,7 +143,7 @@ const TradeController = () => {
             placeholder="0.00"
           />
         </div>
-        <div className="flex gap-4 w-full md:w-auto">
+        <div className="flex-col md:flex gap-4 w-full md:w-auto">
           <button
             disabled={isLoading}
             onClick={() => handleAction("buy")}

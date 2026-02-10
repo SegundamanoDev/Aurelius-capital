@@ -252,6 +252,16 @@ const Register = () => {
                   : "Continue"}
             </button>
           </div>
+          <div>
+            <p>
+              already have an account?{" "}
+              <span>
+                <Link className="ext-slate-500" to="/login">
+                  Login
+                </Link>{" "}
+              </span>
+            </p>
+          </div>
         </form>
       </div>
     </div>
