@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import {
   MdClose,
@@ -11,13 +11,11 @@ import {
 import {
   usePurchaseServiceMutation,
   useGetAllUsersQuery,
-} from "../../api/apiSlice"; // Adjust path
+} from "../../api/apiSlice";
 
 const TradeController = () => {
-  // 1. Fetch real user data (Replace with a specific 'useGetProfileQuery' if you have one)
-  // For now, we assume your auth state or a profile query provides the balance
   const { data: users } = useGetAllUsersQuery();
-  const currentUser = users?.[0]; // Mocking selection of current user
+  const currentUser = users?.[0];
 
   const [purchaseService, { isLoading }] = usePurchaseServiceMutation();
 
@@ -31,7 +29,6 @@ const TradeController = () => {
     const userBalance = currentUser?.balance || 0;
 
     if (type === "buy") {
-      // Check for zero or low funds
       if (userBalance <= 0 || !numericAmount || numericAmount > userBalance) {
         setWarningMsg(
           "Insufficient Funds: Your main wallet balance is too low. Please deposit funds to begin trading.",
@@ -42,14 +39,12 @@ const TradeController = () => {
       }
 
       try {
-        // Trigger Backend Transaction
         await purchaseService({
           type: "trading_fund",
           amount: numericAmount,
           description: `Market Buy Order: ${numericAmount} USD`,
           details: { platform: "Internal Terminal" },
         }).unwrap();
-
         setAmount("");
         alert("Trade Executed: Funds moved to Trading Balance.");
       } catch (err) {
@@ -58,7 +53,6 @@ const TradeController = () => {
     }
 
     if (type === "sell") {
-      // Check for the 'Premium' or 'Ultimate' account type you defined in pricing
       if (
         currentUser?.accountType === "Essential" ||
         currentUser?.accountType === "Plus"
@@ -69,26 +63,25 @@ const TradeController = () => {
         setWarningType("upgrade");
         setShowWarning(true);
       } else {
-        // Handle actual sell logic if they are pro
         alert("Sell Order Executed");
       }
     }
   };
 
   return (
-    <div className="w-full max-w-4xl mx-auto p-6 space-y-8 font-sans pb-20">
+    <div className="w-full max-w-4xl mx-auto p-4 md:p-6 space-y-6 md:space-y-8 font-sans pb-20">
       {/* RISK WARNING SECTION */}
-      <div className="bg-[#1e222d] border-l-4 border-amber-500 rounded-xl p-6 shadow-lg">
-        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+      <div className="bg-[#1e222d] border-l-4 border-amber-500 rounded-xl p-5 md:p-6 shadow-lg">
+        <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
           <div className="flex items-start gap-4">
             <div className="p-2 bg-amber-500/10 rounded-lg shrink-0">
-              <MdWarningAmber className="text-amber-500" size={28} />
+              <MdWarningAmber className="text-amber-500" size={24} />
             </div>
             <div>
-              <h3 className="text-white font-bold text-lg mb-1">
+              <h3 className="text-white font-bold text-base md:text-lg mb-1">
                 Risk Disclosure
               </h3>
-              <p className="text-gray-400 text-sm leading-relaxed">
+              <p className="text-gray-400 text-xs md:text-sm leading-relaxed">
                 Trading involves significant risk. If you are a beginner, we
                 suggest copying a professional.
               </p>
@@ -96,29 +89,29 @@ const TradeController = () => {
           </div>
           <Link
             to="/dashboard/copy-trade"
-            className="flex items-center gap-2 px-6 py-3 bg-white text-black font-bold text-sm rounded-lg hover:bg-gray-200 transition-all"
+            className="w-full lg:w-auto flex items-center justify-center gap-2 px-6 py-3 bg-white text-black font-bold text-sm rounded-lg hover:bg-gray-200 transition-all"
           >
             <MdGroups size={20} /> Copy Trader
           </Link>
         </div>
       </div>
 
-      {/* BALANCE CARD (Live Data) */}
-      <div className="bg-[#131722] border border-[#363a45] rounded-2xl p-6 flex items-center justify-between shadow-xl">
-        <div className="flex items-center gap-4">
-          <div className="p-3 bg-[#2962ff]/10 rounded-full">
+      {/* BALANCE CARD (Updated for Mobile Stacking) */}
+      <div className="bg-[#131722] border border-[#363a45] rounded-2xl p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 shadow-xl">
+        <div className="flex items-center gap-4 w-full">
+          <div className="p-3 bg-[#2962ff]/10 rounded-full shrink-0">
             <MdAccountBalanceWallet className="text-[#2962ff]" size={28} />
           </div>
-          <div>
-            <p className="text-gray-400 text-[10px] uppercase tracking-widest font-bold">
+          <div className="overflow-hidden">
+            <p className="text-gray-400 text-[10px] uppercase tracking-widest font-bold truncate">
               Main Wallet Balance
             </p>
-            <h2 className="text-3xl font-black text-white">
+            <h2 className="text-2xl md:text-3xl font-black text-white truncate">
               ${currentUser?.balance?.toLocaleString() || "0.00"}
             </h2>
           </div>
         </div>
-        <div className="text-right">
+        <div className="text-left sm:text-right w-full sm:w-auto pt-4 sm:pt-0 border-t border-gray-800 sm:border-none">
           <p className="text-gray-400 text-[10px] uppercase tracking-widest font-bold">
             Trading Capital
           </p>
@@ -128,43 +121,50 @@ const TradeController = () => {
         </div>
       </div>
 
-      {/* TRADE INPUT */}
-      <div className="bg-[#131722] border border-[#363a45] rounded-2xl p-8 flex flex-col md:flex-row gap-6 items-end shadow-2xl">
-        <div className="flex-grow w-full">
+      {/* TRADE INPUT & BUTTONS (Mobile Column Layout) */}
+      <div className="bg-[#131722] border border-[#363a45] rounded-2xl p-6 md:p-8 flex flex-col gap-6 shadow-2xl">
+        <div className="w-full">
           <label className="block text-gray-400 text-[10px] font-bold mb-3 uppercase tracking-widest">
             Trade Amount (USD)
           </label>
-          <input
-            type="number"
-            value={amount}
-            onChange={(e) => setAmount(e.target.value)}
-            disabled={isLoading}
-            className="w-full bg-[#1e222d] border border-[#363a45] rounded-xl py-4 px-4 text-white font-bold focus:border-[#2962ff] focus:outline-none"
-            placeholder="0.00"
-          />
+          <div className="relative">
+            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 font-bold">
+              $
+            </span>
+            <input
+              type="number"
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+              disabled={isLoading}
+              className="w-full bg-[#1e222d] border border-[#363a45] rounded-xl py-4 pl-8 pr-4 text-white font-bold focus:border-[#2962ff] focus:outline-none text-lg"
+              placeholder="0.00"
+            />
+          </div>
         </div>
-        <div className="flex-col md:flex gap-4 w-full md:w-auto">
+
+        {/* Buttons: Column on mobile, Row on medium screens */}
+        <div className="flex flex-col md:flex-row gap-4 w-full">
           <button
             disabled={isLoading}
             onClick={() => handleAction("buy")}
-            className="flex-1 md:w-40 py-4 bg-emerald-600 hover:bg-emerald-500 text-white font-black rounded-xl transition-all uppercase text-xs"
+            className="w-full md:flex-1 py-4 bg-emerald-600 hover:bg-emerald-500 text-white font-black rounded-xl transition-all uppercase text-sm shadow-lg shadow-emerald-900/20 active:scale-[0.98]"
           >
             {isLoading ? "Processing..." : "Buy"}
           </button>
           <button
             disabled={isLoading}
             onClick={() => handleAction("sell")}
-            className="flex-1 md:w-40 py-4 bg-rose-600 hover:bg-rose-500 text-white font-black rounded-xl transition-all uppercase text-xs"
+            className="w-full md:flex-1 py-4 bg-rose-600 hover:bg-rose-500 text-white font-black rounded-xl transition-all uppercase text-sm shadow-lg shadow-rose-900/20 active:scale-[0.98]"
           >
             Sell
           </button>
         </div>
       </div>
 
-      {/* WARNING MODAL (Same as before) */}
+      {/* WARNING MODAL (Responsive Width) */}
       {showWarning && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center px-4 bg-black/80 backdrop-blur-md">
-          <div className="bg-[#1e222d] border border-[#363a45] max-w-md w-full rounded-2xl p-8 relative">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center px-6 bg-black/80 backdrop-blur-md">
+          <div className="bg-[#1e222d] border border-[#363a45] max-w-sm w-full rounded-2xl p-6 md:p-8 relative">
             <button
               onClick={() => setShowWarning(false)}
               className="absolute top-4 right-4 text-gray-500 hover:text-white"
@@ -186,8 +186,12 @@ const TradeController = () => {
               </h3>
               <p className="text-gray-400 text-sm mb-6">{warningMsg}</p>
               <Link
-                to={warningType === "funds" ? "/deposit" : "/pricing"}
-                className="w-full py-4 bg-[#2962ff] text-white font-bold rounded-xl text-center"
+                to={
+                  warningType === "funds"
+                    ? "/dashboard/deposit"
+                    : "/dashboard/pricing"
+                }
+                className="w-full py-4 bg-[#2962ff] text-white font-bold rounded-xl text-center shadow-lg shadow-blue-900/30"
               >
                 {warningType === "funds" ? "Go to Deposit" : "View Plans"}
               </Link>
