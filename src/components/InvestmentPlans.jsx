@@ -7,7 +7,7 @@ import {
 import {
   useGetMyProfileQuery,
   usePurchaseServiceMutation,
-} from "../../api/apiSlice";
+} from "../api/apiSlice";
 import toast from "react-hot-toast";
 import { HiOutlineExclamationTriangle } from "react-icons/hi2";
 
@@ -17,36 +17,24 @@ const PricingCard = ({ plan, onInsufficientFunds }) => {
   const [purchaseService, { isLoading }] = usePurchaseServiceMutation();
 
   const handlePurchase = async () => {
-    // 1. Convert price string "2,700.49" to float 2700.49
-    const numericPrice = parseFloat(plan.price.replace(/,/g, ""));
+    const price = Number(plan.price.replace(/,/g, ""));
 
-    // 2. Client-side validation for immediate feedback
-    if (!user || user.balance < numericPrice) {
+    if (!user || user.balance < price) {
       onInsufficientFunds(plan.name);
       return;
     }
 
     try {
-      // 3. Fire the mutation to the backend
       await purchaseService({
-        type: "account_upgrade",
-        amount: numericPrice,
-        details: { planName: plan.name },
-        description: `Upgrade to ${plan.name} Tier Strategy`,
+        amount: price,
+        planName: plan.name,
+        signalType: "Trading Signals",
+        description: `Purchase: ${plan.name} Signal Subscription`,
       }).unwrap();
 
-      toast.success(`Welcome to ${plan.name} Tier! Account upgraded.`, {
-        duration: 5000,
-        style: {
-          background: "#131722",
-          color: "#fff",
-          border: "1px solid #2962ff",
-        },
-      });
+      toast.success(`${plan.name} signals activated 🚀`);
     } catch (err) {
-      toast.error(
-        err?.data?.message || "Acquisition failed. Please try again.",
-      );
+      toast.error(err?.data?.message || "Purchase failed.");
     }
   };
 

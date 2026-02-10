@@ -1,5 +1,6 @@
+// "https://aurelius-backend-dsdm.onrender.com/api",
+// "http://localhost:5000/api",
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-
 export const apiSlice = createApi({
   reducerPath: "api",
   baseQuery: fetchBaseQuery({
@@ -106,7 +107,7 @@ export const apiSlice = createApi({
 
     purchaseService: builder.mutation({
       query: (data) => ({
-        url: "/transactions/purchase-service",
+        url: "/transactions/purchase",
         method: "POST",
         body: data,
       }),
@@ -157,12 +158,12 @@ export const apiSlice = createApi({
     }),
 
     stopCopying: builder.mutation({
-      query: (traderId) => ({
-        url: "/traders/copy/stop",
+      query: (data) => ({
+        url: "/traders/stop-copying",
         method: "POST",
-        body: { traderId },
+        body: data,
       }),
-      invalidatesTags: ["User", "Trader"],
+      invalidatesTags: ["User"],
     }),
 
     createTrader: builder.mutation({
