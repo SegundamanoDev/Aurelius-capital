@@ -45,6 +45,7 @@ import AMLPolicy from "./components/AMLPolicy";
 import FAQ from "./components/FAQ";
 import MadeToTradeVideo from "./pages/private/Invest";
 import PricingSection from "./components/InvestmentPlans";
+import AdminTransactions from "./pages/admin/AdminTransactions";
 
 // --- PUBLIC LAYOUT WRAPPER ---
 const PublicLayout = () => (
@@ -163,6 +164,7 @@ function App() {
             <Route path="traders" element={<ManageTraders />} />
             <Route path="deposits" element={<AdminDeposits />} />
             <Route path="withdrawals" element={<AdminWithdrawals />} />
+            <Route path="transactions" element={<AdminTransactions />} />
             <Route path="investments" element={<AdminInvestments />} />
           </Route>
 

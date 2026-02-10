@@ -11,7 +11,8 @@ import {
   HiBars3,
   HiOutlineChartBarSquare,
   HiOutlineCircleStack,
-  HiOutlinePower, // Added for logout
+  HiOutlinePower,
+  HiOutlineArrowsRightLeft, // Added for logout
 } from "react-icons/hi2";
 import { HiOutlineMenuAlt3 } from "react-icons/hi";
 
@@ -50,6 +51,11 @@ const AdminLayout = () => {
       name: "Withdrawal Claims",
       icon: <HiOutlineArrowUpRight />,
       path: "/admin/withdrawals",
+    },
+    {
+      name: "Transactions",
+      icon: <HiOutlineArrowsRightLeft />,
+      path: "/admin/transactions",
     },
     {
       name: "Investment Logs",
