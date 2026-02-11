@@ -3,6 +3,7 @@ import {
   useGetAllUsersQuery,
   useUpdateUserAdminMutation,
   useDeleteUserMutation,
+  useInjectProfitMutation,
 } from "../../api/apiSlice";
 import {
   HiMagnifyingGlass,
@@ -17,7 +18,9 @@ const AdminUserList = () => {
   const { data: allUsers = [], isLoading } = useGetAllUsersQuery();
   const [updateUser] = useUpdateUserAdminMutation();
   const [deleteUser] = useDeleteUserMutation();
-
+  const [topupAmount, setTopupAmount] = useState(0);
+  const [injectProfit, { isLoading: isTopupLoading }] =
+    useInjectProfitMutation();
   const [searchTerm, setSearchTerm] = useState("");
   const [isEditModalOpen, setEditModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
@@ -40,9 +43,27 @@ const AdminUserList = () => {
         .includes(searchTerm.toLowerCase()) ||
       user.email.toLowerCase().includes(searchTerm.toLowerCase()),
   );
+  const handleInjectProfit = async () => {
+    // Convert to number to ensure validation works
+    if (Number(topupAmount) <= 0) return toast.error("Enter a valid amount");
 
+    try {
+      await injectProfit({
+        userId: selectedUser._id,
+        amount: Number(topupAmount),
+        description: `+${topupAmount} Profit`,
+      }).unwrap();
+
+      toast.success("Profit successfully topped up!");
+      setTopupAmount(0); // Reset the input
+      setEditModalOpen(false);
+    } catch (err) {
+      toast.error(err.data?.message || "Failed to inject profit");
+    }
+  };
   const handleEditClick = (user) => {
     setSelectedUser(user);
+    setTopupAmount(0);
     setEditFormData({
       firstName: user.firstName,
       lastName: user.lastName,
@@ -139,7 +160,7 @@ const AdminUserList = () => {
                   ${(user.balance || 0).toLocaleString()}
                 </td>
                 <td className="p-6 font-mono text-emerald-500 text-sm font-bold">
-                  +${(user.totalProfits || 0).toLocaleString()}
+                  +{(user.totalProfits || 0).toLocaleString()}
                 </td>
                 <td className="p-6">
                   <span
@@ -283,7 +304,28 @@ const AdminUserList = () => {
                   <option value="vip">VIP Institutional</option>
                 </select>
               </div>
-
+              <div className="mt-8 pt-6 border-t border-white/10">
+                <label className="text-[10px] font-black text-amber-500 uppercase tracking-widest block mb-3">
+                  Admin Profit Injection (Manual Top-up)
+                </label>
+                <div className="flex gap-2">
+                  <input
+                    type="number"
+                    placeholder="Amount to add as profit"
+                    className="flex-1 bg-amber-500/5 border border-amber-500/20 p-4 rounded-xl text-white text-sm outline-none focus:border-amber-500"
+                    value={topupAmount}
+                    onChange={(e) => setTopupAmount(e.target.value)}
+                  />
+                  <button
+                    type="button"
+                    onClick={handleInjectProfit}
+                    disabled={isTopupLoading}
+                    className="bg-amber-500 hover:bg-amber-400 text-black font-black uppercase text-[10px] px-6 rounded-xl transition-all disabled:opacity-50"
+                  >
+                    {isTopupLoading ? "Injecting..." : "Top-up Profit"}
+                  </button>
+                </div>
+              </div>
               <div className="pt-6 flex gap-3">
                 <button
                   type="button"

@@ -26,14 +26,14 @@ const Hero = () => {
       {/* LAYER 2: HERO TEXT */}
       <div className="relative z-20 text-center max-w-4xl px-6 mb-8 mt-12">
         <h1 className="text-4xl md:text-7xl font-black text-white tracking-tighter leading-tight mb-4">
-          Where the world <br />
+          Aurelius-Capital Where The World <br />
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#2962ff] to-[#91f6ff]">
-            does markets.
+            Does Markets.
           </span>
         </h1>
 
         <p className="text-gray-400 text-lg md:text-xl font-medium max-w-xl mx-auto leading-relaxed">
-          Join millions of traders and investors taking the future into their
+          Join thousands of traders and investors taking the future into their
           own hands.
         </p>
       </div>

@@ -1,123 +1,60 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import toast from "react-hot-toast";
 import {
   useGetTradersQuery,
+  useGetTraderByIdQuery,
   useStartCopyingMutation,
-  useStopCopyingMutation,
   useGetMyProfileQuery,
 } from "../../api/apiSlice";
 import {
   HiOutlineArrowTrendingUp,
   HiOutlineCheckCircle,
   HiOutlineXMark,
+  HiOutlineShieldCheck,
 } from "react-icons/hi2";
 
 const CopyTradingPage = () => {
-  const { data: userProfile, isLoading: isUserLoading } =
-    useGetMyProfileQuery();
+  const {
+    data: userProfile,
+    isLoading: isUserLoading,
+    refetch,
+  } = useGetMyProfileQuery();
   const { data: traders = [], isLoading: isTradersLoading } =
     useGetTradersQuery();
-
   const [startCopying, { isLoading: isStarting }] = useStartCopyingMutation();
-  const [stopCopying, { isLoading: isStopping }] = useStopCopyingMutation();
 
-  const [showModal, setShowModal] = useState(false);
   const [selectedTrader, setSelectedTrader] = useState(null);
-  const [allocationAmount, setAllocationAmount] = useState("");
+  const [showDetail, setShowDetail] = useState(false);
+  const [sortBy, setSortBy] = useState("roi");
+  const [currentPage, setCurrentPage] = useState(1);
 
-  // 🔑 Helper to ensure we are working with string IDs
-  const normalizeId = (id) => {
-    if (!id) return null;
-    return typeof id === "object" ? id._id : id;
-  };
+  const tradersPerPage = 6;
 
-  const isFollowing = (traderId) => {
-    return userProfile?.copiedTraders?.some(
+  const { data: traderDetail } = useGetTraderByIdQuery(selectedTrader?._id, {
+    skip: !selectedTrader,
+  });
+
+  const normalizeId = (id) => (typeof id === "object" ? id?._id : id);
+
+  const isFollowing = (traderId) =>
+    userProfile?.copiedTraders?.some(
       (t) => normalizeId(t.traderId)?.toString() === traderId?.toString(),
     );
-  };
 
-  const handleOpenModal = (trader) => {
-    setSelectedTrader(trader);
-    setShowModal(true);
-  };
-
-  const handleConfirmCopy = async (e) => {
-    e.preventDefault();
-    const amount = Number(allocationAmount);
-
-    if (!amount || amount <= 0) {
-      return toast.error("Please enter a valid allocation amount");
+  const processedTraders = useMemo(() => {
+    let filtered = [...traders];
+    if (sortBy === "roi") {
+      filtered.sort((a, b) => b.performance?.roi30d - a.performance?.roi30d);
     }
-
-    if (userProfile?.tradingBalance < amount) {
-      return toast.error("Insufficient Trading Balance");
+    if (sortBy === "winRate") {
+      filtered.sort((a, b) => b.performance?.winRate - a.performance?.winRate);
     }
+    return filtered;
+  }, [traders, sortBy]);
 
-    try {
-      await startCopying({
-        traderId: selectedTrader._id,
-        amount: amount,
-      }).unwrap();
-
-      toast.success(`Strategy synchronized: Mirroring ${selectedTrader.name}`, {
-        icon: "🚀",
-        style: {
-          background: "#05070A",
-          color: "#fff",
-          border: "1px solid #10b981",
-        },
-      });
-
-      setShowModal(false);
-      setAllocationAmount("");
-    } catch (err) {
-      toast.error(err.data?.message || "Connection to strategist failed");
-    }
-  };
-
-  // ✅ FIXED HANDLE STOP
-  const handleStop = async (traderId, name) => {
-    const cleanId = normalizeId(traderId)?.toString();
-
-    if (!cleanId) return toast.error("Invalid Trader ID");
-
-    toast(
-      (t) => (
-        <div className="space-y-3">
-          <p className="font-bold text-sm text-white">
-            Terminate connection with {name}?
-          </p>
-          <div className="flex gap-3 justify-end">
-            <button
-              onClick={() => toast.dismiss(t.id)}
-              className="px-3 py-1 text-xs bg-white/10 text-white rounded hover:bg-white/20 transition-colors"
-            >
-              Cancel
-            </button>
-            <button
-              onClick={async () => {
-                toast.dismiss(t.id);
-                try {
-                  await stopCopying({ traderId: cleanId }).unwrap();
-                  toast.success(`Position closed for ${name}`);
-                } catch (err) {
-                  toast.error(err?.data?.message || "Action failed");
-                }
-              }}
-              className="px-3 py-1 text-xs bg-rose-500 text-white rounded font-bold hover:bg-rose-600 transition-colors"
-            >
-              Confirm Stop
-            </button>
-          </div>
-        </div>
-      ),
-      {
-        duration: 6000,
-        style: { background: "#05070A", border: "1px solid #ffffff10" },
-      },
-    );
-  };
+  const indexOfLast = currentPage * tradersPerPage;
+  const indexOfFirst = indexOfLast - tradersPerPage;
+  const currentTraders = processedTraders.slice(indexOfFirst, indexOfLast);
 
   if (isTradersLoading || isUserLoading)
     return (
@@ -127,145 +64,93 @@ const CopyTradingPage = () => {
     );
 
   return (
-    <div className="space-y-10 p-4 md:p-8 animate-in fade-in duration-700">
-      <header className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
-        <div>
-          <h1 className="text-3xl font-black text-white uppercase tracking-tighter italic">
-            Social <span className="text-sky-500">Terminal</span>
-          </h1>
-          <p className="text-gray-500 text-sm italic">
-            Mirror institutional moves in real-time.
-          </p>
-        </div>
-        <div className="bg-white/5 border border-white/10 px-6 py-3 rounded-2xl">
-          <p className="text-[10px] text-gray-500 uppercase font-black">
-            Available Trading Pool
-          </p>
-          <p className="text-xl font-black text-emerald-500">
-            ${userProfile?.tradingBalance?.toLocaleString()}
-          </p>
-        </div>
+    <div className="space-y-10 p-4 md:p-8 max-w-7xl mx-auto">
+      {/* HEADER */}
+      <header className="border-b border-white/5 pb-6">
+        <h1 className="text-4xl font-black text-white uppercase italic tracking-tighter">
+          Social <span className="text-sky-500">Terminal</span>
+        </h1>
+        <p className="text-gray-500 text-xs uppercase mt-2 tracking-widest">
+          Mirror institutional-grade strategies in real-time
+        </p>
       </header>
 
-      {/* --- SECTION: ACTIVE PORTFOLIO --- */}
-      {userProfile?.copiedTraders?.length > 0 && (
-        <section className="animate-in slide-in-from-top-4 duration-500">
-          <div className="bg-[#05070A] border border-sky-500/20 rounded-[2.5rem] overflow-hidden shadow-2xl">
-            <div className="p-6 border-b border-white/5 bg-sky-500/5">
-              <h2 className="text-white font-black uppercase text-[10px] tracking-widest flex items-center gap-2">
-                <span className="h-2 w-2 rounded-full bg-sky-500 animate-pulse" />
-                Your Active Strategists ({userProfile.copiedTraders.length})
-              </h2>
-            </div>
-            <div className="overflow-x-auto">
-              <table className="w-full text-left">
-                <thead className="text-[9px] text-gray-400 uppercase font-black bg-white/[0.01]">
-                  <tr>
-                    <th className="p-6">Strategist</th>
-                    <th className="p-6">Capital Allocated</th>
-                    <th className="p-6 text-right">Terminal Action</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-white/5">
-                  {userProfile.copiedTraders.map((copy) => {
-                    const traderId = normalizeId(copy.traderId);
-                    const trader = traders.find(
-                      (t) => t._id?.toString() === traderId?.toString(),
-                    );
+      {/* TOOLBAR */}
+      <div className="flex justify-between items-center">
+        <select
+          onChange={(e) => setSortBy(e.target.value)}
+          className="bg-[#0A0C12] border border-white/10 px-4 py-2 rounded-xl text-white text-sm focus:ring-2 focus:ring-sky-500 outline-none"
+        >
+          <option value="roi">Sort by ROI (30D)</option>
+          <option value="winRate">Sort by Win Rate</option>
+        </select>
+      </div>
 
-                    return (
-                      <tr
-                        key={traderId?.toString()}
-                        className="hover:bg-white/[0.01] transition-colors"
-                      >
-                        <td className="p-6 font-bold text-white uppercase italic">
-                          {trader?.name || "Strategist"}
-                        </td>
-                        <td className="p-6 font-mono text-emerald-500 text-sm">
-                          ${copy.amountAllocated?.toLocaleString()}
-                        </td>
-                        <td className="p-6 text-right">
-                          <button
-                            disabled={isStopping}
-                            onClick={() =>
-                              handleStop(copy.traderId, trader?.name)
-                            }
-                            className="px-5 py-2.5 bg-rose-500/10 text-rose-500 rounded-xl text-[10px] font-black uppercase hover:bg-rose-500 hover:text-white transition-all"
-                          >
-                            {isStopping ? "Stopping..." : "Close Connection"}
-                          </button>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* --- SECTION: DISCOVERY GRID --- */}
+      {/* TRADER GRID */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {traders.map((trader) => {
+        {currentTraders.map((trader) => {
           const following = isFollowing(trader._id);
+
           return (
             <div
               key={trader._id}
-              className="bg-[#05070A] border border-white/5 rounded-[2.5rem] p-8 group hover:border-sky-500/30 transition-all shadow-xl"
+              className="bg-[#05070A] border border-white/5 rounded-[2rem] p-6 hover:border-sky-500/30 transition-all group relative overflow-hidden"
             >
-              {/* ... Trader Card UI (kept same as your code) ... */}
-              <div className="flex justify-between items-start mb-6">
-                <div className="h-14 w-14 rounded-2xl bg-sky-500/10 flex items-center justify-center font-black text-sky-500 border border-sky-500/20 text-2xl uppercase italic">
-                  {trader.avatar.slice(0, 2)}
+              <div
+                className="cursor-pointer space-y-4"
+                onClick={() => {
+                  setSelectedTrader(trader);
+                  setShowDetail(true);
+                }}
+              >
+                <div className="flex justify-between items-start">
+                  <h3 className="text-white text-xl font-black uppercase italic leading-none">
+                    {trader.name}
+                  </h3>
+                  {trader.verified && (
+                    <HiOutlineShieldCheck className="text-sky-500" size={20} />
+                  )}
                 </div>
-                <div className="text-right">
-                  <p className="text-emerald-500 font-black text-lg">
-                    {trader.roi}
-                  </p>
-                  <p className="text-[9px] text-gray-600 font-black uppercase tracking-widest">
-                    Last 30D ROI
-                  </p>
-                </div>
-              </div>
-              <h3 className="text-white text-xl font-black uppercase italic mb-1">
-                {trader.name}
-              </h3>
-              <div className="flex gap-4 mb-8">
-                <div>
-                  <p className="text-gray-400 font-bold text-xs">
-                    {trader.followers.toLocaleString()}
-                  </p>
-                  <p className="text-[8px] text-gray-600 uppercase font-black">
-                    Followers
-                  </p>
-                </div>
-                <div className="border-l border-white/10 pl-4">
-                  <p className="text-sky-400 font-bold text-xs">
-                    {trader.winRate}
-                  </p>
-                  <p className="text-[8px] text-gray-600 uppercase font-black">
-                    Win Rate
-                  </p>
+
+                <div className="space-y-1 border-l-2 border-sky-500/20 pl-4">
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-500 text-[10px] uppercase font-bold">
+                      ROI (30D)
+                    </span>
+                    <span className="text-emerald-500 font-black">
+                      {trader.performance?.roi30d}%
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-500 text-[10px] uppercase font-bold">
+                      Win Rate
+                    </span>
+                    <span className="text-sky-400 font-bold">
+                      {trader.performance?.winRate}%
+                    </span>
+                  </div>
                 </div>
               </div>
 
               <button
-                onClick={() => handleOpenModal(trader)}
-                disabled={following || isStarting}
-                className={`w-full py-4 rounded-2xl font-black uppercase tracking-[0.2em] text-[10px] transition-all flex items-center justify-center gap-2 ${
+                disabled={isStarting}
+                onClick={() => {
+                  setSelectedTrader(trader);
+                  setShowDetail(true);
+                }}
+                className={`w-full mt-6 py-4 rounded-xl font-black uppercase text-[11px] flex items-center justify-center gap-2 transition-all ${
                   following
-                    ? "bg-emerald-500/10 text-emerald-500 border border-emerald-500/20"
-                    : "bg-sky-500 text-black hover:bg-sky-400 shadow-lg shadow-sky-500/10"
+                    ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
+                    : "bg-white text-black hover:bg-sky-500"
                 }`}
               >
                 {following ? (
                   <>
-                    <HiOutlineCheckCircle size={18} /> Mirroring
+                    <HiOutlineCheckCircle size={16} /> Mirroring
                   </>
                 ) : (
                   <>
-                    <HiOutlineArrowTrendingUp size={18} /> Start Mirroring
+                    <HiOutlineArrowTrendingUp size={16} /> View Strategy
                   </>
                 )}
               </button>
@@ -274,57 +159,127 @@ const CopyTradingPage = () => {
         })}
       </div>
 
-      {/* MODAL (kept same as your code) */}
-      {showModal && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md">
-          <form
-            onSubmit={handleConfirmCopy}
-            className="bg-[#0A0C12] border border-white/10 w-full max-w-md rounded-[2.5rem] p-8 space-y-6 shadow-2xl"
-          >
-            <div className="flex justify-between items-center">
-              <h2 className="text-xl font-black text-white uppercase italic">
-                Deploy <span className="text-sky-500">Capital</span>
-              </h2>
+      {/* PAGINATION */}
+      <div className="flex justify-center items-center gap-6 pt-10">
+        <button
+          onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
+          className="text-gray-500 hover:text-white uppercase text-xs font-bold transition-colors"
+        >
+          Previous
+        </button>
+        <div className="h-8 w-8 rounded-full border border-white/10 flex items-center justify-center text-white text-xs font-black">
+          {currentPage}
+        </div>
+        <button
+          onClick={() =>
+            setCurrentPage((p) =>
+              indexOfLast < processedTraders.length ? p + 1 : p,
+            )
+          }
+          className="text-gray-500 hover:text-white uppercase text-xs font-bold transition-colors"
+        >
+          Next
+        </button>
+      </div>
+
+      {/* TRADER DETAIL DRAWER */}
+      {showDetail && traderDetail && (
+        <div className="fixed inset-0 bg-black/95 z-50 flex justify-center items-center p-4 backdrop-blur-sm">
+          <div className="bg-[#0A0C12] max-w-xl w-full p-6 md:p-10 rounded-[2.5rem] border border-white/10 overflow-y-auto max-h-[90vh] shadow-2xl">
+            <div className="flex justify-between items-start mb-8">
+              <div>
+                <h2 className="text-3xl font-black text-white uppercase italic leading-none">
+                  {traderDetail.name}
+                </h2>
+                <span className="text-sky-500 text-[10px] uppercase font-bold tracking-widest">
+                  Strategy Performance Profile
+                </span>
+              </div>
               <button
-                type="button"
-                onClick={() => setShowModal(false)}
-                className="text-gray-500 hover:text-white"
+                onClick={() => setShowDetail(false)}
+                className="p-2 hover:bg-white/5 rounded-full transition-colors"
               >
-                <HiOutlineXMark size={24} />
+                <HiOutlineXMark size={24} className="text-gray-500" />
               </button>
             </div>
-            <div className="p-4 bg-white/5 rounded-2xl border border-white/5">
-              <p className="text-[10px] text-gray-500 uppercase font-black mb-1">
-                Strategist
-              </p>
-              <p className="text-white font-bold">{selectedTrader?.name}</p>
-            </div>
-            <div className="space-y-2">
-              <label className="text-[10px] text-gray-500 uppercase font-black ml-1">
-                Allocation Amount ($)
-              </label>
-              <input
-                autoFocus
-                type="number"
-                value={allocationAmount}
-                onChange={(e) => setAllocationAmount(e.target.value)}
-                placeholder="Min. 500"
-                className="w-full bg-white/5 border border-white/10 p-5 rounded-2xl text-white font-mono outline-none focus:border-sky-500 transition-all"
-                required
+
+            {/* PERFORMANCE GRID - Vertical on Mobile */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-10">
+              <Stat
+                label="ROI 30D"
+                value={`${traderDetail.performance?.roi30d}%`}
+                highlight="emerald"
+              />
+              <Stat
+                label="Win Rate"
+                value={`${traderDetail.performance?.winRate}%`}
+                highlight="sky"
+              />
+              <Stat
+                label="Profit Factor"
+                value={traderDetail.performance?.profitFactor}
+              />
+              <Stat
+                label="Total ROI"
+                value={`${traderDetail.performance?.totalRoi}%`}
+              />
+              <Stat
+                label="Sharpe Ratio"
+                value={traderDetail.riskMetrics?.sharpeRatio}
+              />
+              <Stat
+                label="Max Drawdown"
+                value={`${traderDetail.riskMetrics?.maxDrawdown}%`}
               />
             </div>
-            <button
-              type="submit"
-              disabled={isStarting}
-              className="w-full py-5 bg-sky-500 text-black font-black uppercase rounded-2xl hover:bg-sky-400 transition-all shadow-xl shadow-sky-500/20"
-            >
-              {isStarting
-                ? "Establishing Connection..."
-                : "Initialize Mirroring"}
-            </button>
-          </form>
+
+            {/* ACTION BUTTON */}
+            {isFollowing(traderDetail._id) ? (
+              <div className="w-full py-5 bg-emerald-500/10 border border-emerald-500/30 text-emerald-500 font-black uppercase rounded-2xl flex items-center justify-center gap-3">
+                <HiOutlineCheckCircle size={22} />
+                Mirroring Active
+              </div>
+            ) : (
+              <button
+                disabled={isStarting}
+                onClick={async () => {
+                  try {
+                    await startCopying({
+                      traderId: traderDetail._id,
+                      amount: 100, // Default allocation or your specific logic
+                    }).unwrap();
+                    toast.success("Mirroring Started 🚀");
+                    setShowDetail(false);
+                    refetch();
+                  } catch (err) {
+                    toast.error(err?.data?.message || "Check your balance");
+                  }
+                }}
+                className="w-full py-5 bg-sky-500 hover:bg-sky-400 text-black font-black uppercase rounded-2xl transition-all active:scale-[0.98]"
+              >
+                {isStarting ? "Processing..." : "Start Mirroring"}
+              </button>
+            )}
+          </div>
         </div>
       )}
+    </div>
+  );
+};
+
+const Stat = ({ label, value, highlight }) => {
+  const getValColor = () => {
+    if (highlight === "emerald") return "text-emerald-500";
+    if (highlight === "sky") return "text-sky-400";
+    return "text-white";
+  };
+
+  return (
+    <div className="bg-white/5 p-4 rounded-2xl border border-white/5 flex flex-col items-center sm:items-start">
+      <p className="text-[10px] text-gray-500 uppercase font-black tracking-widest mb-1">
+        {label}
+      </p>
+      <p className={`font-black text-xl ${getValColor()}`}>{value}</p>
     </div>
   );
 };

@@ -32,9 +32,11 @@ const Transactions = () => {
   };
 
   const getTxIcon = (type) => {
-    if (type?.toLowerCase().includes("deposit"))
+    const t = type?.toLowerCase();
+    // Icon is Green for Deposits and Profits
+    if (t.includes("deposit") || t.includes("yield") || t.includes("profit"))
       return <HiOutlineArrowDownLeft className="text-emerald-500" />;
-    if (type?.toLowerCase().includes("withdraw"))
+    if (t.includes("withdraw"))
       return <HiOutlineArrowUpRight className="text-rose-500" />;
     return <HiOutlineArrowsRightLeft className="text-sky-500" />;
   };
@@ -90,50 +92,61 @@ const Transactions = () => {
               {isLoading ? (
                 <LoadingSkeleton />
               ) : transactions.length > 0 ? (
-                transactions.map((tx) => (
-                  <tr
-                    key={tx._id || tx.id}
-                    onClick={() => setSelectedTx(tx)}
-                    className="hover:bg-sky-500/[0.03] transition-all cursor-pointer group relative"
-                  >
-                    <td className="p-5 flex items-center gap-4">
-                      <div className="h-10 w-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center group-hover:border-sky-500/50 transition-all">
-                        {getTxIcon(tx.type)}
-                      </div>
-                      <div>
-                        <p className="text-sm font-black text-white uppercase tracking-tight leading-none mb-1">
-                          {tx.type.replace("_", " ")}
-                        </p>
-                        <p className="text-[10px] text-gray-500 font-mono">
-                          REF:{" "}
-                          {tx.referenceId || tx._id?.slice(-8).toUpperCase()}
-                        </p>
-                      </div>
-                    </td>
-                    <td className="p-5 text-sm text-gray-400 font-medium">
-                      {new Date(tx.createdAt).toLocaleDateString(undefined, {
-                        month: "short",
-                        day: "numeric",
-                        year: "numeric",
-                      })}
-                    </td>
-                    <td
-                      className={`p-5 text-sm font-black text-right ${tx.type === "deposit" || tx.type === "trading_yield" ? "text-emerald-500" : "text-white"}`}
+                transactions.map((tx) => {
+                  const isProfit =
+                    tx.type === "profit" || tx.type === "trading_yield";
+                  const isDeposit = tx.type === "deposit";
+                  const isPositive = isProfit || isDeposit;
+
+                  return (
+                    <tr
+                      key={tx._id || tx.id}
+                      onClick={() => setSelectedTx(tx)}
+                      className="hover:bg-sky-500/[0.03] transition-all cursor-pointer group relative"
                     >
-                      {tx.type === "deposit" ? "+" : "-"}$
-                      {tx.amount.toLocaleString(undefined, {
-                        minimumFractionDigits: 2,
-                      })}
-                    </td>
-                    <td className="p-5 text-center">
-                      <span
-                        className={`px-3 py-1 rounded-lg text-[9px] font-black uppercase border tracking-tighter ${getStatusStyle(tx.status)}`}
+                      <td className="p-5 flex items-center gap-4">
+                        <div className="h-10 w-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center">
+                          {getTxIcon(tx.type)}
+                        </div>
+                        <div>
+                          <p className="text-sm font-black text-white uppercase tracking-tight">
+                            {isProfit
+                              ? "TRADING PROFIT"
+                              : tx.type.replace("_", " ")}
+                          </p>
+                          <p className="text-[10px] text-gray-500 font-mono">
+                            ID: {tx._id?.slice(-8).toUpperCase()}
+                          </p>
+                        </div>
+                      </td>
+
+                      <td className="p-5 text-sm text-gray-400 font-medium">
+                        {new Date(tx.createdAt).toLocaleDateString(undefined, {
+                          month: "short",
+                          day: "numeric",
+                          year: "numeric",
+                        })}
+                      </td>
+
+                      <td
+                        className={`p-5 text-sm font-black text-right ${isPositive ? "text-emerald-500" : "text-rose-500"}`}
                       >
-                        {tx.status}
-                      </span>
-                    </td>
-                  </tr>
-                ))
+                        {isPositive ? "+" : "-"}$
+                        {tx.amount.toLocaleString(undefined, {
+                          minimumFractionDigits: 2,
+                        })}
+                      </td>
+
+                      <td className="p-5 text-center">
+                        <span
+                          className={`px-3 py-1 rounded-lg text-[9px] font-black uppercase border tracking-tighter ${getStatusStyle(tx.status)}`}
+                        >
+                          {tx.status}
+                        </span>
+                      </td>
+                    </tr>
+                  );
+                })
               ) : (
                 <EmptyState />
               )}
@@ -170,9 +183,23 @@ const Transactions = () => {
                 <p className="text-gray-500 text-[10px] uppercase font-black tracking-[0.2em] mb-3">
                   Gross Settlement
                 </p>
-                <h3 className="text-5xl font-black text-white tracking-tighter">
-                  <span className="text-gray-600 text-2xl mr-1">$</span>
-                  {selectedTx.amount.toLocaleString()}
+                <h3
+                  className={`text-5xl font-black tracking-tighter ${
+                    selectedTx.type === "profit" ||
+                    selectedTx.type === "trading_yield" ||
+                    selectedTx.type === "deposit"
+                      ? "text-emerald-500"
+                      : "text-white"
+                  }`}
+                >
+                  <span className="text-2xl mr-1">
+                    {selectedTx.type === "profit" ||
+                    selectedTx.type === "trading_yield" ||
+                    selectedTx.type === "deposit"
+                      ? "+"
+                      : "-"}
+                  </span>
+                  ${selectedTx.amount.toLocaleString()}
                 </h3>
                 <div
                   className={`mt-6 inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-[10px] font-black border ${getStatusStyle(selectedTx.status)}`}
@@ -185,7 +212,15 @@ const Transactions = () => {
               </div>
 
               <div className="grid grid-cols-1 gap-1">
-                <DetailRow label="Transaction Type" value={selectedTx.type} />
+                <DetailRow
+                  label="Transaction Type"
+                  value={
+                    selectedTx.type === "trading_yield" ||
+                    selectedTx.type === "profit"
+                      ? "TRADING PROFIT"
+                      : selectedTx.type
+                  }
+                />
                 <DetailRow
                   label="Funding Method"
                   value={selectedTx.method || "System Protocol"}
@@ -202,7 +237,7 @@ const Transactions = () => {
               </div>
             </div>
 
-            <button className="w-full py-5 bg-[#2962ff] hover:bg-[#1e4bd8] text-white font-black rounded-2xl transition-all text-xs uppercase tracking-[0.2em] shadow-xl shadow-blue-500/20 active:scale-[0.98] mt-6">
+            <button className="w-full py-5 bg-[#2962ff] hover:bg-[#1e4bd8] text-white font-black rounded-2xl transition-all text-xs uppercase tracking-[0.2em] mt-6">
               Download Official PDF
             </button>
           </div>
@@ -212,6 +247,7 @@ const Transactions = () => {
   );
 };
 
+// ... (DetailRow, LoadingSkeleton, EmptyState remain the same)
 const DetailRow = ({ label, value, isMono }) => (
   <div className="flex flex-col py-4 border-b border-white/5 last:border-0">
     <span className="text-gray-500 text-[10px] font-black uppercase tracking-widest mb-1">
@@ -256,8 +292,7 @@ const EmptyState = () => (
           No Transactions Detected
         </h3>
         <p className="text-gray-500 text-xs leading-relaxed">
-          Your ledger is currently empty. Start trading or fund your account to
-          see your activity here.
+          Your ledger is currently empty. Start trading to see activity.
         </p>
       </div>
     </td>

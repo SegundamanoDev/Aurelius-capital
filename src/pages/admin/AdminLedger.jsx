@@ -11,7 +11,6 @@ import {
 import toast from "react-hot-toast";
 
 const AdminLedger = () => {
-  // 1. Get real users from RTK Query
   const { data: allUsers = [], isLoading } = useGetAllUsersQuery();
   const [injectEntry, { isLoading: isInjecting }] =
     useInjectLedgerEntryMutation();
@@ -19,7 +18,7 @@ const AdminLedger = () => {
   const [formData, setFormData] = useState({
     userId: "",
     amount: "",
-    type: "deposit",
+    type: "deposit", // Default type
     method: "Legacy Migration",
     date: "",
   });
@@ -31,7 +30,12 @@ const AdminLedger = () => {
     }
 
     try {
-      await injectEntry(formData).unwrap();
+      // Ensure amount is passed as a pure number
+      await injectEntry({
+        ...formData,
+        amount: Number(formData.amount),
+      }).unwrap();
+
       toast.success("Historical record injected into ledger");
       setFormData({
         userId: "",
@@ -64,7 +68,6 @@ const AdminLedger = () => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* FORM SIDE */}
         <div className="lg:col-span-1">
           <form
             onSubmit={handleCreateEntry}
@@ -75,6 +78,7 @@ const AdminLedger = () => {
             </h3>
 
             <div className="space-y-4">
+              {/* TARGET USER */}
               <div className="space-y-1">
                 <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest">
                   Target Investor
@@ -97,6 +101,31 @@ const AdminLedger = () => {
                 </select>
               </div>
 
+              {/* TRANSACTION TYPE - ADDED HERE */}
+              <div className="space-y-1">
+                <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest">
+                  Entry Type
+                </label>
+                <select
+                  className="w-full bg-white/5 border border-white/10 p-4 rounded-xl text-white text-sm outline-none focus:border-sky-500 appearance-none"
+                  value={formData.type}
+                  onChange={(e) =>
+                    setFormData({ ...formData, type: e.target.value })
+                  }
+                >
+                  <option value="deposit" className="bg-black">
+                    Deposit / Funding
+                  </option>
+                  <option value="profit" className="bg-black">
+                    Trading Profit
+                  </option>
+                  <option value="withdrawal" className="bg-black">
+                    Withdrawal
+                  </option>
+                </select>
+              </div>
+
+              {/* AMOUNT */}
               <div className="space-y-1">
                 <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest">
                   Amount (USD)
@@ -112,6 +141,7 @@ const AdminLedger = () => {
                 />
               </div>
 
+              {/* DATE */}
               <div className="space-y-1">
                 <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest">
                   Backdate Transaction
@@ -126,9 +156,10 @@ const AdminLedger = () => {
                 />
               </div>
 
+              {/* METHOD */}
               <div className="space-y-1">
                 <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest">
-                  Migration Method
+                  System Note / Method
                 </label>
                 <select
                   className="w-full bg-white/5 border border-white/10 p-4 rounded-xl text-white text-sm outline-none"
@@ -142,6 +173,9 @@ const AdminLedger = () => {
                   </option>
                   <option value="Direct Transfer" className="bg-black">
                     Direct Transfer
+                  </option>
+                  <option value="Profit Distribution" className="bg-black">
+                    Profit Distribution
                   </option>
                   <option value="Crypto Settlement" className="bg-black">
                     Crypto Settlement
@@ -160,7 +194,6 @@ const AdminLedger = () => {
           </form>
         </div>
 
-        {/* LIST SIDE (Mocked until you have a 'getHistory' admin query) */}
         <div className="lg:col-span-2 space-y-4">
           <div className="bg-[#05070A] border border-white/5 rounded-[2.5rem] overflow-hidden shadow-2xl">
             <div className="p-6 border-b border-white/5 flex justify-between items-center">

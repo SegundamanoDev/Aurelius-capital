@@ -30,11 +30,6 @@ const FinalCTA = () => {
               Ready to trade?
             </h2>
 
-            <p className="text-white text-sm md:text-lg max-w-2xl mx-auto font-medium leading-relaxed">
-              Get started with an easy-to-follow guide to trading tools or head
-              straight to Supercharts and experience the power of chart trading.
-            </p>
-
             <div className="flex flex-col sm:flex-row justify-center items-center gap-6 pt-6">
               <Link
                 to="/register"

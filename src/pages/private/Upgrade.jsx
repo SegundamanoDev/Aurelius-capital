@@ -25,7 +25,7 @@ const Upgrade = () => {
       color: "border-white/10",
     },
     {
-      name: "Silver Pro",
+      name: "Silver",
       price: "$499",
       period: "/month",
       description:
@@ -41,7 +41,7 @@ const Upgrade = () => {
       color: "border-sky-500/50",
     },
     {
-      name: "Gold Institutional",
+      name: "Gold",
       price: "$1,999",
       period: "/month",
       description:

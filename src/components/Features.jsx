@@ -37,12 +37,12 @@ const Features = () => {
   return (
     <section className="py-32 bg-[#05070A] px-6 relative overflow-hidden">
       {/* Background visual element */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-px " />
 
       <div className="max-w-7xl mx-auto">
         <div className="flex flex-col lg:flex-row lg:items-end justify-between mb-20 gap-8">
           <div className="space-y-4">
-            <h2 className="text-sky-500 font-black uppercase tracking-[0.4em] text-[10px]">
+            <h2 className="!text-sky-500 font-black uppercase tracking-[0.4em] text-[10px]">
               The Alpha Protocol
             </h2>
             <h3 className="text-4xl md:text-6xl font-black text-white leading-[0.9] uppercase italic tracking-tighter">
@@ -58,11 +58,11 @@ const Features = () => {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-px bg-white/5 border border-white/5 rounded-[2rem] overflow-hidden">
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4 overflow-hidden">
           {features.map((f, i) => (
             <div
               key={i}
-              className="p-10 bg-[#05070A] hover:bg-white/[0.02] transition-all duration-500 group relative"
+              className="p-10 transition-all duration-500 group relative border-b-1 border-gray-800"
             >
               {/* Top Row: Icon & Tag */}
               <div className="flex justify-between items-start mb-12">

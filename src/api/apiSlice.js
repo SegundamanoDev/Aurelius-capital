@@ -139,15 +139,14 @@ export const apiSlice = createApi({
       }),
       invalidatesTags: ["Transaction", "User"],
     }),
-
-    // =========================
-    // TRADERS
-    // =========================
-    getTraders: builder.query({
-      query: () => "/traders",
-      providesTags: ["Trader"],
+    injectProfit: builder.mutation({
+      query: (data) => ({
+        url: "/transactions/inject-profit",
+        method: "POST",
+        body: data,
+      }),
+      invalidatesTags: ["User", "Transaction"],
     }),
-
     startCopying: builder.mutation({
       query: (data) => ({
         url: "/traders/copy/start",
@@ -157,29 +156,29 @@ export const apiSlice = createApi({
       invalidatesTags: ["User", "Trader"],
     }),
 
-    stopCopying: builder.mutation({
-      query: (data) => ({
-        url: "/traders/stop-copying",
-        method: "POST",
-        body: data,
-      }),
-      invalidatesTags: ["User"],
+    getTraders: builder.query({
+      query: () => "/traders",
+      providesTags: ["Trader"],
+    }),
+
+    getTraderById: builder.query({
+      query: (id) => `/traders/${id}`,
     }),
 
     createTrader: builder.mutation({
-      query: (newTrader) => ({
+      query: (data) => ({
         url: "/traders",
         method: "POST",
-        body: newTrader,
+        body: data,
       }),
       invalidatesTags: ["Trader"],
     }),
 
     updateTrader: builder.mutation({
-      query: ({ id, ...patch }) => ({
+      query: ({ id, data }) => ({
         url: `/traders/${id}`,
         method: "PUT",
-        body: patch,
+        body: data,
       }),
       invalidatesTags: ["Trader"],
     }),
@@ -207,15 +206,13 @@ export const {
   useGetAllUsersQuery,
   useUpdateUserAdminMutation,
   useDeleteUserMutation,
-
-  // Traders
+  useStartCopyingMutation,
   useGetTradersQuery,
+  useGetTraderByIdQuery,
   useCreateTraderMutation,
   useUpdateTraderMutation,
   useDeleteTraderMutation,
-  useStartCopyingMutation,
-  useStopCopyingMutation,
-
+  useInjectProfitMutation,
   // Transactions
   useDepositFundsMutation,
   useWithdrawFundsMutation,

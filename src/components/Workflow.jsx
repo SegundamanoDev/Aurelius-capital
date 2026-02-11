@@ -12,11 +12,6 @@ const steps = [
     desc: "Deposit funds via our secure encrypted gateway using crypto or fiat.",
   },
   {
-    id: "03",
-    title: "Deploy AI",
-    desc: "Select your preferred tier and let our algorithms begin market analysis.",
-  },
-  {
     id: "04",
     title: "Harvest Gains",
     desc: "Watch your portfolio grow in real-time and withdraw at your convenience.",
@@ -25,9 +20,9 @@ const steps = [
 
 const Workflow = () => {
   return (
-    <section className="py-24 bg-[#05070A] border-t border-white/5">
+    <section className="py-24">
       <div className="max-w-7xl mx-auto px-6">
-        <div className="grid lg:grid-cols-4 gap-12">
+        <div className="grid lg:grid-cols-3 gap-12">
           {steps.map((step, i) => (
             <div key={i} className="relative group">
               {/* Animated Number Background */}
