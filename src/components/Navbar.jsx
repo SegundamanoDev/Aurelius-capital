@@ -18,7 +18,6 @@ const Navbar = () => {
     { name: "Home", path: "/" },
     { name: "Portfolios", path: "/portfolio" },
     { name: "Copy Trading", path: "/copy-trading" },
-    { name: "Investment Plans", path: "/plans" },
     { name: "Academy", path: "/academy" },
     { name: "Insurance", path: "/insurance" },
     { name: "AML Policy", path: "/aml-policy" },

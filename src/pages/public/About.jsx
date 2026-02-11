@@ -11,8 +11,8 @@ import { Link } from "react-router-dom";
 
 const About = () => {
   const stats = [
-    { label: "Quarterly Volume", value: "$4.2B+" },
-    { label: "Global Users", value: "180K+" },
+    { label: "Quarterly Volume", value: "$439K+" },
+    { label: "Global Users", value: "500K+" },
     { label: "Execution Speed", value: "0.01ms" },
     { label: "Uptime", value: "99.99%" },
   ];

@@ -50,7 +50,8 @@ html {
 .input {
   @apply w-full bg-black/40 border border-white/10 p-4 rounded-xl text-white text-sm outline-none focus:border-sky-500 transition-all;
 }
-section {
+section,
+footer {
   background-color: rgb(0, 0, 0);
 }
 h1,

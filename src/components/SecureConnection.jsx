@@ -9,7 +9,7 @@ const SecureConnection = () => {
           Secure connection method
         </h3>
         <p className="text-gray-400 text-lg md:text-xl leading-relaxed font-medium">
-          Your credentials for the broker account are safe — stored locally in
+          Your credentials for the broker account are safe stored locally in
           your browser and{" "}
           <span className="text-white">never on our servers.</span>
         </p>

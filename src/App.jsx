@@ -46,6 +46,7 @@ import FAQ from "./components/FAQ";
 import MadeToTradeVideo from "./pages/private/Invest";
 import PricingSection from "./components/InvestmentPlans";
 import AdminTransactions from "./pages/admin/AdminTransactions";
+import Insurance from "./components/Insurance";
 
 // --- PUBLIC LAYOUT WRAPPER ---
 const PublicLayout = () => (
@@ -127,6 +128,7 @@ function App() {
             <Route path="/copy-trading" element={<CopyTradingPage />} />
             <Route path="/aml-policy" element={<AMLPolicy />} />
             <Route path="/faqs" element={<FAQ />} />
+            <Route path="/insurance" element={<Insurance />} />
           </Route>
 
           {/* 2. USER DASHBOARD ROUTES */}

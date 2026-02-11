@@ -66,7 +66,7 @@ const HOLDINGS = [
 
 const Portfolio = () => {
   return (
-    <div className="space-y-6 animate-in fade-in duration-1000 pb-20">
+    <div className="space-y-6 animate-in fade-in duration-1000 py-20">
       {/* 1. PERFORMANCE HERO SECTION */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 bg-[#05070A] border border-white/5 rounded-[2.5rem] p-8 shadow-2xl relative overflow-hidden">
@@ -76,7 +76,7 @@ const Portfolio = () => {
                 Total Portfolio Value
               </p>
               <h1 className="text-4xl font-black text-white mt-1">
-                $54,231.00
+                $439,231.000
               </h1>
               <div className="flex gap-4 mt-2">
                 <span className="flex items-center text-emerald-500 text-[11px] font-bold">
@@ -179,7 +179,7 @@ const Portfolio = () => {
           },
           {
             label: "Staking Rewards",
-            val: "+$124.50",
+            val: "+$1,97,500",
             desc: "Passive income (30d)",
             icon: <HiOutlineCircleStack />,
           },

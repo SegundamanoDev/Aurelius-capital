@@ -30,14 +30,12 @@ const Workflow = () => {
                 {step.id}
               </div>
 
-              <div className="relative z-10">
-                <div className="h-1 w-12 bg-sky-500 mb-6 group-hover:w-24 transition-all duration-500" />
+              <div className="border-b-1 border-gray-800 pb-2">
+                <div className="" />
                 <h4 className="text-xl font-bold text-white mb-4">
                   {step.title}
                 </h4>
-                <p className="text-gray-500 text-sm leading-relaxed">
-                  {step.desc}
-                </p>
+                <p className="text-sm leading-relaxed">{step.desc}</p>
               </div>
             </div>
           ))}

@@ -179,9 +179,9 @@ const Academy = () => {
               The Daily Alpha Brief.
             </h2>
             <p className="text-gray-400 text-sm font-medium">
-              Join 50,000+ traders receiving institutional analysis, sentiment
-              heatmaps, and high-probability setups directly in their inbox
-              every morning.
+              Join over 50,000+ traders receiving institutional analysis,
+              sentiment heatmaps, and high-probability setups directly in their
+              inbox every morning.
             </p>
           </div>
           <div className=" md:flex gap-2">
