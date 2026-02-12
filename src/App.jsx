@@ -135,9 +135,9 @@ function App() {
           <Route
             path="/dashboard"
             element={
-              // <ProtectedRoute>
-              <DashboardLayout />
-              // </ProtectedRoute>
+              <ProtectedRoute>
+                <DashboardLayout />
+              </ProtectedRoute>
             }
           >
             <Route index element={<DashboardHome />} />
@@ -155,9 +155,9 @@ function App() {
           <Route
             path="/admin"
             element={
-              // <ProtectedAdminRoute>
-              <AdminLayout />
-              // </ProtectedAdminRoute>
+              <ProtectedAdminRoute>
+                <AdminLayout />
+              </ProtectedAdminRoute>
             }
           >
             <Route index element={<AdminDashboard />} />
