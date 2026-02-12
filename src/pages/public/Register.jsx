@@ -53,10 +53,6 @@ const Register = () => {
   };
 
   const handleSubmit = async () => {
-    if (formData.password !== formData.confirmPassword) {
-      return toast.error("Passwords do not match!");
-    }
-
     const payload = {
       username: formData.username,
       firstName: formData.firstName,
