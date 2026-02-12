@@ -1,6 +1,9 @@
 import React, { useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
-import { useGetMyTransactionsQuery } from "../../api/apiSlice";
+import {
+  useGetMyProfileQuery,
+  useGetMyTransactionsQuery,
+} from "../../api/apiSlice";
 import {
   HiOutlineArrowTrendingUp,
   HiOutlineWallet,
@@ -13,8 +16,13 @@ import { getSymbol } from "../public/Register";
 const DashboardHome = () => {
   const container = useRef();
 
-  // Pull User data
-  const { user } = useSelector((state) => state.auth);
+  const { data: freshUser, isLoading: userLoading } = useGetMyProfileQuery();
+
+  // 3. Keep the Redux selector as a fallback/initial state
+  const { user: authUser } = useSelector((state) => state.auth);
+
+  // 4. Prioritize the fresh data from the API hook
+  const user = freshUser || authUser;
 
   // Get the correct symbol based on user profile
   const currencySymbol = getSymbol(user?.currency);
@@ -23,6 +31,16 @@ const DashboardHome = () => {
   const { data: transactionsData, isLoading: txLoading } =
     useGetMyTransactionsQuery();
   const transactions = transactionsData || [];
+
+  if (userLoading) {
+    return (
+      <div className="h-screen flex items-center justify-center bg-[#020408]">
+        <div className="text-sky-500 animate-pulse font-black tracking-widest uppercase text-xs">
+          Initializing Secure Terminal...
+        </div>
+      </div>
+    );
+  }
 
   // 2. Updated stats to use dynamic currencySymbol
   const stats = [
