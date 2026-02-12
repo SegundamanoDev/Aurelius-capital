@@ -4,7 +4,8 @@ import {
   useGetAllTransactionsQuery,
   useUpdateTransactionStatusMutation,
 } from "../../api/apiSlice";
-import toast from "react-hot-toast"; // 1. Import toast
+import { getSymbol } from "../public/Register";
+import toast from "react-hot-toast";
 
 const AdminDeposits = () => {
   const { data: transactions, isLoading, error } = useGetAllTransactionsQuery();
@@ -18,7 +19,6 @@ const AdminDeposits = () => {
     ) || [];
 
   const handleAction = async (id, status) => {
-    // 2. Create a promise-based toast
     const actionTask = updateStatus({ transactionId: id, status }).unwrap();
 
     toast.promise(
@@ -64,7 +64,7 @@ const AdminDeposits = () => {
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-black text-white uppercase tracking-tighter">
-          Funding Approvals
+          Funding <span className="text-sky-500">Approvals</span>
           <span className="ml-3 text-sky-500 bg-sky-500/10 px-3 py-1 rounded-full text-sm">
             {pendingDeposits.length}
           </span>
@@ -90,15 +90,23 @@ const AdminDeposits = () => {
                     {dep.method} Protocol •{" "}
                     {new Date(dep.createdAt).toLocaleDateString()}
                   </p>
+                  {/* Added a small badge to clarify the currency code */}
+                  <span className="mt-1 inline-block px-2 py-0.5 rounded bg-white/5 text-sky-400 text-[8px] font-bold">
+                    CURRENCY: {dep.userId?.currency || "USD"}
+                  </span>
                 </div>
               </div>
 
-              <div className="text-left md:text-center px-6 py-3 bg-white/[0.02] rounded-2xl border border-white/5">
+              <div className="text-left md:text-center px-6 py-4 bg-white/[0.02] rounded-2xl border border-white/5 min-w-[180px]">
                 <p className="text-[9px] text-gray-500 font-black uppercase tracking-widest mb-1">
                   Volume Requested
                 </p>
                 <h3 className="text-xl font-black text-emerald-500 font-mono">
-                  ${dep.amount.toLocaleString()}
+                  {/* 2. Dynamic Symbol and Formatting */}
+                  {getSymbol(dep.userId?.currency)}
+                  {dep.amount.toLocaleString(undefined, {
+                    minimumFractionDigits: 2,
+                  })}
                 </h3>
               </div>
 

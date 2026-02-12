@@ -8,17 +8,15 @@ import {
   useGetAllTransactionsQuery,
   useUpdateTransactionStatusMutation,
 } from "../../api/apiSlice";
+import { getSymbol } from "../public/Register";
 import toast from "react-hot-toast";
 
 const AdminWithdrawals = () => {
-  // 1. Fetch real-time data
   const { data: transactions, isLoading, error } = useGetAllTransactionsQuery();
 
-  // 2. Setup Mutation
   const [updateStatus, { isLoading: isUpdating }] =
     useUpdateTransactionStatusMutation();
 
-  // 3. Filter for Pending Withdrawals
   const pendingWithdrawals =
     transactions?.filter(
       (t) => t.type === "withdrawal" && t.status === "pending",
@@ -65,7 +63,7 @@ const AdminWithdrawals = () => {
     <div className="space-y-6 animate-in fade-in duration-700">
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-black text-white uppercase tracking-tighter">
-          Withdrawal Claims
+          Withdrawal <span className="text-amber-500">Claims</span>
         </h2>
         <div className="px-4 py-1.5 bg-amber-500/10 border border-amber-500/20 rounded-full">
           <p className="text-amber-500 text-[10px] font-black uppercase tracking-widest">
@@ -80,7 +78,7 @@ const AdminWithdrawals = () => {
             <thead className="bg-white/[0.02] text-[10px] text-gray-500 uppercase font-black">
               <tr>
                 <th className="p-6">Investor</th>
-                <th className="p-6">Amount</th>
+                <th className="p-6">Amount (Local Payout)</th>
                 <th className="p-6">Destination</th>
                 <th className="p-6">Timestamp</th>
                 <th className="p-6 text-right">Terminal Action</th>
@@ -104,10 +102,15 @@ const AdminWithdrawals = () => {
                     <td className="p-6">
                       <div className="flex flex-col">
                         <span className="font-mono text-red-400 font-black text-base">
-                          -${w.amount.toLocaleString()}
+                          -{getSymbol(w.userId?.currency)}
+                          {w.amount.toLocaleString(undefined, {
+                            minimumFractionDigits: 2,
+                          })}
                         </span>
-                        <span className="text-[9px] text-gray-600 font-bold uppercase">
-                          USD Asset
+                        <span
+                          className={`text-[9px] font-bold uppercase ${w.userId?.currency !== "USD" ? "text-amber-500" : "text-gray-600"}`}
+                        >
+                          {w.userId?.currency || "USD"} ASSET
                         </span>
                       </div>
                     </td>

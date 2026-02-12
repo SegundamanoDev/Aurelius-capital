@@ -5,11 +5,11 @@ import { logOut } from "../features/authSlice";
 import {
   HiOutlineHome,
   HiOutlineCreditCard,
-  HiOutlineChartBar,
+  // HiOutlineChartBar,
   HiOutlineLogout,
   HiOutlineUser,
   HiOutlineUsers,
-  HiOutlineShieldCheck,
+  // HiOutlineShieldCheck,
   HiMenuAlt3,
   HiX,
 } from "react-icons/hi";
@@ -48,12 +48,12 @@ const DashboardLayout = () => {
       icon: <HiOutlineCreditCard />,
       path: "/dashboard/withdraw",
     },
-    {
-      name: "Pricing",
-      icon: <HiOutlineCreditCard />,
-      path: "/dashboard/pricing",
-    },
-    { name: "Trade", icon: <HiOutlineChartBar />, path: "/dashboard/trade" },
+    // {
+    //   name: "Pricing",
+    //   icon: <HiOutlineCreditCard />,
+    //   path: "/dashboard/pricing",
+    // },
+    // { name: "Trade", icon: <HiOutlineChartBar />, path: "/dashboard/trade" },
     {
       name: "Copy Trading",
       icon: <HiOutlineUsers />,
@@ -64,11 +64,11 @@ const DashboardLayout = () => {
       icon: <HiOutlineArrowsRightLeft />,
       path: "/dashboard/transactions",
     },
-    {
-      name: "Upgrade",
-      icon: <HiOutlineShieldCheck />,
-      path: "/dashboard/upgrade",
-    },
+    // {
+    //   name: "Upgrade",
+    //   icon: <HiOutlineShieldCheck />,
+    //   path: "/dashboard/upgrade",
+    // },
     { name: "Profile", icon: <HiOutlineUser />, path: "/dashboard/profile" },
   ];
 
@@ -89,7 +89,7 @@ const DashboardLayout = () => {
           </button>
         </div>
 
-        <nav className="flex-1 p-4 space-y-1 overflow-y-auto scrollbar-hide">
+        <nav className="flex-1 p-4 space-y-2 overflow-y-auto scrollbar-hide">
           {menuItems.map((item) => {
             const isActive = location.pathname === item.path;
             return (
@@ -151,7 +151,7 @@ const DashboardLayout = () => {
                 Net Equity
               </p>
               <p className="text-sky-400 font-bold text-sm">
-                $
+                {user?.currency}
                 {(user?.balance || 0).toLocaleString(undefined, {
                   minimumFractionDigits: 2,
                 })}

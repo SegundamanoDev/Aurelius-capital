@@ -11,6 +11,8 @@ import {
   HiOutlineCheckCircle,
   HiOutlineXMark,
   HiOutlineShieldCheck,
+  HiOutlineUser,
+  HiCheckBadge,
 } from "react-icons/hi2";
 
 const CopyTradingPage = () => {
@@ -94,38 +96,60 @@ const CopyTradingPage = () => {
           return (
             <div
               key={trader._id}
-              className="bg-[#05070A] border border-white/5 rounded-[2rem] p-6 hover:border-sky-500/30 transition-all group relative overflow-hidden"
+              className="bg-[#05070A] border border-white/5 rounded-[2.5rem] p-8 hover:border-sky-500/30 transition-all group relative overflow-hidden"
             >
               <div
-                className="cursor-pointer space-y-4"
+                className="cursor-pointer flex flex-col items-center text-center space-y-4"
                 onClick={() => {
                   setSelectedTrader(trader);
                   setShowDetail(true);
                 }}
               >
-                <div className="flex justify-between items-start">
-                  <h3 className="text-white text-xl font-black uppercase italic leading-none">
-                    {trader.name}
-                  </h3>
+                {/* TOP ALIGNED IMAGE WITH VERIFIED BADGE */}
+                <div className="relative">
+                  <div className="h-24 w-24 rounded-3xl overflow-hidden border-2 border-white/5 bg-white/5 flex items-center justify-center group-hover:border-sky-500/50 transition-colors shadow-2xl">
+                    {trader.avatar ? (
+                      <img
+                        src={trader.avatar}
+                        alt={trader.name}
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      <HiOutlineUser className="text-gray-700" size={40} />
+                    )}
+                  </div>
                   {trader.verified && (
-                    <HiOutlineShieldCheck className="text-sky-500" size={20} />
+                    <div className="absolute -bottom-2 -right-2 bg-sky-500 text-black p-1 rounded-lg shadow-lg">
+                      <HiCheckBadge size={18} />
+                    </div>
                   )}
                 </div>
 
-                <div className="space-y-1 border-l-2 border-sky-500/20 pl-4">
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-500 text-[10px] uppercase font-bold">
+                <div>
+                  <h3 className="text-white text-2xl font-black uppercase italic tracking-tight leading-none">
+                    {trader.name}
+                  </h3>
+                  {trader.verified && (
+                    <span className="text-[9px] text-sky-500 font-black uppercase tracking-[0.2em] mt-2 block">
+                      Verified Strategy
+                    </span>
+                  )}
+                </div>
+
+                <div className="w-full space-y-2 pt-2">
+                  <div className="flex justify-between items-center bg-white/[0.02] p-3 rounded-xl border border-white/5">
+                    <span className="text-gray-500 text-[10px] uppercase font-bold tracking-widest">
                       ROI (30D)
                     </span>
-                    <span className="text-emerald-500 font-black">
-                      {trader.performance?.roi30d}%
+                    <span className="text-emerald-500 font-black font-mono">
+                      +{trader.performance?.roi30d}%
                     </span>
                   </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-500 text-[10px] uppercase font-bold">
+                  <div className="flex justify-between items-center bg-white/[0.02] p-3 rounded-xl border border-white/5">
+                    <span className="text-gray-500 text-[10px] uppercase font-bold tracking-widest">
                       Win Rate
                     </span>
-                    <span className="text-sky-400 font-bold">
+                    <span className="text-sky-400 font-black font-mono">
                       {trader.performance?.winRate}%
                     </span>
                   </div>
@@ -138,10 +162,10 @@ const CopyTradingPage = () => {
                   setSelectedTrader(trader);
                   setShowDetail(true);
                 }}
-                className={`w-full mt-6 py-4 rounded-xl font-black uppercase text-[11px] flex items-center justify-center gap-2 transition-all ${
+                className={`w-full mt-6 py-4 rounded-2xl font-black uppercase text-[11px] flex items-center justify-center gap-2 transition-all ${
                   following
                     ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
-                    : "bg-white text-black hover:bg-sky-500"
+                    : "bg-sky-500 text-black hover:bg-sky-400 shadow-lg shadow-sky-500/10"
                 }`}
               >
                 {following ? (
@@ -187,13 +211,33 @@ const CopyTradingPage = () => {
         <div className="fixed inset-0 bg-black/95 z-50 flex justify-center items-center p-4 backdrop-blur-sm">
           <div className="bg-[#0A0C12] max-w-xl w-full p-6 md:p-10 rounded-[2.5rem] border border-white/10 overflow-y-auto max-h-[90vh] shadow-2xl">
             <div className="flex justify-between items-start mb-8">
-              <div>
-                <h2 className="text-3xl font-black text-white uppercase italic leading-none">
-                  {traderDetail.name}
-                </h2>
-                <span className="text-sky-500 text-[10px] uppercase font-bold tracking-widest">
-                  Strategy Performance Profile
-                </span>
+              <div className="flex flex-col items-center sm:items-start gap-4 w-full">
+                <div className="relative">
+                  <div className="h-28 w-28 rounded-[2rem] overflow-hidden border-2 border-sky-500/20 bg-white/5 flex items-center justify-center shadow-2xl">
+                    {traderDetail.avatar ? (
+                      <img
+                        src={traderDetail.avatar}
+                        alt={traderDetail.name}
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      <HiOutlineUser className="text-gray-700" size={48} />
+                    )}
+                  </div>
+                  {traderDetail.verified && (
+                    <div className="absolute -bottom-2 -right-2 bg-sky-500 text-black p-1.5 rounded-xl shadow-xl">
+                      <HiCheckBadge size={22} />
+                    </div>
+                  )}
+                </div>
+                <div className="text-center sm:text-left">
+                  <h2 className="text-4xl font-black text-white uppercase italic leading-none tracking-tight">
+                    {traderDetail.name}
+                  </h2>
+                  <span className="text-sky-500 text-[10px] uppercase font-black tracking-[0.3em] mt-3 block">
+                    Institutional Strategy Profile
+                  </span>
+                </div>
               </div>
               <button
                 onClick={() => setShowDetail(false)}
@@ -203,7 +247,6 @@ const CopyTradingPage = () => {
               </button>
             </div>
 
-            {/* PERFORMANCE GRID - Vertical on Mobile */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-10">
               <Stat
                 label="ROI 30D"
@@ -233,7 +276,6 @@ const CopyTradingPage = () => {
               />
             </div>
 
-            {/* ACTION BUTTON */}
             {isFollowing(traderDetail._id) ? (
               <div className="w-full py-5 bg-emerald-500/10 border border-emerald-500/30 text-emerald-500 font-black uppercase rounded-2xl flex items-center justify-center gap-3">
                 <HiOutlineCheckCircle size={22} />
@@ -244,10 +286,7 @@ const CopyTradingPage = () => {
                 disabled={isStarting}
                 onClick={async () => {
                   try {
-                    await startCopying({
-                      traderId: traderDetail._id,
-                      amount: 100, // Default allocation or your specific logic
-                    }).unwrap();
+                    await startCopying({ traderId: traderDetail._id }).unwrap();
                     toast.success("Mirroring Started 🚀");
                     setShowDetail(false);
                     refetch();
@@ -255,7 +294,7 @@ const CopyTradingPage = () => {
                     toast.error(err?.data?.message || "Check your balance");
                   }
                 }}
-                className="w-full py-5 bg-sky-500 hover:bg-sky-400 text-black font-black uppercase rounded-2xl transition-all active:scale-[0.98]"
+                className="w-full py-5 bg-sky-500 hover:bg-sky-400 text-black font-black uppercase rounded-2xl transition-all active:scale-[0.98] shadow-xl shadow-sky-500/20"
               >
                 {isStarting ? "Processing..." : "Start Mirroring"}
               </button>

@@ -9,8 +9,8 @@ import {
   HiOutlineClock,
   HiOutlineUser,
   HiOutlineMagnifyingGlass,
-  HiOutlineFunnel,
 } from "react-icons/hi2";
+import { getSymbol } from "../public/Register";
 import toast from "react-hot-toast";
 
 const AdminTransactions = () => {
@@ -24,7 +24,6 @@ const AdminTransactions = () => {
   const [filter, setFilter] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
 
-  // Logic for approving/declining
   const handleStatusChange = async (transactionId, newStatus) => {
     try {
       await updateStatus({ transactionId, status: newStatus }).unwrap();
@@ -44,6 +43,7 @@ const AdminTransactions = () => {
     const matchesFilter = filter === "all" || tx.status === filter;
     const matchesSearch =
       tx.userId?.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      tx.userId?.firstName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       tx.type?.toLowerCase().includes(searchTerm.toLowerCase());
     return matchesFilter && matchesSearch;
   });
@@ -75,18 +75,16 @@ const AdminTransactions = () => {
         </div>
 
         <div className="flex flex-col sm:flex-row gap-3">
-          {/* Search */}
           <div className="relative group">
             <HiOutlineMagnifyingGlass className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-sky-500 transition-colors" />
             <input
               type="text"
-              placeholder="Search by email..."
+              placeholder="Search email or name..."
               className="bg-[#0A0C10] border border-white/10 rounded-xl py-2.5 pl-10 pr-4 text-sm text-white focus:outline-none focus:border-sky-500/50 w-full sm:w-64"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
-          {/* Filter */}
           <select
             className="bg-[#0A0C10] border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none cursor-pointer"
             value={filter}
@@ -112,7 +110,7 @@ const AdminTransactions = () => {
         </div>
       )}
 
-      {/* Desktop Table View (Hidden on Mobile) */}
+      {/* Desktop Table View */}
       <div className="hidden lg:block bg-[#05070A] border border-white/5 rounded-[2rem] overflow-hidden shadow-2xl">
         <table className="w-full text-left">
           <thead className="bg-white/[0.02] border-b border-white/5">
@@ -124,7 +122,7 @@ const AdminTransactions = () => {
                 Transaction Info
               </th>
               <th className="p-5 text-[10px] font-black uppercase tracking-widest text-gray-500">
-                Volume
+                Volume (Local)
               </th>
               <th className="p-5 text-[10px] font-black uppercase tracking-widest text-gray-500">
                 Status
@@ -165,10 +163,14 @@ const AdminTransactions = () => {
                 </td>
                 <td className="p-5">
                   <span className="text-sm font-black text-white">
-                    ${tx.amount.toLocaleString()}
+                    {/* 2. Dynamic Symbol based on the transaction's user */}
+                    {getSymbol(tx.userId?.currency)}
+                    {tx.amount.toLocaleString(undefined, {
+                      minimumFractionDigits: 2,
+                    })}
                   </span>
                   <p className="text-[9px] text-gray-600 uppercase font-bold">
-                    {tx.method || "System"}
+                    {tx.userId?.currency || "USD"} Settlement
                   </p>
                 </td>
                 <td className="p-5">
@@ -204,7 +206,7 @@ const AdminTransactions = () => {
         </table>
       </div>
 
-      {/* Mobile Card View (Hidden on Desktop) */}
+      {/* Mobile Card View */}
       <div className="lg:hidden space-y-4">
         {filteredData.map((tx) => (
           <div
@@ -235,13 +237,17 @@ const AdminTransactions = () => {
             <div className="flex justify-between items-end border-t border-white/5 pt-4">
               <div>
                 <p className="text-[10px] text-gray-500 uppercase font-black tracking-widest">
-                  Amount & Type
+                  Amount ({tx.userId?.currency || "USD"})
                 </p>
                 <p className="text-lg font-black text-white">
-                  ${tx.amount.toLocaleString()}
+                  {/* 3. Dynamic Symbol for Mobile Card */}
+                  {getSymbol(tx.userId?.currency)}
+                  {tx.amount.toLocaleString(undefined, {
+                    minimumFractionDigits: 2,
+                  })}
                 </p>
                 <p className="text-[10px] text-sky-500 font-bold uppercase">
-                  {tx.type}
+                  {tx.type.replace("_", " ")}
                 </p>
               </div>
 

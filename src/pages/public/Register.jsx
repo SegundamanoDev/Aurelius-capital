@@ -8,15 +8,31 @@ import {
   HiOutlineEnvelope,
   HiOutlineMapPin,
   HiOutlineBriefcase,
-  HiOutlineGlobeAlt,
 } from "react-icons/hi2";
+
+// 1. Helpers & Constants (Defined outside the component)
+export const currencyMap = {
+  USD: { symbol: "$", label: "US Dollar" },
+  EUR: { symbol: "€", label: "Euro" },
+  GBP: { symbol: "£", label: "British Pound" },
+  NGN: { symbol: "₦", label: "Nigerian Naira" },
+  CAD: { symbol: "CA$", label: "Canadian Dollar" },
+  AUD: { symbol: "A$", label: "Australian Dollar" },
+  ZAR: { symbol: "R", label: "South African Rand" },
+  KES: { symbol: "KSh", label: "Kenyan Shilling" },
+  GHS: { symbol: "GH₵", label: "Ghanaian Cedi" },
+  INR: { symbol: "₹", label: "Indian Rupee" },
+  JPY: { symbol: "¥", label: "Japanese Yen" },
+  CNY: { symbol: "¥", label: "Chinese Yuan" },
+};
+
+export const getSymbol = (code) => currencyMap[code]?.symbol || "$";
 
 const Register = () => {
   const [step, setStep] = useState(1);
   const navigate = useNavigate();
-  const [register, { isLoading, error }] = useRegisterMutation();
+  const [register, { isLoading, error: apiError }] = useRegisterMutation();
 
-  // State for all fields
   const [formData, setFormData] = useState({
     username: "",
     email: "",
@@ -36,25 +52,19 @@ const Register = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // ... inside your Register component ...
-
   const handleSubmit = async () => {
-    // 1. Frontend Check (This works fine)
     if (formData.password !== formData.confirmPassword) {
-      toast.error("Passwords do not match!", {
-        style: { background: "#161B26", color: "#fff" },
-      });
-      return;
+      return toast.error("Passwords do not match!");
     }
 
-    // 2. Reshape the data
     const payload = {
+      username: formData.username,
       firstName: formData.firstName,
       lastName: formData.lastName,
       middleName: formData.middleName,
       email: formData.email,
       password: formData.password,
-      confirmPassword: formData.confirmPassword, // <--- ADD THIS LINE
+      currency: formData.currency,
       sex: formData.sex.toLowerCase(),
       maritalStatus: formData.maritalStatus.toLowerCase(),
       occupation: formData.occupation,
@@ -67,28 +77,21 @@ const Register = () => {
       },
     };
 
-    // 3. Fire the API call
-    toast.promise(register(payload).unwrap(), {
-      loading: "Initializing Secure Account...",
-      success: () => {
-        navigate("/login");
-        return <b>Account Created! Please Sign In.</b>;
-      },
-      error: (err) => {
-        // If it still fails, this will show the specific error from the backend
-        return `${err?.data?.message || "Registration failed"}`;
-      },
-    });
+    try {
+      await toast.promise(register(payload).unwrap(), {
+        loading: "Initializing Secure Account...",
+        success: "Account Created! Please Sign In.",
+        error: (err) => err?.data?.message || "Registration failed",
+      });
+      navigate("/login");
+    } catch (err) {
+      // Handled by toast.promise
+    }
   };
-  const currencies = [
-    { country: "America", code: "USD", symbol: "$" },
-    { country: "United Kingdom", code: "GBP", symbol: "£" },
-    { country: "Nigeria", code: "NGN", symbol: "₦" },
-  ];
 
   return (
     <div className="min-h-screen pt-24 pb-12 flex items-center justify-center px-4 bg-[#020408]">
-      <div className="w-full max-w-2xl bg-[#05070A] border border-white/5 rounded-[2.5rem] p-8 md:p-12 shadow-2xl relative overflow-hidden">
+      <div className="w-full max-w-2xl bg-[#05070A] border border-white/5 rounded-[2.5rem] p-8 md:p-12 shadow-2xl relative">
         {/* Progress Bar */}
         <div className="flex gap-2 mb-8">
           {[1, 2, 3].map((i) => (
@@ -99,13 +102,7 @@ const Register = () => {
           ))}
         </div>
 
-        {error && (
-          <div className="mb-4 text-red-500 text-xs font-bold uppercase text-center p-3 bg-red-500/5 rounded-lg border border-red-500/20">
-            {error?.data?.message || "Registration Failed"}
-          </div>
-        )}
-
-        <form className="space-y-6">
+        <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
           {step === 1 && (
             <div className="space-y-4 animate-in fade-in slide-in-from-right-4">
               <div className="grid md:grid-cols-2 gap-4">
@@ -208,21 +205,28 @@ const Register = () => {
                   value={formData.occupation}
                   onChange={handleChange}
                 />
-                <div className="space-y-2">
+
+                <div className="space-y-2 text-left">
                   <label className="text-[10px] text-gray-500 font-black uppercase tracking-widest">
-                    Base Currency
+                    Account Currency
                   </label>
                   <select
                     name="currency"
                     onChange={handleChange}
                     value={formData.currency}
-                    className="w-full bg-black/40 border border-white/10 p-4 rounded-xl text-white outline-none appearance-none"
+                    className="w-full bg-black/40 border border-white/10 p-4 rounded-xl text-white outline-none focus:border-sky-500 transition-all appearance-none"
                   >
-                    {currencies.map((c) => (
-                      <option key={c.code} value={c.code}>
-                        {c.country} ({c.symbol})
-                      </option>
-                    ))}
+                    {Object.entries(currencyMap).map(
+                      ([code, { symbol, label }]) => (
+                        <option
+                          key={code}
+                          value={code}
+                          className="bg-black text-white"
+                        >
+                          {code} - {label} ({symbol})
+                        </option>
+                      ),
+                    )}
                   </select>
                 </div>
               </div>
@@ -234,7 +238,7 @@ const Register = () => {
               <button
                 type="button"
                 onClick={() => setStep(step - 1)}
-                className="flex-1 py-4 bg-white/5 text-white font-bold rounded-2xl border border-white/10"
+                className="flex-1 py-4 bg-white/5 text-white font-bold rounded-2xl border border-white/10 hover:bg-white/10 transition-all"
               >
                 Back
               </button>
@@ -243,7 +247,7 @@ const Register = () => {
               type="button"
               disabled={isLoading}
               onClick={() => (step < 3 ? setStep(step + 1) : handleSubmit())}
-              className="flex-[2] py-4 bg-sky-500 text-black font-black uppercase rounded-2xl"
+              className="flex-[2] py-4 bg-sky-500 text-black font-black uppercase rounded-2xl hover:bg-sky-400 transition-all shadow-lg shadow-sky-500/10"
             >
               {isLoading
                 ? "Processing..."
@@ -252,6 +256,7 @@ const Register = () => {
                   : "Continue"}
             </button>
           </div>
+
           <div className="mt-8 text-center border-t border-white/5 pt-6">
             <p className="text-gray-500 text-sm">
               Already have an account?{" "}
@@ -268,6 +273,8 @@ const Register = () => {
     </div>
   );
 };
+
+// --- SUB-COMPONENTS (Crucial to prevent ReferenceErrors) ---
 
 const InputGroup = ({
   label,
@@ -294,14 +301,14 @@ const InputGroup = ({
         value={value}
         onChange={onChange}
         placeholder={placeholder}
-        className={`w-full bg-black/40 border border-white/10 p-4 ${icon ? "pl-12" : "px-4"} rounded-xl text-white outline-none focus:border-sky-500`}
+        className={`w-full bg-black/40 border border-white/10 p-4 ${icon ? "pl-12" : "px-4"} rounded-xl text-white outline-none focus:border-sky-500 transition-all`}
       />
     </div>
   </div>
 );
 
 const SelectGroup = ({ label, name, options, value, onChange }) => (
-  <div className="space-y-2">
+  <div className="space-y-2 text-left">
     <label className="text-[10px] text-gray-500 font-black uppercase tracking-widest">
       {label}
     </label>
@@ -309,10 +316,10 @@ const SelectGroup = ({ label, name, options, value, onChange }) => (
       name={name}
       value={value}
       onChange={onChange}
-      className="w-full bg-black/40 border border-white/10 p-4 rounded-xl text-white outline-none"
+      className="w-full bg-black/40 border border-white/10 p-4 rounded-xl text-white outline-none focus:border-sky-500 transition-all"
     >
       {options.map((opt) => (
-        <option key={opt} value={opt}>
+        <option key={opt} value={opt} className="bg-black">
           {opt}
         </option>
       ))}

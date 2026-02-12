@@ -10,22 +10,22 @@ import {
   HiOutlineAdjustmentsHorizontal,
   HiOutlineTrash,
   HiOutlineXMark,
+  HiOutlineExclamationTriangle, // Added for delete warning
 } from "react-icons/hi2";
 import toast from "react-hot-toast";
 
 const AdminUserList = () => {
-  // 1. RTK Query Hooks (Replaces useSelector)
   const { data: allUsers = [], isLoading } = useGetAllUsersQuery();
   const [updateUser] = useUpdateUserAdminMutation();
-  const [deleteUser] = useDeleteUserMutation();
+  const [deleteUser, { isLoading: isDeleting }] = useDeleteUserMutation();
   const [topupAmount, setTopupAmount] = useState(0);
   const [injectProfit, { isLoading: isTopupLoading }] =
     useInjectProfitMutation();
   const [searchTerm, setSearchTerm] = useState("");
   const [isEditModalOpen, setEditModalOpen] = useState(false);
+  const [isDeleteModalOpen, setDeleteModalOpen] = useState(false); // State for Delete Modal
   const [selectedUser, setSelectedUser] = useState(null);
 
-  // 2. Form State (Mapped to your Model)
   const [editFormData, setEditFormData] = useState({
     firstName: "",
     lastName: "",
@@ -35,7 +35,6 @@ const AdminUserList = () => {
     accountType: "",
   });
 
-  // Filter Logic
   const filteredUsers = allUsers.filter(
     (user) =>
       `${user.firstName} ${user.lastName}`
@@ -43,24 +42,23 @@ const AdminUserList = () => {
         .includes(searchTerm.toLowerCase()) ||
       user.email.toLowerCase().includes(searchTerm.toLowerCase()),
   );
-  const handleInjectProfit = async () => {
-    // Convert to number to ensure validation works
-    if (Number(topupAmount) <= 0) return toast.error("Enter a valid amount");
 
+  const handleInjectProfit = async () => {
+    if (Number(topupAmount) <= 0) return toast.error("Enter a valid amount");
     try {
       await injectProfit({
         userId: selectedUser._id,
         amount: Number(topupAmount),
         description: `+${topupAmount} Profit`,
       }).unwrap();
-
       toast.success("Profit successfully topped up!");
-      setTopupAmount(0); // Reset the input
+      setTopupAmount(0);
       setEditModalOpen(false);
     } catch (err) {
       toast.error(err.data?.message || "Failed to inject profit");
     }
   };
+
   const handleEditClick = (user) => {
     setSelectedUser(user);
     setTopupAmount(0);
@@ -75,6 +73,12 @@ const AdminUserList = () => {
     setEditModalOpen(true);
   };
 
+  // Open Delete Modal
+  const handleDeleteClick = (user) => {
+    setSelectedUser(user);
+    setDeleteModalOpen(true);
+  };
+
   const handleUpdateUser = async (e) => {
     e.preventDefault();
     try {
@@ -86,14 +90,13 @@ const AdminUserList = () => {
     }
   };
 
-  const handleDelete = async (id) => {
-    if (window.confirm("Purge this user? This cannot be undone.")) {
-      try {
-        await deleteUser(id).unwrap();
-        toast.success("User removed.");
-      } catch (err) {
-        toast.error("Deletion failed.");
-      }
+  const confirmDelete = async () => {
+    try {
+      await deleteUser(selectedUser._id).unwrap();
+      toast.success("Investor purged from database.");
+      setDeleteModalOpen(false);
+    } catch (err) {
+      toast.error("Deletion failed.");
     }
   };
 
@@ -109,7 +112,7 @@ const AdminUserList = () => {
       {/* HEADER & SEARCH */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <h2 className="text-2xl font-black text-white uppercase tracking-tighter italic">
-          Investor Directory
+          Investor <span className="text-sky-500">Directory</span>
         </h2>
         <div className="relative w-full md:w-96">
           <HiMagnifyingGlass className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" />
@@ -181,7 +184,7 @@ const AdminUserList = () => {
                     <HiOutlineAdjustmentsHorizontal size={18} />
                   </button>
                   <button
-                    onClick={() => handleDelete(user._id)}
+                    onClick={() => handleDeleteClick(user)}
                     className="p-2 text-gray-500 hover:text-red-500 transition-colors"
                   >
                     <HiOutlineTrash size={18} />
@@ -193,7 +196,7 @@ const AdminUserList = () => {
         </table>
       </div>
 
-      {/* EDIT USER MODAL */}
+      {/* EDIT USER MODAL (Same as before) */}
       {isEditModalOpen && (
         <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/95 backdrop-blur-md">
           <div className="bg-[#05070A] border border-white/10 w-full max-w-lg rounded-[2.5rem] shadow-2xl relative animate-in zoom-in-95 duration-200">
@@ -304,6 +307,7 @@ const AdminUserList = () => {
                   <option value="vip">VIP Institutional</option>
                 </select>
               </div>
+
               <div className="mt-8 pt-6 border-t border-white/10">
                 <label className="text-[10px] font-black text-amber-500 uppercase tracking-widest block mb-3">
                   Admin Profit Injection (Manual Top-up)
@@ -326,6 +330,7 @@ const AdminUserList = () => {
                   </button>
                 </div>
               </div>
+
               <div className="pt-6 flex gap-3">
                 <button
                   type="button"
@@ -342,6 +347,54 @@ const AdminUserList = () => {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* FAILSAFE DELETE MODAL */}
+      {isDeleteModalOpen && (
+        <div className="fixed inset-0 z-[250] flex items-center justify-center p-4 bg-black/80 backdrop-blur-xl">
+          <div className="bg-[#05070A] border border-red-500/20 w-full max-w-md rounded-[2.5rem] shadow-[0_0_50px_rgba(239,68,68,0.15)] overflow-hidden animate-in zoom-in-95 duration-200">
+            <div className="p-8 text-center space-y-4">
+              <div className="mx-auto w-16 h-16 bg-red-500/10 rounded-full flex items-center justify-center text-red-500 mb-4">
+                <HiOutlineExclamationTriangle size={32} />
+              </div>
+
+              <h3 className="text-2xl font-black text-white uppercase italic tracking-tighter">
+                Purge Investor?
+              </h3>
+
+              <p className="text-gray-400 text-sm leading-relaxed">
+                You are about to permanently delete{" "}
+                <span className="text-white font-bold">
+                  {selectedUser?.firstName} {selectedUser?.lastName}
+                </span>
+                . This action will erase all trade history and capital records
+                from the encrypted ledger.
+              </p>
+
+              <div className="bg-red-500/5 border border-red-500/10 p-3 rounded-xl">
+                <p className="text-[10px] text-red-400 font-black uppercase tracking-[0.2em]">
+                  Warning: This action is irreversible
+                </p>
+              </div>
+
+              <div className="pt-6 flex flex-col gap-3">
+                <button
+                  onClick={confirmDelete}
+                  disabled={isDeleting}
+                  className="w-full py-4 bg-red-500 hover:bg-red-400 text-white font-black uppercase text-[11px] tracking-widest rounded-2xl transition-all shadow-lg shadow-red-500/20"
+                >
+                  {isDeleting ? "Purging Records..." : "Confirm Final Purge"}
+                </button>
+                <button
+                  onClick={() => setDeleteModalOpen(false)}
+                  className="w-full py-4 text-gray-500 font-black uppercase text-[10px] tracking-widest hover:text-white transition-colors"
+                >
+                  Abort Action
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}

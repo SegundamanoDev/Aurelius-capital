@@ -1,11 +1,20 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { HiMenuAlt2, HiX } from "react-icons/hi"; // Using Alt2 for a left-aligned feel
+import { HiMenuAlt2, HiX } from "react-icons/hi";
 import { RiCopperCoinLine } from "react-icons/ri";
 
 const Navbar = () => {
   const [nav, setNav] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+
+  // Prevent background scroll when menu is open
+  useEffect(() => {
+    if (nav) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+  }, [nav]);
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -13,7 +22,6 @@ const Navbar = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Updated link list with your new agenda
   const links = [
     { name: "Home", path: "/" },
     { name: "Portfolios", path: "/portfolio" },
@@ -28,7 +36,7 @@ const Navbar = () => {
 
   return (
     <>
-      {/* 1. MAIN NAVIGATION BAR (Static Top) */}
+      {/* 1. MAIN NAVIGATION BAR */}
       <nav
         className={`fixed w-full z-[100] transition-all duration-500 ${
           scrolled || nav
@@ -47,19 +55,23 @@ const Navbar = () => {
             </span>
           </Link>
 
-          {/* Toggle Button - Visible on all screens */}
+          {/* Toggle Button */}
           <button
             onClick={() => setNav(!nav)}
             className="text-white z-[110] p-2 hover:bg-white/5 rounded-full transition-all"
           >
-            {nav ? <HiX size={30} /> : <HiMenuAlt2 size={30} />}
+            {nav ? (
+              <HiX size={30} className="text-sky-500" />
+            ) : (
+              <HiMenuAlt2 size={30} />
+            )}
           </button>
         </div>
       </nav>
 
-      {/* 2. SIDEBAR OVERLAY (The Background Dimmer) */}
+      {/* 2. BACKDROP OVERLAY (Closes Menu on Click) */}
       <div
-        className={`fixed inset-0 bg-black/60 backdrop-blur-sm z-[101] transition-opacity duration-500 ${
+        className={`fixed inset-0 bg-black/80 backdrop-blur-md z-[101] transition-opacity duration-500 ${
           nav
             ? "opacity-100 pointer-events-auto"
             : "opacity-0 pointer-events-none"
@@ -67,13 +79,23 @@ const Navbar = () => {
         onClick={() => setNav(false)}
       />
 
-      {/* 3. SIDEBAR DRAWER (Slides from Left) */}
+      {/* 3. SIDEBAR DRAWER */}
       <aside
         className={`fixed top-0 left-0 h-screen w-full md:w-[450px] bg-[#05070A] border-r border-white/5 z-[102] transition-transform duration-700 ease-[cubic-bezier(0.77,0,0.175,1)] ${
           nav ? "translate-x-0" : "-translate-x-full"
         }`}
       >
-        <div className="flex flex-col h-full p-10 pt-32">
+        {/* Mobile Close Icon (Inside Drawer) */}
+        <div className="absolute top-6 right-6 md:hidden">
+          <button
+            onClick={() => setNav(false)}
+            className="text-white p-2 bg-white/5 rounded-full"
+          >
+            <HiX size={24} />
+          </button>
+        </div>
+
+        <div className="flex flex-col h-full p-8 md:p-10 pt-24 md:pt-32">
           <p className="text-[10px] font-black text-sky-500 uppercase tracking-[0.4em] mb-10">
             Navigation Protocol
           </p>
@@ -82,7 +104,7 @@ const Navbar = () => {
             {links.map((link, i) => (
               <li
                 key={link.name}
-                style={{ transitionDelay: `${i * 50}ms` }}
+                style={{ transitionDelay: `${nav ? i * 50 + 200 : 0}ms` }}
                 className={`transform transition-all duration-700 ${
                   nav
                     ? "translate-x-0 opacity-100"
@@ -112,7 +134,7 @@ const Navbar = () => {
             <Link
               to="/register"
               onClick={() => setNav(false)}
-              className="block w-full bg-white text-black py-5 rounded-2xl text-center font-black uppercase text-xs tracking-widest hover:bg-sky-500 transition-all"
+              className="block w-full bg-white text-black py-5 rounded-2xl text-center font-black uppercase text-xs tracking-widest hover:bg-sky-500 transition-all shadow-xl shadow-white/5"
             >
               Start Trading Now
             </Link>

@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useSelector } from "react-redux"; // 1. Import useSelector
 import { useGetMyTransactionsQuery } from "../../api/apiSlice";
 import {
   HiOutlineArrowsRightLeft,
@@ -9,8 +10,13 @@ import {
   HiOutlineDocumentText,
   HiOutlineCreditCard,
 } from "react-icons/hi2";
+import { getSymbol } from "../public/Register";
 
 const Transactions = () => {
+  // 3. Get User Currency from Redux
+  const { user } = useSelector((state) => state.auth);
+  const currencySymbol = getSymbol(user?.currency);
+
   const {
     data: transactions = [],
     isLoading,
@@ -33,7 +39,6 @@ const Transactions = () => {
 
   const getTxIcon = (type) => {
     const t = type?.toLowerCase();
-    // Icon is Green for Deposits and Profits
     if (t.includes("deposit") || t.includes("yield") || t.includes("profit"))
       return <HiOutlineArrowDownLeft className="text-emerald-500" />;
     if (t.includes("withdraw"))
@@ -81,7 +86,7 @@ const Transactions = () => {
                   Settlement Date
                 </th>
                 <th className="p-5 text-[10px] font-black uppercase tracking-[0.2em] text-gray-500 text-right">
-                  Volume (USD)
+                  Volume ({user?.currency || "USD"})
                 </th>
                 <th className="p-5 text-[10px] font-black uppercase tracking-[0.2em] text-gray-500 text-center">
                   Protocol Status
@@ -128,10 +133,12 @@ const Transactions = () => {
                         })}
                       </td>
 
+                      {/* 4. Dynamic Currency Symbol in Table */}
                       <td
                         className={`p-5 text-sm font-black text-right ${isPositive ? "text-emerald-500" : "text-rose-500"}`}
                       >
-                        {isPositive ? "+" : "-"}$
+                        {isPositive ? "+" : "-"}
+                        {currencySymbol}
                         {tx.amount.toLocaleString(undefined, {
                           minimumFractionDigits: 2,
                         })}
@@ -183,6 +190,7 @@ const Transactions = () => {
                 <p className="text-gray-500 text-[10px] uppercase font-black tracking-[0.2em] mb-3">
                   Gross Settlement
                 </p>
+                {/* 5. Dynamic Currency Symbol in Receipt */}
                 <h3
                   className={`text-5xl font-black tracking-tighter ${
                     selectedTx.type === "profit" ||
@@ -199,7 +207,8 @@ const Transactions = () => {
                       ? "+"
                       : "-"}
                   </span>
-                  ${selectedTx.amount.toLocaleString()}
+                  {currencySymbol}
+                  {selectedTx.amount.toLocaleString()}
                 </h3>
                 <div
                   className={`mt-6 inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-[10px] font-black border ${getStatusStyle(selectedTx.status)}`}
@@ -247,7 +256,7 @@ const Transactions = () => {
   );
 };
 
-// ... (DetailRow, LoadingSkeleton, EmptyState remain the same)
+// ... (Sub-components: DetailRow, LoadingSkeleton, EmptyState stay exactly the same)
 const DetailRow = ({ label, value, isMono }) => (
   <div className="flex flex-col py-4 border-b border-white/5 last:border-0">
     <span className="text-gray-500 text-[10px] font-black uppercase tracking-widest mb-1">

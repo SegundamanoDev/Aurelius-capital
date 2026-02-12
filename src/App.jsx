@@ -30,9 +30,9 @@ import AdminLayout from "./pages/admin/AdminLayout";
 import AdminUserList from "./pages/admin/AdminUserList";
 import AdminDeposits from "./pages/admin/AdminDeposits";
 import AdminWithdrawals from "./pages/admin/AdminWithdrawals";
-import AdminInvestments from "./pages/admin/AdminInvestments";
+// import AdminInvestments from "./pages/admin/AdminInvestments";
 import CopyTrading from "./pages/private/CopyTrading";
-import Upgrade from "./pages/private/Upgrade";
+// import Upgrade from "./pages/private/Upgrade";
 import ManageTraders from "./pages/admin/ManageTraders";
 import AdminLedger from "./pages/admin/AdminLedger";
 import Market from "./pages/public/Market";
@@ -43,8 +43,8 @@ import ScrollToTop from "./components/ScrollToTop";
 import CopyTradingPage from "./components/CopyTradingPage";
 import AMLPolicy from "./components/AMLPolicy";
 import FAQ from "./components/FAQ";
-import MadeToTradeVideo from "./pages/private/Invest";
-import PricingSection from "./components/InvestmentPlans";
+// import MadeToTradeVideo from "./pages/private/Invest";
+// import PricingSection from "./components/InvestmentPlans";
 import AdminTransactions from "./pages/admin/AdminTransactions";
 import Insurance from "./components/Insurance";
 
@@ -141,14 +141,14 @@ function App() {
             }
           >
             <Route index element={<DashboardHome />} />
-            <Route path="trade" element={<MadeToTradeVideo />} />
+            {/* <Route path="trade" element={<MadeToTradeVideo />} /> */}
             <Route path="profile" element={<Profile />} />
             <Route path="deposit" element={<Deposit />} />
             <Route path="withdraw" element={<Withdraw />} />
             <Route path="transactions" element={<Transactions />} />
             <Route path="copy-trade" element={<CopyTrading />} />
-            <Route path="upgrade" element={<Upgrade />} />
-            <Route path="pricing" element={<PricingSection />} />
+            {/* <Route path="upgrade" element={<Upgrade />} />
+            <Route path="pricing" element={<PricingSection />} /> */}
           </Route>
 
           {/* 3. ADMIN PANEL ROUTES */}
@@ -167,7 +167,7 @@ function App() {
             <Route path="deposits" element={<AdminDeposits />} />
             <Route path="withdrawals" element={<AdminWithdrawals />} />
             <Route path="transactions" element={<AdminTransactions />} />
-            <Route path="investments" element={<AdminInvestments />} />
+            {/* <Route path="investments" element={<AdminInvestments />} /> */}
           </Route>
 
           {/* CATCH ALL */}

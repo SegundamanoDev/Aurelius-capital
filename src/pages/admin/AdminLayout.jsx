@@ -7,7 +7,7 @@ import {
   HiOutlineUsers,
   HiOutlineArrowDownLeft,
   HiOutlineArrowUpRight,
-  HiOutlineClipboardDocumentList,
+  // HiOutlineClipboardDocumentList,
   HiBars3,
   HiOutlineChartBarSquare,
   HiOutlineCircleStack,
@@ -57,11 +57,11 @@ const AdminLayout = () => {
       icon: <HiOutlineArrowsRightLeft />,
       path: "/admin/transactions",
     },
-    {
-      name: "Investment Logs",
-      icon: <HiOutlineClipboardDocumentList />,
-      path: "/admin/investments",
-    },
+    // {
+    //   name: "Investment Logs",
+    //   icon: <HiOutlineClipboardDocumentList />,
+    //   path: "/admin/investments",
+    // },
   ];
 
   return (
@@ -79,7 +79,7 @@ const AdminLayout = () => {
           </span>
         </div>
 
-        <nav className="p-4 space-y-1.5 overflow-y-auto h-[calc(100vh-160px)] scrollbar-hide">
+        <nav className="p-4 space-y-2.5 overflow-y-auto h-[calc(100vh-160px)] scrollbar-hide">
           {menuItems.map((item) => (
             <Link
               key={item.name}
