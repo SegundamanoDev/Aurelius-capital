@@ -160,7 +160,7 @@ const TestimonialSection = () => {
             to="/register"
             style={{
               padding: "15px 40px",
-              fontSize: "1.1rem",
+              fontSize: "15px",
               fontWeight: "bold",
               borderRadius: "50px",
               border: "none",
