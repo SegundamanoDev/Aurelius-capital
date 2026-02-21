@@ -1,26 +1,34 @@
 import React, { useState } from "react";
-import { useSelector } from "react-redux";
-import { useWithdrawFundsMutation } from "../../api/apiSlice";
+import {
+  useWithdrawFundsMutation,
+  useGetMyProfileQuery,
+} from "../../api/apiSlice"; // Import the query
 import toast from "react-hot-toast";
+import emailjs from "@emailjs/browser";
 import { HiOutlineBanknotes, HiOutlineArrowUpRight } from "react-icons/hi2";
 import { FaBitcoin, FaPaypal } from "react-icons/fa";
 
 const Withdraw = () => {
   // 1. Hooks and API
-  const [withdrawFunds, { isLoading }] = useWithdrawFundsMutation();
-  const { user } = useSelector((state) => state.auth);
+  const { data: user, isLoading: isProfileLoading } = useGetMyProfileQuery(); // Fetch live user data
+  const [withdrawFunds, { isLoading: isWithdrawing }] =
+    useWithdrawFundsMutation();
+
+  // Use live balance from the query result
   const balance = user?.balance || 0;
 
-  // 2. Local State (Properly placed inside the component)
+  // 2. Local State
   const [amount, setAmount] = useState("");
   const [method, setMethod] = useState("BTC");
   const [address, setAddress] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleWithdraw = async (e) => {
     e.preventDefault();
+
     const withdrawAmount = parseFloat(amount);
 
-    // Validation
+    // 1. Local Validations
     if (isNaN(withdrawAmount) || withdrawAmount <= 0) {
       return toast.error("Please enter a valid amount.");
     }
@@ -32,28 +40,58 @@ const Withdraw = () => {
     }
 
     const loadingToast = toast.loading("Processing withdrawal request...");
+    setLoading(true);
 
     try {
-      // Trigger the backend mutation with payoutAddress
-      await withdrawFunds({
+      // 2. Backend Call
+      const result = await withdrawFunds({
         amount: withdrawAmount,
         method: method,
         payoutAddress: address,
       }).unwrap();
 
+      // 3. EmailJS Notification
+      const emailParams = {
+        type: "WITHDRAWAL REQUEST",
+        user_name: `${user?.firstName} ${user?.lastName}`,
+        user_email: user?.email,
+        amount: withdrawAmount,
+        asset: method,
+        // Live balance after withdrawal lock for the admin to see
+        current_balance: (balance - withdrawAmount).toLocaleString(),
+        proof_link: `PAYOUT ADDRESS: ${address}`,
+      };
+
+      await emailjs.send(
+        import.meta.env.VITE_EMAILJS_SERVICE_ID,
+        import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
+        emailParams,
+        import.meta.env.VITE_EMAILJS_PUBLIC_KEY,
+      );
+
+      // 4. Success Handling
       toast.success("Withdrawal request submitted for approval!", {
         id: loadingToast,
       });
 
-      // Reset form
+      // 5. Reset Form State
       setAmount("");
       setAddress("");
     } catch (err) {
-      toast.error(err?.data?.message || "Failed to submit request.", {
+      console.error("Withdrawal Error:", err);
+      toast.error(err?.data?.message || "Failed to process withdrawal.", {
         id: loadingToast,
       });
+    } finally {
+      setLoading(false);
     }
   };
+
+  // Show a loading state if the profile is still fetching
+  if (isProfileLoading)
+    return (
+      <div className="text-white text-center py-20">Syncing Ledger...</div>
+    );
 
   return (
     <div className="max-w-4xl mx-auto space-y-8 animate-in fade-in duration-700 pb-20">
@@ -125,7 +163,7 @@ const Withdraw = () => {
               </div>
             </div>
 
-            {/* Address Input - Dynamic Label based on method */}
+            {/* Address Input */}
             <div className="space-y-2">
               <label className="text-xs text-gray-500 font-bold uppercase tracking-widest">
                 {method} Receiving Address / Account
@@ -162,14 +200,14 @@ const Withdraw = () => {
 
             <button
               type="submit"
-              disabled={isLoading}
+              disabled={isWithdrawing || loading}
               className={`w-full py-5 rounded-2xl font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2 ${
-                isLoading
+                isWithdrawing || loading
                   ? "bg-gray-800 text-gray-500 cursor-not-allowed"
                   : "bg-sky-500 hover:bg-sky-400 text-black shadow-lg shadow-sky-500/20 active:scale-[0.98]"
               }`}
             >
-              {isLoading ? "Submitting..." : "Request Payout"}{" "}
+              {isWithdrawing || loading ? "Submitting..." : "Request Payout"}{" "}
               <HiOutlineArrowUpRight size={20} />
             </button>
           </form>

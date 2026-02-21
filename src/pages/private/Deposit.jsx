@@ -54,51 +54,58 @@ const Deposit = () => {
   const handleDepositSubmit = async (e) => {
     e.preventDefault();
 
-    if (!amount || amount <= 0) {
+    const fileInput = e.target.querySelector('input[type="file"]');
+    if (!fileInput.files[0])
+      return toast.error("Please upload proof of payment");
+    if (!amount || amount <= 0)
       return toast.error("Please enter a valid amount");
-    }
 
-    const toastId = toast.loading("Processing your deposit...");
+    const toastId = toast.loading("Uploading proof and processing...");
     setLoading(true);
 
     try {
-      // 1️⃣ Save deposit (critical)
-      await depositFunds({
-        amount: Number(amount),
-        method: selectedAsset,
-        referenceId: `DEP-${Math.random().toString(36).toUpperCase().slice(2, 10)}`,
-      }).unwrap();
+      // 1️⃣ Prepare FormData for the Backend
+      const formData = new FormData();
+      formData.append("amount", amount);
+      formData.append("method", selectedAsset);
+      formData.append(
+        "referenceId",
+        `DEP-${Math.random().toString(36).toUpperCase().slice(2, 10)}`,
+      );
+      formData.append("my_file", fileInput.files[0]); // This goes to Cloudinary
 
-      toast.success("Deposit recorded. Sending confirmation email...", {
-        id: toastId,
-      });
-    } catch (dbError) {
-      console.error("DB Error:", dbError);
-      toast.error("Deposit failed. Please try again.", { id: toastId });
-      setLoading(false);
-      return;
-    }
+      // 2️⃣ Call API (Ensure your Redux Slice supports FormData)
+      const result = await depositFunds(formData).unwrap();
 
-    try {
-      // 2️⃣ Email notification (non-critical)
-      await emailjs.sendForm(
+      // 3️⃣ Send Email via EmailJS
+      // We manually add the Cloudinary Link to a hidden input so the admin gets it
+      const emailParams = {
+        user_name: user ? `${user.firstName} ${user.lastName}` : "User",
+        user_email: user?.email,
+        asset: selectedAsset,
+        amount: amount,
+        proof_link: result.proofImage,
+        type: "deposit",
+      };
+      console.log(emailParams);
+      console.log("Service ID:", import.meta.env.VITE_EMAILJS_SERVICE_ID);
+      console.log("Template ID:", import.meta.env.VITE_EMAILJS_TEMPLATE_ID);
+      console.log("Public Key:", import.meta.env.VITE_EMAILJS_PUBLIC_KEY);
+      await emailjs.send(
         import.meta.env.VITE_EMAILJS_SERVICE_ID,
         import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
-        form.current,
+        emailParams, // Send as object instead of sendForm
         import.meta.env.VITE_EMAILJS_PUBLIC_KEY,
       );
 
-      toast.success("Email notification sent successfully!");
-    } catch (emailError) {
-      console.error("EmailJS Error:", emailError.text || emailError);
-      toast.error(
-        "Deposit saved, but email failed. Support has been notified.",
-      );
-    } finally {
-      setLoading(false);
+      toast.success("Deposit submitted for verification!", { id: toastId });
       setAmount("");
       setFileSelected(null);
       e.target.reset();
+    } catch (err) {
+      toast.error(err.data?.message || "Submission failed", { id: toastId });
+    } finally {
+      setLoading(false);
     }
   };
 

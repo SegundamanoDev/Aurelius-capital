@@ -4,7 +4,7 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 export const apiSlice = createApi({
   reducerPath: "api",
   baseQuery: fetchBaseQuery({
-    baseUrl: "https://aurelius-backend-dsdm.onrender.com/api",
+    baseUrl: "http://localhost:5000/api",
     prepareHeaders: (headers, { getState }) => {
       const stateToken = getState().auth?.token;
       const localToken = localStorage.getItem("token");

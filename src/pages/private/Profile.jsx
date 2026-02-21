@@ -295,7 +295,7 @@ const Profile = () => {
                   No Active Signals
                 </p>
                 <a
-                  href="/dashboard/copy-trading"
+                  href="/dashboard/copy-trade"
                   className="px-6 py-3 bg-white/5 text-white text-[10px] font-black uppercase rounded-xl hover:bg-sky-500 hover:text-black transition-all"
                 >
                   Browse Traders

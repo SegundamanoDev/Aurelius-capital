@@ -147,7 +147,7 @@ const AdminUserList = () => {
                 <td className="p-6">
                   <div className="flex items-center gap-3">
                     <div className="h-10 w-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center font-bold text-sky-500 text-xs shrink-0">
-                      {user.firstName.charAt(0)}
+                      {user?.firstName ? user.firstName.charAt(0) : "U"}
                     </div>
                     <div className="truncate">
                       <p className="text-sm font-bold text-white uppercase">

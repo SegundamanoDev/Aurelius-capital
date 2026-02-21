@@ -63,7 +63,10 @@ const AdminLayout = () => {
     //   path: "/admin/investments",
     // },
   ];
-
+  const handleLogout = () => {
+    dispatch(logOut());
+    navigate("/login");
+  };
   return (
     <div className="flex h-screen bg-[#020408] text-white overflow-hidden font-sans">
       {/* ... Mobile Sidebar Overlay remains same ... */}
@@ -96,9 +99,7 @@ const AdminLayout = () => {
         {/* LOGOUT BUTTON IN SIDEBAR */}
         <div className="absolute bottom-0 left-0 w-full p-4 border-t border-white/5 bg-[#05070A]">
           <button
-            onClick={() => {
-              /* Add logout logic here */
-            }}
+            onClick={handleLogout}
             className="flex items-center gap-4 w-full p-3.5 rounded-xl text-[13px] font-bold text-red-500 hover:bg-red-500/10 transition-all"
           >
             <HiOutlinePower className="text-xl" />

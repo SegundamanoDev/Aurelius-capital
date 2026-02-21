@@ -105,7 +105,7 @@ const AdminDashboard = () => {
               >
                 <div>
                   <p className="text-sm font-bold text-white uppercase">
-                    {tx.user?.name || "Unknown"}
+                    {tx.userId?.firstName || "Unknown"}
                   </p>
                   <p className="text-[10px] text-gray-500">
                     ${tx.amount.toLocaleString()} via {tx.method}
@@ -151,7 +151,7 @@ const AdminDashboard = () => {
               >
                 <div>
                   <p className="text-sm font-bold text-white uppercase">
-                    {tx.user?.name || "Unknown"}
+                    {tx.userId?.firstName || "Unknown"}
                   </p>
                   <p className="text-[10px] text-gray-500">
                     ${tx.amount.toLocaleString()} to{" "}
