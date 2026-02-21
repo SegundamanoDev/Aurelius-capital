@@ -1,13 +1,93 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
-import { HiMenuAlt2, HiX } from "react-icons/hi";
-import { RiCopperCoinLine } from "react-icons/ri";
+import { HiMenuAlt2, HiX, HiChevronDown } from "react-icons/hi"; // Added Chevron
+import { RiCopperCoinLine, RiGlobalLine } from "react-icons/ri";
+import { setLanguage, getSelectedLanguage } from "../utils/translate";
 
 const Navbar = () => {
   const [nav, setNav] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [langOpen, setLangOpen] = useState(false); // Dropdown state
+  const dropdownRef = useRef(null); // Ref for click-outside
+  const currentLang = getSelectedLanguage();
 
-  // Prevent background scroll when menu is open
+  const languages = [
+    { name: "English", code: "en", flag: "🇺🇸" },
+    { name: "Español", code: "es", flag: "🇪🇸" },
+    { name: "Français", code: "fr", flag: "🇫🇷" },
+    { name: "Deutsch", code: "de", flag: "🇩🇪" },
+    { name: "Italiano", code: "it", flag: "🇮🇹" },
+    { name: "Slovenščina", code: "sl", flag: "🇸🇮" },
+    { name: "Slovenčina", code: "sk", flag: "🇸🇰" },
+    { name: "Română", code: "ro", flag: "🇷🇴" },
+    { name: "Polski", code: "pl", flag: "🇵🇱" },
+    { name: "Português", code: "pt", flag: "🇵🇹" },
+    // --- 50 Additional Languages ---
+    { name: "Afrikaans", code: "af", flag: "🇿🇦" },
+    { name: "Shqip", code: "sq", flag: "🇦🇱" },
+    { name: "العربية", code: "ar", flag: "🇸🇦" },
+    { name: "Հայերեն", code: "hy", flag: "🇦🇲" },
+    { name: "Azərbaycan", code: "az", flag: "🇦🇿" },
+    { name: "Euskara", code: "eu", flag: "🇪🇸" },
+    { name: "Беларуская", code: "be", flag: "🇧🇾" },
+    { name: "বাংলা", code: "bn", flag: "🇧🇩" },
+    { name: "Bosanski", code: "bs", flag: "🇧🇦" },
+    { name: "Български", code: "bg", flag: "🇧🇬" },
+    { name: "Català", code: "ca", flag: "🇪🇸" },
+    { name: "中文 (简体)", code: "zh-CN", flag: "🇨🇳" },
+    { name: "中文 (繁體)", code: "zh-TW", flag: "🇭🇰" },
+    { name: "Hrvatski", code: "hr", flag: "🇭🇷" },
+    { name: "Čeština", code: "cs", flag: "🇨🇿" },
+    { name: "Dansk", code: "da", flag: "🇩🇰" },
+    { name: "Nederlands", code: "nl", flag: "🇳🇱" },
+    { name: "Eesti", code: "et", flag: "🇪🇪" },
+    { name: "Filipino", code: "tl", flag: "🇵🇭" },
+    { name: "Suomi", code: "fi", flag: "🇫🇮" },
+    { name: "Galego", code: "gl", flag: "🇪🇸" },
+    { name: "ქართული", code: "ka", flag: "🇬🇪" },
+    { name: "Ελληνικά", code: "el", flag: "🇬🇷" },
+    { name: "ગુજરાતી", code: "gu", flag: "🇮🇳" },
+    { name: "עברית", code: "iw", flag: "🇮🇱" },
+    { name: "हिन्दी", code: "hi", flag: "🇮🇳" },
+    { name: "Magyar", code: "hu", flag: "🇭🇺" },
+    { name: "Íslenska", code: "is", flag: "🇮🇸" },
+    { name: "Bahasa Indonesia", code: "id", flag: "🇮🇩" },
+    { name: "日本語", code: "ja", flag: "🇯🇵" },
+    { name: "ಕನ್ನಡ", code: "kn", flag: "🇮🇳" },
+    { name: "Қазақ тілі", code: "kk", flag: "🇰🇿" },
+    { name: "한국어", code: "ko", flag: "🇰🇷" },
+    { name: "Latviešu", code: "lv", flag: "🇱🇻" },
+    { name: "Lietuvių", code: "lt", flag: "🇱🇹" },
+    { name: "Македонски", code: "mk", flag: "🇲🇰" },
+    { name: "Bahasa Melayu", code: "ms", flag: "🇲🇾" },
+    { name: "മലയാളം", code: "ml", flag: "🇮🇳" },
+    { name: "मराठी", code: "mr", flag: "🇮🇳" },
+    { name: "Norsk", code: "no", flag: "🇳🇴" },
+    { name: "فارسی", code: "fa", flag: "🇮🇷" },
+    { name: "ਪੰਜਾਬੀ", code: "pa", flag: "🇮🇳" },
+    { name: "Русский", code: "ru", flag: "🇷🇺" },
+    { name: "Српски", code: "sr", flag: "🇷🇸" },
+    { name: "Svenska", code: "sv", flag: "🇸🇪" },
+    { name: "தமிழ்", code: "ta", flag: "🇮🇳" },
+    { name: "తెలుగు", code: "te", flag: "🇮🇳" },
+    { name: "ไทย", code: "th", flag: "🇹🇭" },
+    { name: "Türkçe", code: "tr", flag: "🇹🇷" },
+    { name: "Українська", code: "uk", flag: "🇺🇦" },
+    { name: "اردو", code: "ur", flag: "🇵🇰" },
+    { name: "Tiếng Việt", code: "vi", flag: "🇻🇳" },
+  ];
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setLangOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   useEffect(() => {
     if (nav) {
       document.body.style.overflow = "hidden";
@@ -36,7 +116,6 @@ const Navbar = () => {
 
   return (
     <>
-      {/* 1. MAIN NAVIGATION BAR */}
       <nav
         className={`fixed w-full z-[100] transition-all duration-500 ${
           scrolled || nav
@@ -55,21 +134,64 @@ const Navbar = () => {
             </span>
           </Link>
 
-          {/* Toggle Button */}
-          <button
-            onClick={() => setNav(!nav)}
-            className="text-white z-[110] p-2 hover:bg-white/5 rounded-full transition-all"
-          >
-            {nav ? (
-              <HiX size={30} className="text-sky-500" />
-            ) : (
-              <HiMenuAlt2 size={30} />
-            )}
-          </button>
+          {/* Right Side Controls */}
+          <div className="flex items-center gap-4 z-[110]">
+            {/* --- DROPDOWN SELECTOR --- */}
+            <div className="relative" ref={dropdownRef}>
+              <button
+                onClick={() => setLangOpen(!langOpen)}
+                className="flex items-center gap-2 bg-white/5 border border-white/10 px-3 py-1.5 rounded-xl hover:bg-white/10 transition-all text-white text-[10px] font-bold uppercase tracking-widest"
+              >
+                <span className="text-sm">
+                  {languages.find((l) => l.code === currentLang)?.flag || "🌐"}
+                </span>
+                <span className="hidden sm:inline">{currentLang}</span>
+                <HiChevronDown
+                  className={`transition-transform duration-300 ${langOpen ? "rotate-180" : ""}`}
+                />
+              </button>
+
+              {/* Dropdown Menu */}
+              {langOpen && (
+                <div className="absolute right-0 mt-3 w-48 bg-[#05070A] border border-white/10 rounded-2xl overflow-hidden shadow-2xl animate-in fade-in zoom-in duration-200 backdrop-blur-xl">
+                  <div className="max-h-[300px] overflow-y-auto no-scrollbar">
+                    {languages.map((lang) => (
+                      <button
+                        key={lang.code}
+                        onClick={() => {
+                          setLanguage(lang.code);
+                          setLangOpen(false);
+                        }}
+                        className={`w-full flex items-center gap-3 px-4 py-3 text-left text-[10px] font-bold tracking-widest uppercase transition-colors hover:bg-sky-500/10 ${
+                          currentLang === lang.code
+                            ? "text-sky-500 bg-sky-500/5"
+                            : "text-gray-400"
+                        }`}
+                      >
+                        <span className="text-base">{lang.flag}</span>
+                        {lang.name}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Menu Toggle */}
+            <button
+              onClick={() => setNav(!nav)}
+              className="text-white p-2 hover:bg-white/5 rounded-full transition-all"
+            >
+              {nav ? (
+                <HiX size={30} className="text-sky-500" />
+              ) : (
+                <HiMenuAlt2 size={30} />
+              )}
+            </button>
+          </div>
         </div>
       </nav>
 
-      {/* 2. BACKDROP OVERLAY (Closes Menu on Click) */}
       <div
         className={`fixed inset-0 bg-black/80 backdrop-blur-md z-[101] transition-opacity duration-500 ${
           nav
@@ -79,28 +201,17 @@ const Navbar = () => {
         onClick={() => setNav(false)}
       />
 
-      {/* 3. SIDEBAR DRAWER */}
       <aside
         className={`fixed top-0 left-0 h-screen w-full md:w-[450px] bg-[#05070A] border-r border-white/5 z-[102] transition-transform duration-700 ease-[cubic-bezier(0.77,0,0.175,1)] ${
           nav ? "translate-x-0" : "-translate-x-full"
         }`}
       >
-        {/* Mobile Close Icon (Inside Drawer) */}
-        <div className="absolute top-6 right-6 md:hidden">
-          <button
-            onClick={() => setNav(false)}
-            className="text-white p-2 bg-white/5 rounded-full"
-          >
-            <HiX size={24} />
-          </button>
-        </div>
-
-        <div className="flex flex-col h-full p-8 md:p-10 pt-24 md:pt-32">
-          <p className="text-[10px] font-black text-sky-500 uppercase tracking-[0.4em] mb-10">
+        <div className="flex flex-col h-full p-8 md:p-10 pt-24 md:pt-28">
+          <p className="text-[10px] font-black text-sky-500 uppercase tracking-[0.4em] mb-6">
             Navigation Protocol
           </p>
 
-          <ul className="space-y-4 overflow-y-auto no-scrollbar pb-10">
+          <ul className="space-y-4 overflow-y-auto no-scrollbar pb-10 flex-grow">
             {links.map((link, i) => (
               <li
                 key={link.name}
@@ -125,16 +236,15 @@ const Navbar = () => {
             ))}
           </ul>
 
-          {/* Sidebar Footer */}
           <div
-            className={`mt-auto pt-10 border-t border-white/5 transition-all duration-700 delay-500 ${
+            className={`mt-auto pt-6 border-t border-white/5 transition-all duration-700 delay-500 ${
               nav ? "opacity-100" : "opacity-0"
             }`}
           >
             <Link
               to="/register"
               onClick={() => setNav(false)}
-              className="block w-full bg-white text-black py-5 rounded-2xl text-center font-black uppercase text-xs tracking-widest hover:bg-sky-500 transition-all shadow-xl shadow-white/5"
+              className="block w-full bg-white text-black py-4 rounded-2xl text-center font-black uppercase text-xs tracking-widest hover:bg-sky-500 hover:text-white transition-all shadow-xl shadow-white/5"
             >
               Start Trading Now
             </Link>

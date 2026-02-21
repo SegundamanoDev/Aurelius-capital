@@ -5,12 +5,13 @@ const Community = () => {
     <div className="flex flex-col items-center justify-center w-full py-16 bg-[rgb(0,0,0)] text-white font-sans px-4">
       {/* 1. Text Header Section */}
       <div className="max-w-3xl text-center mb-10">
-        <h2 className="text-3xl md:text-5xl font-bold tracking-tight mb-6 text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-indigo-500">
+        <h2 className="text-4xl md:text-6xl font-bold tracking-tight mb-6 text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-indigo-500">
           The social network for your finance life
         </h2>
-        <p className="text-lg md:text-xl text-[#d1d4dc] leading-relaxed">
-          Get creative with world markets by participating in the largest social
-          network on the web for traders and investors.
+        <p className="text-3xl md:text-4xl text-[#d1d4dc] leading-relaxed">
+          Stop trading in the dark. Connect with the elite, copy the bold, and
+          turn every market move into a shared victory. The future isn't just
+          digital it's collaborative.
         </p>
       </div>
 

@@ -1,5 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import TestimonialSlider from "./Swiper";
 
 const Hero = () => {
   return (
@@ -70,18 +71,6 @@ const Hero = () => {
           {/* Internal shadow for depth */}
           <div className="absolute inset-0 pointer-events-none shadow-[inset_0_0_100px_rgba(5,7,10,0.9)]" />
         </div>
-      </div>
-
-      {/* LAYER 4: START TRADING BUTTON */}
-      <div className="relative z-20 flex justify-center w-full">
-        <div className="absolute -z-10 w-64 h-24 bg-[#2962ff]/30 blur-[60px] rounded-full" />
-
-        <Link
-          to="/register"
-          className="px-14 py-5 bg-[#2962ff] hover:bg-[#1e4bd8] text-white font-black uppercase text-[12px] tracking-[0.25em] rounded-full transition-all shadow-[0_15px_40px_rgba(41,98,255,0.4)] hover:scale-105 active:scale-95"
-        >
-          Start Trading
-        </Link>
       </div>
     </section>
   );

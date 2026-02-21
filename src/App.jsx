@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   BrowserRouter as Router,
   Routes,
@@ -8,7 +8,7 @@ import {
 } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { Toaster } from "react-hot-toast";
-
+import { initAutoTranslate } from "./utils/translate";
 // Layouts
 import DashboardLayout from "./layouts/DashboardLayout";
 import Navbar from "./components/Navbar";
@@ -94,6 +94,12 @@ const ProtectedAdminRoute = ({ children }) => {
 };
 
 function App() {
+  // --- TRIGGER AUTO TRANSLATE ON MOUNT ---
+  useEffect(() => {
+    // This checks if the user has a preferred language or
+    // if their browser language differs from English.
+    initAutoTranslate();
+  }, []);
   return (
     <Router>
       <ScrollToTop />
@@ -110,6 +116,7 @@ function App() {
             },
           }}
         />
+
         <Routes>
           {/* 1. PUBLIC ROUTES (Wrapped in GuestRoute) */}
           <Route

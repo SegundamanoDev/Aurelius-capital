@@ -5,11 +5,15 @@ import Workflow from "../../components/Workflow";
 import FinalCTA from "../../components/FinalCTA";
 import Community from "../../components/Community";
 import SecureConnection from "../../components/SecureConnection";
+import TickerTape from "../../components/TradingView";
+import TestimonialSection from "../../components/Swiper";
 
 const Home = () => {
   return (
     <div>
+      <TickerTape />
       <Hero />
+      <TestimonialSection />
       <Features />
       <SecureConnection />
       <Community />

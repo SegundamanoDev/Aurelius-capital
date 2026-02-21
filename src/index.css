@@ -63,3 +63,53 @@ h4 {
 p {
   color: #9ca3af;
 }
+/* Hide the Google Translate branding/dropdown button */
+#google_translate_element {
+  display: none !important;
+}
+
+/* Fix the body displacement when the top banner appears */
+body {
+  top: 0 !important;
+}
+
+/* Optional: If you want to hide the "Powered by Google" text in the top banner */
+.goog-logo-link {
+  display: none !important;
+}
+.goog-te-gadget {
+  color: transparent !important;
+}
+.goog-te-banner-frame.skiptranslate {
+  display: none !important;
+}
+.goog-te-balloon-frame {
+  display: none !important;
+}
+/* 1. Hide the Google Translate Banner Frame */
+.goog-te-banner-frame,
+.goog-te-banner-frame.skiptranslate,
+#goog-gt-tt,
+.goog-te-balloon-frame {
+  display: none !important;
+  visibility: hidden !important;
+}
+
+/* 2. Force the page to stay at the very top */
+/* Google often adds a 40px margin to the top of the body */
+body {
+  top: 0 !important;
+  position: static !important; /* Prevents Google's relative positioning shift */
+}
+
+/* 3. Remove the push-down effect on the HTML element */
+html {
+  margin-top: 0 !important;
+}
+
+/* 4. Optional: Hide the "Original Text" tooltip when hovering over translated words */
+.goog-text-highlight {
+  background-color: transparent !important;
+  box-shadow: none !important;
+  box-sizing: border-box !important;
+}
