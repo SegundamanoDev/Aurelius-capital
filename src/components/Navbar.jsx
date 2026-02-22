@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
-import { HiMenuAlt2, HiX, HiChevronDown } from "react-icons/hi"; // Added Chevron
+import { HiMenuAlt2, HiX, HiChevronDown, HiSun, HiMoon } from "react-icons/hi"; // Added Chevron
 import { RiCopperCoinLine, RiGlobalLine } from "react-icons/ri";
 import { setLanguage, getSelectedLanguage } from "../utils/translate";
-
+import { useDarkMode } from "../utils/useDarkMode";
 const Navbar = () => {
+  const [colorTheme, setTheme] = useDarkMode();
   const [nav, setNav] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [langOpen, setLangOpen] = useState(false); // Dropdown state
@@ -136,6 +137,16 @@ const Navbar = () => {
 
           {/* Right Side Controls */}
           <div className="flex items-center gap-4 z-[110]">
+            <button
+              onClick={() => setTheme(colorTheme)}
+              className="p-2 rounded-xl bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-800 dark:text-yellow-400 hover:scale-110 transition-all"
+            >
+              {colorTheme === "light" ? (
+                <HiSun size={20} />
+              ) : (
+                <HiMoon size={20} className="text-sky-400" />
+              )}
+            </button>
             {/* --- DROPDOWN SELECTOR --- */}
             <div className="relative" ref={dropdownRef}>
               <button
@@ -202,12 +213,12 @@ const Navbar = () => {
       />
 
       <aside
-        className={`fixed top-0 left-0 h-screen w-full md:w-[450px] bg-[#05070A] border-r border-white/5 z-[102] transition-transform duration-700 ease-[cubic-bezier(0.77,0,0.175,1)] ${
+        className={`fixed top-0 left-0 h-screen w-full md:w-[450px] bg-white dark:bg-[#0a0c10] text-gray-900 dark:text-white border-gray-200 dark:border-white/10 z-[102] transition-transform duration-700 ease-[cubic-bezier(0.77,0,0.175,1)] ${
           nav ? "translate-x-0" : "-translate-x-full"
         }`}
       >
         <div className="flex flex-col h-full p-8 md:p-10 pt-24 md:pt-28">
-          <p className="text-[10px] font-black text-sky-500 uppercase tracking-[0.4em] mb-6">
+          <p className="text-[10px] font-black uppercase tracking-[0.4em] mb-6">
             Navigation Protocol
           </p>
 
@@ -225,7 +236,7 @@ const Navbar = () => {
                 <Link
                   to={link.path}
                   onClick={() => setNav(false)}
-                  className="text-3xl md:text-4xl font-black text-white/40 hover:text-white hover:italic transition-all flex items-center gap-4 group"
+                  className="text-3xl md:text-4xl font-black bg-white dark:bg-[#0a0c10] text-gray-900 dark:text-white border-gray-200 dark:border-white/10 hover:text-white hover:italic transition-all flex items-center gap-4 group"
                 >
                   <span className="text-xs font-mono text-sky-500/40 group-hover:text-sky-500 italic">
                     0{i + 1}

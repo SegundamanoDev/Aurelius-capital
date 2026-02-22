@@ -16,7 +16,7 @@ const InvestmentPromo = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center w-full py-24 bg-[#05070A] text-white px-6 font-sans">
+    <div className="flex flex-col items-center justify-center w-full py-24 bg-white dark:bg-[#0a0c10] text-gray-900 dark:text-white border-gray-200 dark:border-white/10px-6 font-sans">
       {/* 1. Header Text Section */}
       <div className="max-w-4xl text-center mb-12">
         <h2 className="text-4xl md:text-6xl font-black tracking-tighter mb-6 leading-tight">

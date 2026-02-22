@@ -31,7 +31,7 @@ const Insurance = () => {
   ];
 
   return (
-    <div className="bg-[#05070A] text-slate-300 min-h-screen pb-32 overflow-hidden">
+    <div className="bg-white dark:bg-[#0a0c10] text-gray-900 dark:text-white border-gray-200 dark:border-white/10min-h-screen pb-32 overflow-hidden">
       {/* 1. SECURE HEADER */}
       <section className="relative pt-24 pb-20 px-6 border-b border-white/5">
         <div className="max-w-4xl mx-auto text-center space-y-6">

@@ -69,7 +69,7 @@ const Portfolio = () => {
     <div className="space-y-6 animate-in fade-in duration-1000 py-20">
       {/* 1. PERFORMANCE HERO SECTION */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 bg-[#05070A] border border-white/5 rounded-[2.5rem] p-8 shadow-2xl relative overflow-hidden">
+        <div className="lg:col-span-2 bg-white dark:bg-[#0a0c10] text-gray-900 dark:text-white border-gray-200 dark:border-white/10 rounded-[2.5rem] p-8 shadow-2xl relative overflow-hidden">
           <div className="flex justify-between items-start mb-6">
             <div>
               <p className="text-[10px] font-black text-gray-500 uppercase tracking-[0.3em]">
@@ -116,7 +116,7 @@ const Portfolio = () => {
         </div>
 
         {/* 2. ASSET ALLOCATION (Visuals) */}
-        <div className="bg-[#05070A] border border-white/5 rounded-[2.5rem] p-8 flex flex-col items-center justify-center">
+        <div className="bg-white dark:bg-[#0a0c10] text-gray-900 dark:text-white border-gray-200 dark:border-white/10rounded-[2.5rem] p-8 flex flex-col items-center justify-center">
           <p className="text-[10px] font-black text-gray-500 uppercase tracking-[0.3em] mb-4 w-full">
             Asset Allocation
           </p>
@@ -163,7 +163,7 @@ const Portfolio = () => {
       </div>
 
       {/* 3. ALPHA ANALYTICS & RISK METRICS */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 bg-white dark:bg-[#0a0c10] text-gray-900 dark:text-white border-gray-200 dark:border-white/10">
         {[
           {
             label: "Sharpe Ratio",
@@ -186,7 +186,7 @@ const Portfolio = () => {
         ].map((metric, i) => (
           <div
             key={i}
-            className="bg-[#05070A] border border-white/5 rounded-3xl p-6"
+            className="bg-white dark:bg-[#0a0c10] text-gray-900 dark:text-white border-gray-200 dark:border-white/10 border border-white/5 rounded-3xl p-6"
           >
             <div className="flex items-center gap-3 mb-2">
               <span className="text-sky-500">{metric.icon}</span>
@@ -205,7 +205,7 @@ const Portfolio = () => {
       </div>
 
       {/* 4. HOLDINGS TABLE */}
-      <div className="bg-[#05070A] border border-white/5 rounded-[2.5rem] overflow-hidden shadow-2xl">
+      <div className="bg-white dark:bg-[#0a0c10] text-gray-900 dark:text-white border-gray-200 dark:border-white/10 rounded-[2.5rem] overflow-hidden shadow-2xl">
         <div className="p-6 border-b border-white/5 flex justify-between items-center">
           <h3 className="text-[11px] font-black text-white uppercase tracking-[0.2em]">
             Active Holdings

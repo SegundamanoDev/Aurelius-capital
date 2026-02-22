@@ -17,7 +17,7 @@ export const apiSlice = createApi({
       return headers;
     },
   }),
-  tagTypes: ["User", "Trader", "Transaction"],
+  tagTypes: ["User", "Trader", "Transaction", "Message"],
   endpoints: (builder) => ({
     // =========================
     // AUTH
@@ -37,6 +37,19 @@ export const apiSlice = createApi({
         method: "POST",
         body: userData,
       }),
+    }),
+    getChatHistory: builder.query({
+      query: (userId) => `/chat/history/${userId}`,
+      providesTags: ["Message"],
+    }),
+
+    sendChatMessage: builder.mutation({
+      query: (data) => ({
+        url: "/chat/send",
+        method: "POST",
+        body: data,
+      }),
+      invalidatesTags: ["Message"],
     }),
 
     // =========================
@@ -196,6 +209,9 @@ export const apiSlice = createApi({
 export const {
   useLoginMutation,
   useRegisterMutation,
+
+  useGetChatHistoryQuery,
+  useSendChatMessageMutation,
 
   // User (self)
   useGetMyProfileQuery,

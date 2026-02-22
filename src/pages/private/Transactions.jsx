@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useSelector } from "react-redux"; // 1. Import useSelector
+import { useSelector } from "react-redux";
 import { useGetMyTransactionsQuery } from "../../api/apiSlice";
 import {
   HiOutlineArrowsRightLeft,
@@ -13,7 +13,6 @@ import {
 import { getSymbol } from "../public/Register";
 
 const Transactions = () => {
-  // 3. Get User Currency from Redux
   const { user } = useSelector((state) => state.auth);
   const currencySymbol = getSymbol(user?.currency);
 
@@ -27,13 +26,13 @@ const Transactions = () => {
   const getStatusStyle = (status) => {
     switch (status?.toLowerCase()) {
       case "completed":
-        return "bg-emerald-500/10 text-emerald-500 border-emerald-500/20";
+        return "bg-emerald-500/10 text-emerald-600 dark:text-emerald-500 border-emerald-500/20";
       case "pending":
-        return "bg-amber-500/10 text-amber-500 border-amber-500/20";
+        return "bg-amber-500/10 text-amber-600 dark:text-amber-500 border-amber-500/20";
       case "failed":
-        return "bg-rose-500/10 text-rose-500 border-rose-500/20";
+        return "bg-rose-500/10 text-rose-600 dark:text-rose-500 border-rose-500/20";
       default:
-        return "bg-gray-500/10 text-gray-400 border-white/5";
+        return "bg-gray-500/10 text-gray-500 dark:text-gray-400 border-app-border";
     }
   };
 
@@ -47,11 +46,11 @@ const Transactions = () => {
   };
 
   return (
-    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
+    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700 transition-colors duration-500">
       {/* Header Section */}
       <div className="flex justify-between items-center px-2">
         <div>
-          <h1 className="text-2xl font-black text-white tracking-tight uppercase italic">
+          <h1 className="text-2xl font-black text-text-main tracking-tight uppercase italic">
             Financial <span className="text-sky-500">Ledger</span>
           </h1>
           <p className="text-gray-500 text-xs font-medium tracking-wide">
@@ -61,9 +60,9 @@ const Transactions = () => {
 
         <button
           onClick={() => refetch()}
-          className="group flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 transition-all active:scale-95"
+          className="group flex items-center gap-2 px-4 py-2 rounded-full bg-card-bg border border-app-border hover:bg-gray-100 dark:hover:bg-white/10 transition-all active:scale-95 shadow-sm"
         >
-          <span className="text-[10px] font-black uppercase tracking-widest text-gray-400 group-hover:text-white">
+          <span className="text-[10px] font-black uppercase tracking-widest text-gray-400 group-hover:text-text-main">
             Sync Feed
           </span>
           <HiOutlineArrowPath
@@ -74,11 +73,11 @@ const Transactions = () => {
       </div>
 
       {/* Main Table Container */}
-      <div className="bg-[#0A0C10] border border-white/10 rounded-[2rem] overflow-hidden shadow-2xl backdrop-blur-3xl">
+      <div className="bg-card-bg border border-app-border rounded-[2rem] overflow-hidden shadow-xl backdrop-blur-3xl">
         <div className="overflow-x-auto">
           <table className="w-full text-left">
             <thead>
-              <tr className="bg-white/[0.02] border-b border-white/10">
+              <tr className="bg-gray-50 dark:bg-white/[0.02] border-b border-app-border">
                 <th className="p-5 text-[10px] font-black uppercase tracking-[0.2em] text-gray-500">
                   Event Type
                 </th>
@@ -93,15 +92,16 @@ const Transactions = () => {
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-white/[0.05]">
+            <tbody className="divide-y divide-app-border">
               {isLoading ? (
                 <LoadingSkeleton />
               ) : transactions.length > 0 ? (
                 transactions.map((tx) => {
-                  const isProfit =
-                    tx.type === "profit" || tx.type === "trading_yield";
-                  const isDeposit = tx.type === "deposit";
-                  const isPositive = isProfit || isDeposit;
+                  const isPositive = [
+                    "profit",
+                    "trading_yield",
+                    "deposit",
+                  ].includes(tx.type);
 
                   return (
                     <tr
@@ -110,12 +110,12 @@ const Transactions = () => {
                       className="hover:bg-sky-500/[0.03] transition-all cursor-pointer group relative"
                     >
                       <td className="p-5 flex items-center gap-4">
-                        <div className="h-10 w-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center">
+                        <div className="h-10 w-10 rounded-xl bg-gray-100 dark:bg-white/5 border border-app-border flex items-center justify-center">
                           {getTxIcon(tx.type)}
                         </div>
                         <div>
-                          <p className="text-sm font-black text-white uppercase tracking-tight">
-                            {isProfit
+                          <p className="text-sm font-black text-text-main uppercase tracking-tight">
+                            {tx.type === "profit" || tx.type === "trading_yield"
                               ? "TRADING PROFIT"
                               : tx.type.replace("_", " ")}
                           </p>
@@ -125,7 +125,7 @@ const Transactions = () => {
                         </div>
                       </td>
 
-                      <td className="p-5 text-sm text-gray-400 font-medium">
+                      <td className="p-5 text-sm text-gray-500 dark:text-gray-400 font-medium">
                         {new Date(tx.createdAt).toLocaleDateString(undefined, {
                           month: "short",
                           day: "numeric",
@@ -133,7 +133,6 @@ const Transactions = () => {
                         })}
                       </td>
 
-                      {/* 4. Dynamic Currency Symbol in Table */}
                       <td
                         className={`p-5 text-sm font-black text-right ${isPositive ? "text-emerald-500" : "text-rose-500"}`}
                       >
@@ -166,44 +165,43 @@ const Transactions = () => {
       {selectedTx && (
         <>
           <div
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] animate-in fade-in"
+            className="fixed inset-0 bg-black/40 dark:bg-black/60 backdrop-blur-sm z-[100] animate-in fade-in"
             onClick={() => setSelectedTx(null)}
           />
-          <div className="fixed top-4 right-4 bottom-4 w-full max-w-[420px] bg-[#0A0C10] border border-white/10 z-[110] rounded-[2.5rem] p-8 shadow-[0_0_50px_rgba(0,0,0,0.5)] animate-in slide-in-from-right duration-500 flex flex-col">
+          <div className="fixed top-4 right-4 bottom-4 w-full max-w-[420px] bg-card-bg border border-app-border z-[110] rounded-[2.5rem] p-8 shadow-2xl animate-in slide-in-from-right duration-500 flex flex-col">
             <div className="flex items-center justify-between mb-10">
               <div className="flex items-center gap-2">
                 <HiOutlineDocumentText className="text-sky-500" size={20} />
-                <h2 className="text-lg font-black text-white uppercase italic">
+                <h2 className="text-lg font-black text-text-main uppercase italic">
                   Transaction <span className="text-sky-500">Receipt</span>
                 </h2>
               </div>
               <button
                 onClick={() => setSelectedTx(null)}
-                className="p-2 hover:bg-white/10 rounded-full text-gray-500 transition-colors"
+                className="p-2 hover:bg-gray-100 dark:hover:bg-white/10 rounded-full text-gray-500 transition-colors"
               >
                 <HiXMark size={24} />
               </button>
             </div>
 
             <div className="flex-grow space-y-8">
-              <div className="text-center py-12 rounded-[2rem] bg-gradient-to-b from-white/[0.03] to-transparent border border-white/5">
+              <div className="text-center py-12 rounded-[2rem] bg-gray-50 dark:bg-white/[0.03] border border-app-border">
                 <p className="text-gray-500 text-[10px] uppercase font-black tracking-[0.2em] mb-3">
                   Gross Settlement
                 </p>
-                {/* 5. Dynamic Currency Symbol in Receipt */}
                 <h3
                   className={`text-5xl font-black tracking-tighter ${
-                    selectedTx.type === "profit" ||
-                    selectedTx.type === "trading_yield" ||
-                    selectedTx.type === "deposit"
+                    ["profit", "trading_yield", "deposit"].includes(
+                      selectedTx.type,
+                    )
                       ? "text-emerald-500"
-                      : "text-white"
+                      : "text-text-main"
                   }`}
                 >
                   <span className="text-2xl mr-1">
-                    {selectedTx.type === "profit" ||
-                    selectedTx.type === "trading_yield" ||
-                    selectedTx.type === "deposit"
+                    {["profit", "trading_yield", "deposit"].includes(
+                      selectedTx.type,
+                    )
                       ? "+"
                       : "-"}
                   </span>
@@ -224,10 +222,9 @@ const Transactions = () => {
                 <DetailRow
                   label="Transaction Type"
                   value={
-                    selectedTx.type === "trading_yield" ||
-                    selectedTx.type === "profit"
+                    ["trading_yield", "profit"].includes(selectedTx.type)
                       ? "TRADING PROFIT"
-                      : selectedTx.type
+                      : selectedTx.type.toUpperCase()
                   }
                 />
                 <DetailRow
@@ -246,7 +243,7 @@ const Transactions = () => {
               </div>
             </div>
 
-            <button className="w-full py-5 bg-[#2962ff] hover:bg-[#1e4bd8] text-white font-black rounded-2xl transition-all text-xs uppercase tracking-[0.2em] mt-6">
+            <button className="w-full py-5 bg-sky-600 hover:bg-sky-500 text-white font-black rounded-2xl transition-all text-xs uppercase tracking-[0.2em] mt-6 shadow-lg shadow-sky-500/20">
               Download Official PDF
             </button>
           </div>
@@ -256,14 +253,13 @@ const Transactions = () => {
   );
 };
 
-// ... (Sub-components: DetailRow, LoadingSkeleton, EmptyState stay exactly the same)
 const DetailRow = ({ label, value, isMono }) => (
-  <div className="flex flex-col py-4 border-b border-white/5 last:border-0">
+  <div className="flex flex-col py-4 border-b border-app-border last:border-0">
     <span className="text-gray-500 text-[10px] font-black uppercase tracking-widest mb-1">
       {label}
     </span>
     <span
-      className={`text-white text-sm font-bold uppercase truncate ${isMono ? "font-mono text-sky-400 text-xs" : ""}`}
+      className={`text-text-main text-sm font-bold uppercase truncate ${isMono ? "font-mono text-sky-500 dark:text-sky-400 text-xs" : ""}`}
     >
       {value}
     </span>
@@ -295,9 +291,9 @@ const EmptyState = () => (
       <div className="max-w-xs mx-auto">
         <HiOutlineArrowsRightLeft
           size={48}
-          className="mx-auto text-white/5 mb-6"
+          className="mx-auto text-gray-300 dark:text-white/5 mb-6"
         />
-        <h3 className="text-white font-black uppercase text-sm mb-2">
+        <h3 className="text-text-main font-black uppercase text-sm mb-2">
           No Transactions Detected
         </h3>
         <p className="text-gray-500 text-xs leading-relaxed">

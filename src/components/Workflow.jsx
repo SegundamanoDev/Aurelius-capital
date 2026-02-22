@@ -20,7 +20,7 @@ const steps = [
 
 const Workflow = () => {
   return (
-    <section className="py-24">
+    <section className="py-24 bg-white dark:bg-[#0a0c10] text-gray-900 dark:text-white border-gray-200 dark:border-white/10">
       <div className="max-w-7xl mx-auto px-6">
         <div className="grid lg:grid-cols-3 gap-12">
           {steps.map((step, i) => (

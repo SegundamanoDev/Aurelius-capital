@@ -12,7 +12,7 @@ const Footer = () => {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="pb-10 border-gray-800 px-6">
+    <footer className="pb-10 bg-white dark:bg-[#0a0c10] text-gray-900 dark:text-white border-gray-200 dark:border-white/10 px-6">
       {/* Risk Disclaimer - Crucial for Financial Design */}
       <div className="pt-8 border-t-1 border-gray-800 text-gray-600 leading-relaxed text-center">
         <p className="mt-6 font-medium uppercase tracking-[0.2em]">

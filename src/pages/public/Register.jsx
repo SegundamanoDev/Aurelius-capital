@@ -10,7 +10,6 @@ import {
   HiOutlineBriefcase,
 } from "react-icons/hi2";
 
-// 1. Helpers & Constants (Defined outside the component)
 export const currencyMap = {
   USD: { symbol: "$", label: "US Dollar" },
   EUR: { symbol: "€", label: "Euro" },
@@ -31,7 +30,7 @@ export const getSymbol = (code) => currencyMap[code]?.symbol || "$";
 const Register = () => {
   const [step, setStep] = useState(1);
   const navigate = useNavigate();
-  const [register, { isLoading, error: apiError }] = useRegisterMutation();
+  const [register, { isLoading }] = useRegisterMutation();
 
   const [formData, setFormData] = useState({
     username: "",
@@ -84,20 +83,22 @@ const Register = () => {
         error: (err) => err?.data?.message || "Registration failed",
       });
       navigate("/login");
-    } catch (err) {
-      // Handled by toast.promise
-    }
+    } catch (err) {}
   };
 
   return (
-    <div className="min-h-screen pt-24 pb-12 flex items-center justify-center px-4 bg-[#020408]">
-      <div className="w-full max-w-2xl bg-[#05070A] border border-white/5 rounded-[2.5rem] p-8 md:p-12 shadow-2xl relative">
+    /* Changed bg-[#020408] to bg-app-bg */
+    <div className="min-h-screen pt-24 pb-12 flex items-center justify-center px-4 bg-app-bg transition-colors duration-500">
+      {/* Changed bg-[#05070A] to bg-card-bg and border-white/5 to border-app-border */}
+      <div className="w-full max-w-2xl bg-card-bg border border-app-border rounded-[2.5rem] p-8 md:p-12 shadow-2xl relative transition-all duration-500">
         {/* Progress Bar */}
         <div className="flex gap-2 mb-8">
           {[1, 2, 3].map((i) => (
             <div
               key={i}
-              className={`h-1 flex-1 rounded-full transition-all duration-500 ${step >= i ? "bg-sky-500" : "bg-white/10"}`}
+              className={`h-1 flex-1 rounded-full transition-all duration-500 ${
+                step >= i ? "bg-sky-500" : "bg-gray-200 dark:bg-white/10"
+              }`}
             />
           ))}
         </div>
@@ -214,14 +215,14 @@ const Register = () => {
                     name="currency"
                     onChange={handleChange}
                     value={formData.currency}
-                    className="w-full bg-black/40 border border-white/10 p-4 rounded-xl text-white outline-none focus:border-sky-500 transition-all appearance-none"
+                    className="w-full bg-gray-50 dark:bg-black/40 border border-app-border p-4 rounded-xl text-text-main outline-none focus:border-sky-500 transition-all appearance-none"
                   >
                     {Object.entries(currencyMap).map(
                       ([code, { symbol, label }]) => (
                         <option
                           key={code}
                           value={code}
-                          className="bg-black text-white"
+                          className="bg-white dark:bg-black text-text-main"
                         >
                           {code} - {label} ({symbol})
                         </option>
@@ -238,7 +239,7 @@ const Register = () => {
               <button
                 type="button"
                 onClick={() => setStep(step - 1)}
-                className="flex-1 py-4 bg-white/5 text-white font-bold rounded-2xl border border-white/10 hover:bg-white/10 transition-all"
+                className="flex-1 py-4 bg-gray-100 dark:bg-white/5 text-text-main font-bold rounded-2xl border border-app-border hover:bg-gray-200 dark:hover:bg-white/10 transition-all"
               >
                 Back
               </button>
@@ -247,7 +248,7 @@ const Register = () => {
               type="button"
               disabled={isLoading}
               onClick={() => (step < 3 ? setStep(step + 1) : handleSubmit())}
-              className="flex-[2] py-4 bg-sky-500 text-black font-black uppercase rounded-2xl hover:bg-sky-400 transition-all shadow-lg shadow-sky-500/10"
+              className="flex-[2] py-4 bg-sky-500 text-white dark:text-black font-black uppercase rounded-2xl hover:bg-sky-400 transition-all shadow-lg shadow-sky-500/10"
             >
               {isLoading
                 ? "Processing..."
@@ -257,7 +258,7 @@ const Register = () => {
             </button>
           </div>
 
-          <div className="mt-8 text-center border-t border-white/5 pt-6">
+          <div className="mt-8 text-center border-t border-app-border pt-6">
             <p className="text-gray-500 text-sm">
               Already have an account?{" "}
               <Link
@@ -274,7 +275,7 @@ const Register = () => {
   );
 };
 
-// --- SUB-COMPONENTS (Crucial to prevent ReferenceErrors) ---
+// --- SUB-COMPONENTS (Updated for Light/Dark) ---
 
 const InputGroup = ({
   label,
@@ -291,7 +292,7 @@ const InputGroup = ({
     </label>
     <div className="relative">
       {icon && (
-        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">
+        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
           {icon}
         </span>
       )}
@@ -301,7 +302,9 @@ const InputGroup = ({
         value={value}
         onChange={onChange}
         placeholder={placeholder}
-        className={`w-full bg-black/40 border border-white/10 p-4 ${icon ? "pl-12" : "px-4"} rounded-xl text-white outline-none focus:border-sky-500 transition-all`}
+        className={`w-full bg-gray-50 dark:bg-black/40 border border-app-border p-4 ${
+          icon ? "pl-12" : "px-4"
+        } rounded-xl text-text-main outline-none focus:border-sky-500 transition-all placeholder:text-gray-400`}
       />
     </div>
   </div>
@@ -316,10 +319,10 @@ const SelectGroup = ({ label, name, options, value, onChange }) => (
       name={name}
       value={value}
       onChange={onChange}
-      className="w-full bg-black/40 border border-white/10 p-4 rounded-xl text-white outline-none focus:border-sky-500 transition-all"
+      className="w-full bg-gray-50 dark:bg-black/40 border border-app-border p-4 rounded-xl text-text-main outline-none focus:border-sky-500 transition-all"
     >
       {options.map((opt) => (
-        <option key={opt} value={opt} className="bg-black">
+        <option key={opt} value={opt} className="bg-white dark:bg-black">
           {opt}
         </option>
       ))}

@@ -47,6 +47,7 @@ import FAQ from "./components/FAQ";
 // import PricingSection from "./components/InvestmentPlans";
 import AdminTransactions from "./pages/admin/AdminTransactions";
 import Insurance from "./components/Insurance";
+import ChatWidget from "./components/ChatWidget";
 
 // --- PUBLIC LAYOUT WRAPPER ---
 const PublicLayout = () => (
@@ -103,7 +104,7 @@ function App() {
   return (
     <Router>
       <ScrollToTop />
-      <div className="bg-[#05070A] min-h-screen font-inter text-slate-300 selection:bg-sky-500/30 selection:text-white">
+      <div className="min-h-screen bg-white dark:bg-[#05070A] text-gray-900 dark:text-white transition-colors duration-300">
         <Toaster
           position="top-right"
           toastOptions={{
@@ -180,6 +181,7 @@ function App() {
           {/* CATCH ALL */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
+        <ChatWidget />
       </div>
     </Router>
   );

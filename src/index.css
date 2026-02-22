@@ -1,17 +1,109 @@
 @import "tailwindcss";
+@variant dark (&:where(.dark, .dark *));
+
+/* 1. Define your base variables for Light Mode */
+:root {
+  --app-bg: #ffffff;
+  --card-bg: #f9fafb;
+  --text-main: #111827;
+  --border-color: rgba(0, 0, 0, 0.1);
+}
+
+/* 2. Overwrite variables for Dark Mode */
+.dark {
+  --app-bg: #05070a;
+  --card-bg: #0a0c10;
+  --text-main: #ffffff;
+  --border-color: rgba(255, 255, 255, 0.05);
+}
+
+/* 3. Register them in the Tailwind Theme */
 @theme {
-  --font-mono: "Fira Code", "Roboto Mono", monospace;
-
-  --color-navy-bg: #0a192f;
-  --color-slate-light: #ccd6f6;
-  --color-sapphire-bg: #112240;
-  --color-mint-accent: #64ffda;
-  --color-slate-dark: #8892b0;
-}
-html {
-  scroll-behavior: smooth;
+  --color-app-bg: var(--app-bg);
+  --color-card-bg: var(--card-bg);
+  --color-text-main: var(--text-main);
+  --color-app-border: var(--border-color);
 }
 
+/* 4. Global Selectors: The "Lazy" shortcut */
+body {
+  background-color: var(--app-bg);
+  color: var(--text-main);
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
+}
+
+/* This forces all your dark cards to follow the variable */
+section,
+.card,
+[class*="bg-[#0a0c10]"],
+[class*="bg-[#05070A]"] {
+  background-color: var(--card-bg) !important;
+  border-color: var(--border-color) !important;
+}
+
+[class*="text-white"],
+[class*="text-gray-400"] {
+  color: var(--text-main) !important;
+}
+/* 5. Global Link and Interactive Selectors */
+a,
+button:not([class*="bg-sky-500"]) {
+  transition:
+    color 0.3s ease,
+    background-color 0.3s ease;
+}
+
+/* Force links that were specifically white/gray to follow the theme */
+a[class*="text-white"],
+a[class*="text-gray-400"],
+a[class*="text-gray-300"] {
+  color: var(--text-main) !important;
+}
+/* 6. Button Theme Controller */
+
+/* Secondary/Ghost Buttons: Force them to follow theme variables */
+button:not(.bg-sky-500):not(.bg-emerald-500),
+[role="button"]:not(.bg-sky-500) {
+  background-color: var(--card-bg) !important;
+  color: var(--text-main) !important;
+  border-color: var(--border-color) !important;
+  transition: all 0.3s ease;
+}
+
+/* Primary Buttons: Ensure Sky/Blue buttons KEEP white text in both modes */
+button.bg-sky-500,
+.bg-sky-500 {
+  color: #ffffff !important; /* Always white for readability on blue */
+}
+
+/* Specific fix for your Navbar/Academy ghost buttons that used white/5 */
+button[class*="bg-white/5"],
+button[class*="bg-gray-100"] {
+  background-color: var(--card-bg) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-main) !important;
+}
+
+/* Hover effects for themed buttons */
+button:not(.bg-sky-500):hover {
+  filter: brightness(0.9); /* Darkens slightly in light mode */
+}
+
+.dark button:not(.bg-sky-500):hover {
+  filter: brightness(1.2); /* Brightens slightly in dark mode */
+}
+/* Hover state for links to ensure they remain visible/attractive */
+a:hover {
+  @apply text-sky-500 dark:text-sky-400;
+}
+
+/* Navbar specific links if they are still stuck */
+nav a {
+  color: var(--text-main);
+}
+/* --- YOUR ANIMATIONS (Untouched) --- */
 @keyframes subtle-zoom {
   0% {
     transform: scale(1);
@@ -23,6 +115,7 @@ html {
 .animate-subtle-zoom {
   animation: subtle-zoom 20s infinite alternate ease-in-out;
 }
+
 @keyframes infinite-scroll {
   from {
     transform: translateX(0);
@@ -34,6 +127,7 @@ html {
 .animate-infinite-scroll {
   animation: infinite-scroll 25s linear infinite;
 }
+
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -47,46 +141,15 @@ html {
 .animate-in {
   animation: fadeIn 0.8s ease-out forwards;
 }
+
+/* Updated Input for Light/Dark support */
 .input {
-  @apply w-full bg-black/40 border border-white/10 p-4 rounded-xl text-white text-sm outline-none focus:border-sky-500 transition-all;
-}
-section,
-footer {
-  background-color: rgb(0, 0, 0);
-}
-h1,
-h2,
-h3,
-h4 {
-  color: #e5e7eb;
-}
-p {
-  color: #9ca3af;
-}
-/* Hide the Google Translate branding/dropdown button */
-#google_translate_element {
-  display: none !important;
+  @apply w-full bg-gray-100 dark:bg-black/40 border border-gray-200 dark:border-white/10 p-4 rounded-xl text-gray-900 dark:text-white text-sm outline-none focus:border-sky-500 transition-all;
 }
 
-/* Fix the body displacement when the top banner appears */
-body {
-  top: 0 !important;
-}
-
-/* Optional: If you want to hide the "Powered by Google" text in the top banner */
-.goog-logo-link {
-  display: none !important;
-}
-.goog-te-gadget {
-  color: transparent !important;
-}
-.goog-te-banner-frame.skiptranslate {
-  display: none !important;
-}
-.goog-te-balloon-frame {
-  display: none !important;
-}
-/* 1. Hide the Google Translate Banner Frame */
+/* --- GOOGLE TRANSLATE FIXES (Untouched) --- */
+#google_translate_element,
+.goog-logo-link,
 .goog-te-banner-frame,
 .goog-te-banner-frame.skiptranslate,
 #goog-gt-tt,
@@ -95,21 +158,12 @@ body {
   visibility: hidden !important;
 }
 
-/* 2. Force the page to stay at the very top */
-/* Google often adds a 40px margin to the top of the body */
 body {
   top: 0 !important;
-  position: static !important; /* Prevents Google's relative positioning shift */
+  position: static !important;
+  @apply bg-white dark:bg-[#05070A] transition-colors duration-500;
 }
 
-/* 3. Remove the push-down effect on the HTML element */
 html {
   margin-top: 0 !important;
-}
-
-/* 4. Optional: Hide the "Original Text" tooltip when hovering over translated words */
-.goog-text-highlight {
-  background-color: transparent !important;
-  box-shadow: none !important;
-  box-sizing: border-box !important;
 }

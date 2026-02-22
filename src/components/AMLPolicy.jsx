@@ -8,7 +8,7 @@ import {
 
 const AMLPolicy = () => {
   return (
-    <div className="bg-[#05070A] text-slate-300 min-h-screen pb-32 pt-24 px-6 overflow-hidden">
+    <div className="bg-white dark:bg-[#0a0c10] text-gray-900 dark:text-white border-gray-200 dark:border-white/10">
       {/* 1. COMPLIANCE HEADER */}
       <section className="max-w-4xl mx-auto text-center mb-20">
         <div className="flex justify-center mb-6">

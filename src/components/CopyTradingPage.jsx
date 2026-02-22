@@ -10,7 +10,7 @@ import { Link } from "react-router-dom";
 
 const CopyTradingPage = () => {
   return (
-    <div className="bg-[#05070A] text-slate-300 min-h-screen pb-32 overflow-hidden">
+    <div className="bg-white dark:bg-[#0a0c10] text-gray-900 dark:text-white border-gray-200 dark:border-white/10min-h-screen pb-32 overflow-hidden">
       {/* 1. HERO SECTION */}
       <section className="relative pt-20 pb-16 px-6 overflow-hidden">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-sky-500/5 via-transparent to-transparent pointer-events-none" />
@@ -74,7 +74,7 @@ const CopyTradingPage = () => {
 
       {/* 3. HOW THE COPIER WORKS (THE BLUEPRINT) */}
       <section className="max-w-7xl mx-auto px-6 mb-32">
-        <div className="bg-[#0A0C10] border border-white/5 rounded-[3rem] overflow-hidden">
+        <div className="bg-white dark:bg-[#0a0c10] text-gray-900 dark:text-white border-gray-200 dark:border-white/10rounded-[3rem] overflow-hidden">
           <div className="grid lg:grid-cols-3">
             <div className="p-12 border-b lg:border-b-0 lg:border-r border-white/5">
               <HiOutlineCpuChip className="text-sky-500 text-4xl mb-6" />

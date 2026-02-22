@@ -3,7 +3,7 @@ import { HiOutlineUserGroup, HiOutlineCurrencyDollar } from "react-icons/hi2";
 
 const Affiliate = () => {
   return (
-    <section className="py-24 bg-[#05070A] px-6">
+    <section className="bg-white dark:bg-[#0a0c10] text-gray-900 dark:text-white border-gray-200 dark:border-white/10">
       <div className="max-w-7xl mx-auto">
         <div className="bg-linear-to-br from-slate-900 to-[#05070A] border border-white/5 rounded-[40px] p-8 md:p-16 flex flex-col md:flex-row items-center gap-12 relative overflow-hidden">
           {/* Subtle background icon */}

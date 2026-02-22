@@ -23,7 +23,7 @@ const FAQ = () => {
             We calculate all necessary parameters automatically. When the expert
             exits a position, you exit it. Automatically.
           </p>
-          <div className="p-4 bg-sky-500/5 border border-sky-500/10 rounded-xl">
+          <div className="p-4 bg-white dark:bg-[#0a0c10] text-gray-900 dark:text-white border-gray-200 dark:border-white/10rounded-xl">
             <p className="text-[11px] font-black text-sky-500 uppercase tracking-widest mb-2">
               Technical Requirement:
             </p>
@@ -59,7 +59,7 @@ const FAQ = () => {
   };
 
   return (
-    <section className="py-24 bg-[#05070A] px-6">
+    <section className="py-24 bg-white dark:bg-[#0a0c10] text-gray-900 dark:text-white border-gray-200 dark:border-white/10 px-6">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="mb-16">

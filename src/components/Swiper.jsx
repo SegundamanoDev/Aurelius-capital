@@ -64,10 +64,10 @@ const testimonials = [
 const TestimonialSection = () => {
   return (
     <section
+      className="bg-white dark:bg-[#0a0c10] text-gray-900 dark:text-white border-gray-200 dark:border-white/10"
       style={{
         padding: "80px 20px",
-        backgroundColor: "#0f172a", // Deep Navy/Dark background
-        color: "#ffffff",
+
         fontFamily: "sans-serif",
       }}
     >
@@ -103,11 +103,10 @@ const TestimonialSection = () => {
           {testimonials.map((t, i) => (
             <SwiperSlide key={i}>
               <div
+                className="bg-white dark:bg-[#0a0c10] text-gray-900 dark:text-white border-gray-200 dark:border-white/10"
                 style={{
-                  background: "#1e293b", // Lighter dark for cards
                   padding: "40px 30px",
                   borderRadius: "20px",
-                  border: "1px solid #334155",
                   height: "280px",
                   display: "flex",
                   flexDirection: "column",
@@ -119,16 +118,16 @@ const TestimonialSection = () => {
                   style={{
                     fontSize: "1.1rem",
                     lineHeight: "1.6",
-                    color: "#e2e8f0",
                   }}
                 >
                   "{t.text}"
                 </p>
                 <div>
                   <h4
+                    className="bg-white dark:bg-[#0a0c10] text-gray-900 dark:text-white border-gray-200 dark:border-white/10"
                     style={{
                       margin: "0",
-                      color: "#38bdf8",
+
                       fontSize: "1.2rem",
                     }}
                   >
@@ -145,12 +144,12 @@ const TestimonialSection = () => {
 
         {/* --- BOTTOM CTA SECTION --- */}
         <div
+          className="bg-white dark:bg-[#0a0c10] text-gray-900 dark:text-white border-gray-200 dark:border-white/10"
           style={{
             marginTop: "60px",
             textAlign: "center",
             padding: "40px",
             borderRadius: "20px",
-            background: "linear-gradient(90deg, #3b82f6 0%, #2563eb 100%)",
           }}
         >
           <h3 style={{ fontSize: "1.8rem", marginBottom: "20px" }}>

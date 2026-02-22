@@ -35,7 +35,7 @@ const features = [
 
 const Features = () => {
   return (
-    <section className="py-32 bg-[#05070A] px-6 relative overflow-hidden">
+    <section className="py-32 bg-white dark:bg-[#0a0c10] text-gray-900 dark:text-white border-gray-200 dark:border-white/10 px-6 relative overflow-hidden">
       {/* Background visual element */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-px " />
 

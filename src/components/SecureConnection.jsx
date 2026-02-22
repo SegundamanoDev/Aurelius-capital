@@ -2,7 +2,7 @@ import React from "react";
 
 const SecureConnection = () => {
   return (
-    <div className="flex flex-col bg-[rgb(0,0,0)] items-center justify-center w-full py-20 px-6">
+    <div className="flex flex-col bg-white dark:bg-[#0a0c10] text-gray-900 dark:text-white border-gray-200 dark:border-white/10 items-center justify-center w-full py-20 px-6">
       {/* 1. Text Header Section */}
       <div className="max-w-2xl text-center mb-12">
         <h3 className="text-3xl md:text-5xl font-black tracking-tight mb-6">

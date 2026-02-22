@@ -2,22 +2,19 @@ import React, { useState } from "react";
 import {
   useWithdrawFundsMutation,
   useGetMyProfileQuery,
-} from "../../api/apiSlice"; // Import the query
+} from "../../api/apiSlice";
 import toast from "react-hot-toast";
 import emailjs from "@emailjs/browser";
 import { HiOutlineBanknotes, HiOutlineArrowUpRight } from "react-icons/hi2";
 import { FaBitcoin, FaPaypal } from "react-icons/fa";
 
 const Withdraw = () => {
-  // 1. Hooks and API
-  const { data: user, isLoading: isProfileLoading } = useGetMyProfileQuery(); // Fetch live user data
+  const { data: user, isLoading: isProfileLoading } = useGetMyProfileQuery();
   const [withdrawFunds, { isLoading: isWithdrawing }] =
     useWithdrawFundsMutation();
 
-  // Use live balance from the query result
   const balance = user?.balance || 0;
 
-  // 2. Local State
   const [amount, setAmount] = useState("");
   const [method, setMethod] = useState("BTC");
   const [address, setAddress] = useState("");
@@ -25,10 +22,8 @@ const Withdraw = () => {
 
   const handleWithdraw = async (e) => {
     e.preventDefault();
-
     const withdrawAmount = parseFloat(amount);
 
-    // 1. Local Validations
     if (isNaN(withdrawAmount) || withdrawAmount <= 0) {
       return toast.error("Please enter a valid amount.");
     }
@@ -43,21 +38,18 @@ const Withdraw = () => {
     setLoading(true);
 
     try {
-      // 2. Backend Call
-      const result = await withdrawFunds({
+      await withdrawFunds({
         amount: withdrawAmount,
         method: method,
         payoutAddress: address,
       }).unwrap();
 
-      // 3. EmailJS Notification
       const emailParams = {
         type: "WITHDRAWAL REQUEST",
         user_name: `${user?.firstName} ${user?.lastName}`,
         user_email: user?.email,
         amount: withdrawAmount,
         asset: method,
-        // Live balance after withdrawal lock for the admin to see
         current_balance: (balance - withdrawAmount).toLocaleString(),
         proof_link: `PAYOUT ADDRESS: ${address}`,
       };
@@ -69,16 +61,13 @@ const Withdraw = () => {
         import.meta.env.VITE_EMAILJS_PUBLIC_KEY,
       );
 
-      // 4. Success Handling
       toast.success("Withdrawal request submitted for approval!", {
         id: loadingToast,
       });
 
-      // 5. Reset Form State
       setAmount("");
       setAddress("");
     } catch (err) {
-      console.error("Withdrawal Error:", err);
       toast.error(err?.data?.message || "Failed to process withdrawal.", {
         id: loadingToast,
       });
@@ -87,42 +76,43 @@ const Withdraw = () => {
     }
   };
 
-  // Show a loading state if the profile is still fetching
   if (isProfileLoading)
     return (
-      <div className="text-white text-center py-20">Syncing Ledger...</div>
+      <div className="text-gray-500 uppercase font-black tracking-widest text-center py-20 animate-pulse">
+        Syncing Ledger...
+      </div>
     );
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8 animate-in fade-in duration-700 pb-20">
+    <div className="max-w-4xl mx-auto space-y-8 animate-in fade-in duration-700 pb-20 transition-colors duration-500">
       <div>
-        <h1 className="text-3xl font-black text-white tracking-tighter italic uppercase">
+        <h1 className="text-3xl font-black text-text-main tracking-tighter italic uppercase">
           Withdraw <span className="text-sky-500">Funds</span>
         </h1>
-        <p className="text-gray-500 text-sm mt-1">
+        <p className="text-gray-500 text-sm mt-1 font-medium">
           Transfer your profits to your preferred external wallet or bank.
         </p>
       </div>
 
       <div className="grid md:grid-cols-3 gap-8">
-        {/* Left: Balance Card */}
+        {/* Left: Info Cards */}
         <div className="space-y-6">
-          <div className="bg-[#05070A] border border-white/5 p-6 rounded-3xl shadow-xl">
+          <div className="bg-card-bg border border-app-border p-6 rounded-3xl shadow-xl shadow-black/5">
             <p className="text-[10px] text-gray-500 uppercase font-black tracking-widest">
               Available Balance
             </p>
-            <h2 className="text-3xl font-bold text-sky-400 mt-2">
+            <h2 className="text-3xl font-black text-sky-600 dark:text-sky-400 mt-2">
               ${balance.toLocaleString()}
             </h2>
           </div>
 
-          <div className="bg-amber-500/5 border border-amber-500/10 p-6 rounded-3xl">
-            <h4 className="text-amber-500 text-xs font-bold uppercase mb-2">
+          <div className="bg-amber-500/5 border border-amber-500/20 p-6 rounded-3xl">
+            <h4 className="text-amber-600 dark:text-amber-500 text-xs font-black uppercase mb-2">
               Verification Notice
             </h4>
-            <p className="text-gray-400 text-[11px] leading-relaxed">
+            <p className="text-gray-500 dark:text-gray-400 text-[11px] leading-relaxed font-medium">
               Withdrawals are processed after internal security audits. Ensure
-              your payout address is correct.
+              your payout address is correct to avoid permanent loss of funds.
             </p>
           </div>
         </div>
@@ -131,31 +121,39 @@ const Withdraw = () => {
         <div className="md:col-span-2">
           <form
             onSubmit={handleWithdraw}
-            className="bg-[#05070A] border border-white/5 p-8 rounded-[2.5rem] shadow-2xl space-y-8"
+            className="bg-card-bg border border-app-border p-8 rounded-[2.5rem] shadow-2xl shadow-black/5 space-y-8"
           >
             {/* Payout Method Tabs */}
             <div className="space-y-4">
-              <label className="text-xs text-gray-500 font-bold uppercase">
+              <label className="text-xs text-gray-500 font-black uppercase tracking-widest ml-1">
                 Payout Method
               </label>
               <div className="grid grid-cols-3 gap-3">
                 {[
-                  { id: "BTC", label: "Crypto", icon: <FaBitcoin /> },
-                  { id: "PayPal", label: "PayPal", icon: <FaPaypal /> },
-                  { id: "Bank", label: "Bank", icon: <HiOutlineBanknotes /> },
+                  { id: "BTC", label: "Crypto", icon: <FaBitcoin size={18} /> },
+                  {
+                    id: "PayPal",
+                    label: "PayPal",
+                    icon: <FaPaypal size={18} />,
+                  },
+                  {
+                    id: "Bank",
+                    label: "Bank",
+                    icon: <HiOutlineBanknotes size={18} />,
+                  },
                 ].map((item) => (
                   <button
                     key={item.id}
                     type="button"
                     onClick={() => setMethod(item.id)}
-                    className={`flex flex-col items-center gap-2 p-4 rounded-2xl border transition-all ${
+                    className={`flex flex-col items-center gap-2 p-4 rounded-2xl border transition-all duration-300 ${
                       method === item.id
-                        ? "border-sky-500 bg-sky-500/10 text-sky-400"
-                        : "border-white/5 bg-black/20 text-gray-500 hover:bg-white/5"
+                        ? "border-sky-500 bg-sky-500/10 text-sky-600 dark:text-sky-400 shadow-inner"
+                        : "border-app-border bg-gray-50 dark:bg-black/20 text-gray-400 hover:bg-gray-100 dark:hover:bg-white/5"
                     }`}
                   >
                     {item.icon}
-                    <span className="text-[10px] font-bold uppercase">
+                    <span className="text-[10px] font-black uppercase tracking-tighter">
                       {item.label}
                     </span>
                   </button>
@@ -165,7 +163,7 @@ const Withdraw = () => {
 
             {/* Address Input */}
             <div className="space-y-2">
-              <label className="text-xs text-gray-500 font-bold uppercase tracking-widest">
+              <label className="text-xs text-gray-500 font-black uppercase tracking-widest ml-1">
                 {method} Receiving Address / Account
               </label>
               <input
@@ -174,13 +172,13 @@ const Withdraw = () => {
                 onChange={(e) => setAddress(e.target.value)}
                 placeholder={`Enter your ${method} details`}
                 required
-                className="w-full bg-black/40 border border-white/10 p-4 rounded-xl text-white outline-none focus:border-sky-500 transition-all font-mono text-sm"
+                className="w-full bg-gray-50 dark:bg-black/40 border border-app-border p-4 rounded-xl text-text-main outline-none focus:border-sky-500 transition-all font-mono text-sm placeholder:text-gray-400"
               />
             </div>
 
             {/* Amount Input */}
             <div className="space-y-2">
-              <label className="text-xs text-gray-500 font-bold uppercase tracking-widest">
+              <label className="text-xs text-gray-500 font-black uppercase tracking-widest ml-1">
                 Amount (USD)
               </label>
               <div className="relative">
@@ -190,9 +188,9 @@ const Withdraw = () => {
                   onChange={(e) => setAmount(e.target.value)}
                   placeholder="0.00"
                   required
-                  className="w-full bg-black/40 border border-white/10 p-5 rounded-2xl text-2xl font-bold text-white outline-none focus:border-sky-500 transition-all pl-10"
+                  className="w-full bg-gray-50 dark:bg-black/40 border border-app-border p-5 rounded-2xl text-2xl font-black text-text-main outline-none focus:border-sky-500 transition-all pl-10 placeholder:text-gray-300"
                 />
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-600 font-bold">
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-black text-xl">
                   $
                 </span>
               </div>
@@ -201,14 +199,17 @@ const Withdraw = () => {
             <button
               type="submit"
               disabled={isWithdrawing || loading}
-              className={`w-full py-5 rounded-2xl font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2 ${
+              className={`w-full py-5 rounded-2xl font-black uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-2 text-sm ${
                 isWithdrawing || loading
-                  ? "bg-gray-800 text-gray-500 cursor-not-allowed"
-                  : "bg-sky-500 hover:bg-sky-400 text-black shadow-lg shadow-sky-500/20 active:scale-[0.98]"
+                  ? "bg-gray-200 dark:bg-gray-800 text-gray-400 dark:text-gray-500 cursor-not-allowed"
+                  : "bg-sky-600 hover:bg-sky-500 text-white shadow-xl shadow-sky-500/20 active:scale-[0.98]"
               }`}
             >
-              {isWithdrawing || loading ? "Submitting..." : "Request Payout"}{" "}
-              <HiOutlineArrowUpRight size={20} />
+              {isWithdrawing || loading ? "Processing..." : "Request Payout"}
+              <HiOutlineArrowUpRight
+                size={20}
+                className={isWithdrawing ? "animate-pulse" : ""}
+              />
             </button>
           </form>
         </div>

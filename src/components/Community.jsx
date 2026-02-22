@@ -2,7 +2,7 @@ import React from "react";
 
 const Community = () => {
   return (
-    <div className="flex flex-col items-center justify-center w-full py-16 bg-[rgb(0,0,0)] text-white font-sans px-4">
+    <div className="flex flex-col items-center justify-center w-full py-16  font-sans px-4 bg-white dark:bg-[#0a0c10] text-gray-900 dark:text-white border-gray-200 dark:border-white/10">
       {/* 1. Text Header Section */}
       <div className="max-w-3xl text-center mb-10">
         <h2 className="text-4xl md:text-6xl font-bold tracking-tight mb-6 text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-indigo-500">

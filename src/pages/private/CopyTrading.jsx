@@ -10,7 +10,6 @@ import {
   HiOutlineArrowTrendingUp,
   HiOutlineCheckCircle,
   HiOutlineXMark,
-  HiOutlineShieldCheck,
   HiOutlineUser,
   HiCheckBadge,
 } from "react-icons/hi2";
@@ -60,16 +59,16 @@ const CopyTradingPage = () => {
 
   if (isTradersLoading || isUserLoading)
     return (
-      <div className="p-20 text-center text-gray-500 animate-pulse uppercase font-black tracking-widest">
+      <div className="p-20 text-center text-gray-500 animate-pulse uppercase font-black tracking-widest bg-app-bg h-screen">
         Initialising Secure Social Terminal...
       </div>
     );
 
   return (
-    <div className="space-y-10 p-4 md:p-8 max-w-7xl mx-auto">
+    <div className="space-y-10 p-4 md:p-8 max-w-7xl mx-auto transition-colors duration-500">
       {/* HEADER */}
-      <header className="border-b border-white/5 pb-6">
-        <h1 className="text-4xl font-black text-white uppercase italic tracking-tighter">
+      <header className="border-b border-app-border pb-6">
+        <h1 className="text-4xl font-black text-text-main uppercase italic tracking-tighter">
           Social <span className="text-sky-500">Terminal</span>
         </h1>
         <p className="text-gray-500 text-xs uppercase mt-2 tracking-widest">
@@ -81,7 +80,7 @@ const CopyTradingPage = () => {
       <div className="flex justify-between items-center">
         <select
           onChange={(e) => setSortBy(e.target.value)}
-          className="bg-[#0A0C12] border border-white/10 px-4 py-2 rounded-xl text-white text-sm focus:ring-2 focus:ring-sky-500 outline-none"
+          className="bg-card-bg border border-app-border px-4 py-2 rounded-xl text-text-main text-sm focus:ring-2 focus:ring-sky-500 outline-none shadow-sm"
         >
           <option value="roi">Sort by ROI (30D)</option>
           <option value="winRate">Sort by Win Rate</option>
@@ -96,7 +95,7 @@ const CopyTradingPage = () => {
           return (
             <div
               key={trader._id}
-              className="bg-[#05070A] border border-white/5 rounded-[2.5rem] p-8 hover:border-sky-500/30 transition-all group relative overflow-hidden"
+              className="bg-card-bg border border-app-border rounded-[2.5rem] p-8 hover:border-sky-500/30 transition-all group relative overflow-hidden shadow-xl"
             >
               <div
                 className="cursor-pointer flex flex-col items-center text-center space-y-4"
@@ -105,9 +104,9 @@ const CopyTradingPage = () => {
                   setShowDetail(true);
                 }}
               >
-                {/* TOP ALIGNED IMAGE WITH VERIFIED BADGE */}
+                {/* AVATAR */}
                 <div className="relative">
-                  <div className="h-24 w-24 rounded-3xl overflow-hidden border-2 border-white/5 bg-white/5 flex items-center justify-center group-hover:border-sky-500/50 transition-colors shadow-2xl">
+                  <div className="h-24 w-24 rounded-3xl overflow-hidden border-2 border-app-border bg-gray-100 dark:bg-white/5 flex items-center justify-center group-hover:border-sky-500/50 transition-colors shadow-lg">
                     {trader.avatar ? (
                       <img
                         src={trader.avatar}
@@ -115,18 +114,21 @@ const CopyTradingPage = () => {
                         className="h-full w-full object-cover"
                       />
                     ) : (
-                      <HiOutlineUser className="text-gray-700" size={40} />
+                      <HiOutlineUser
+                        className="text-gray-400 dark:text-gray-700"
+                        size={40}
+                      />
                     )}
                   </div>
                   {trader.verified && (
-                    <div className="absolute -bottom-2 -right-2 bg-sky-500 text-black p-1 rounded-lg shadow-lg">
+                    <div className="absolute -bottom-2 -right-2 bg-sky-500 text-white dark:text-black p-1 rounded-lg shadow-lg">
                       <HiCheckBadge size={18} />
                     </div>
                   )}
                 </div>
 
                 <div>
-                  <h3 className="text-white text-2xl font-black uppercase italic tracking-tight leading-none">
+                  <h3 className="text-text-main text-2xl font-black uppercase italic tracking-tight leading-none">
                     {trader.name}
                   </h3>
                   {trader.verified && (
@@ -136,8 +138,9 @@ const CopyTradingPage = () => {
                   )}
                 </div>
 
+                {/* MINI STATS */}
                 <div className="w-full space-y-2 pt-2">
-                  <div className="flex justify-between items-center bg-white/[0.02] p-3 rounded-xl border border-white/5">
+                  <div className="flex justify-between items-center bg-gray-50 dark:bg-white/[0.02] p-3 rounded-xl border border-app-border">
                     <span className="text-gray-500 text-[10px] uppercase font-bold tracking-widest">
                       ROI (30D)
                     </span>
@@ -145,11 +148,11 @@ const CopyTradingPage = () => {
                       +{trader.performance?.roi30d}%
                     </span>
                   </div>
-                  <div className="flex justify-between items-center bg-white/[0.02] p-3 rounded-xl border border-white/5">
+                  <div className="flex justify-between items-center bg-gray-50 dark:bg-white/[0.02] p-3 rounded-xl border border-app-border">
                     <span className="text-gray-500 text-[10px] uppercase font-bold tracking-widest">
                       Win Rate
                     </span>
-                    <span className="text-sky-400 font-black font-mono">
+                    <span className="text-sky-500 dark:text-sky-400 font-black font-mono">
                       {trader.performance?.winRate}%
                     </span>
                   </div>
@@ -164,8 +167,8 @@ const CopyTradingPage = () => {
                 }}
                 className={`w-full mt-6 py-4 rounded-2xl font-black uppercase text-[11px] flex items-center justify-center gap-2 transition-all ${
                   following
-                    ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
-                    : "bg-sky-500 text-black hover:bg-sky-400 shadow-lg shadow-sky-500/10"
+                    ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20"
+                    : "bg-sky-500 text-white dark:text-black hover:bg-sky-400 shadow-lg shadow-sky-500/10"
                 }`}
               >
                 {following ? (
@@ -187,11 +190,11 @@ const CopyTradingPage = () => {
       <div className="flex justify-center items-center gap-6 pt-10">
         <button
           onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
-          className="text-gray-500 hover:text-white uppercase text-xs font-bold transition-colors"
+          className="text-gray-500 hover:text-text-main uppercase text-xs font-bold transition-colors"
         >
           Previous
         </button>
-        <div className="h-8 w-8 rounded-full border border-white/10 flex items-center justify-center text-white text-xs font-black">
+        <div className="h-8 w-8 rounded-full border border-app-border flex items-center justify-center text-text-main text-xs font-black">
           {currentPage}
         </div>
         <button
@@ -200,20 +203,20 @@ const CopyTradingPage = () => {
               indexOfLast < processedTraders.length ? p + 1 : p,
             )
           }
-          className="text-gray-500 hover:text-white uppercase text-xs font-bold transition-colors"
+          className="text-gray-500 hover:text-text-main uppercase text-xs font-bold transition-colors"
         >
           Next
         </button>
       </div>
 
-      {/* TRADER DETAIL DRAWER */}
+      {/* TRADER DETAIL MODAL */}
       {showDetail && traderDetail && (
-        <div className="fixed inset-0 bg-black/95 z-50 flex justify-center items-center p-4 backdrop-blur-sm">
-          <div className="bg-[#0A0C12] max-w-xl w-full p-6 md:p-10 rounded-[2.5rem] border border-white/10 overflow-y-auto max-h-[90vh] shadow-2xl">
+        <div className="fixed inset-0 bg-black/40 dark:bg-black/90 z-[110] flex justify-center items-center p-4 backdrop-blur-md">
+          <div className="bg-card-bg max-w-xl w-full p-6 md:p-10 rounded-[2.5rem] border border-app-border overflow-y-auto max-h-[90vh] shadow-2xl transition-all duration-300">
             <div className="flex justify-between items-start mb-8">
               <div className="flex flex-col items-center sm:items-start gap-4 w-full">
                 <div className="relative">
-                  <div className="h-28 w-28 rounded-[2rem] overflow-hidden border-2 border-sky-500/20 bg-white/5 flex items-center justify-center shadow-2xl">
+                  <div className="h-28 w-28 rounded-[2rem] overflow-hidden border-2 border-sky-500/20 bg-gray-100 dark:bg-white/5 flex items-center justify-center shadow-xl">
                     {traderDetail.avatar ? (
                       <img
                         src={traderDetail.avatar}
@@ -221,17 +224,20 @@ const CopyTradingPage = () => {
                         className="h-full w-full object-cover"
                       />
                     ) : (
-                      <HiOutlineUser className="text-gray-700" size={48} />
+                      <HiOutlineUser
+                        className="text-gray-400 dark:text-gray-700"
+                        size={48}
+                      />
                     )}
                   </div>
                   {traderDetail.verified && (
-                    <div className="absolute -bottom-2 -right-2 bg-sky-500 text-black p-1.5 rounded-xl shadow-xl">
+                    <div className="absolute -bottom-2 -right-2 bg-sky-500 text-white dark:text-black p-1.5 rounded-xl shadow-xl">
                       <HiCheckBadge size={22} />
                     </div>
                   )}
                 </div>
                 <div className="text-center sm:text-left">
-                  <h2 className="text-4xl font-black text-white uppercase italic leading-none tracking-tight">
+                  <h2 className="text-4xl font-black text-text-main uppercase italic leading-none tracking-tight">
                     {traderDetail.name}
                   </h2>
                   <span className="text-sky-500 text-[10px] uppercase font-black tracking-[0.3em] mt-3 block">
@@ -241,7 +247,7 @@ const CopyTradingPage = () => {
               </div>
               <button
                 onClick={() => setShowDetail(false)}
-                className="p-2 hover:bg-white/5 rounded-full transition-colors"
+                className="p-2 hover:bg-gray-100 dark:hover:bg-white/5 rounded-full transition-colors"
               >
                 <HiOutlineXMark size={24} className="text-gray-500" />
               </button>
@@ -277,7 +283,7 @@ const CopyTradingPage = () => {
             </div>
 
             {isFollowing(traderDetail._id) ? (
-              <div className="w-full py-5 bg-emerald-500/10 border border-emerald-500/30 text-emerald-500 font-black uppercase rounded-2xl flex items-center justify-center gap-3">
+              <div className="w-full py-5 bg-emerald-500/10 border border-emerald-500/30 text-emerald-600 dark:text-emerald-500 font-black uppercase rounded-2xl flex items-center justify-center gap-3">
                 <HiOutlineCheckCircle size={22} />
                 Mirroring Active
               </div>
@@ -294,7 +300,7 @@ const CopyTradingPage = () => {
                     toast.error(err?.data?.message || "Check your balance");
                   }
                 }}
-                className="w-full py-5 bg-sky-500 hover:bg-sky-400 text-black font-black uppercase rounded-2xl transition-all active:scale-[0.98] shadow-xl shadow-sky-500/20"
+                className="w-full py-5 bg-sky-500 hover:bg-sky-400 text-white dark:text-black font-black uppercase rounded-2xl transition-all active:scale-[0.98] shadow-xl shadow-sky-500/20"
               >
                 {isStarting ? "Processing..." : "Start Mirroring"}
               </button>
@@ -309,12 +315,12 @@ const CopyTradingPage = () => {
 const Stat = ({ label, value, highlight }) => {
   const getValColor = () => {
     if (highlight === "emerald") return "text-emerald-500";
-    if (highlight === "sky") return "text-sky-400";
-    return "text-white";
+    if (highlight === "sky") return "text-sky-500 dark:text-sky-400";
+    return "text-text-main";
   };
 
   return (
-    <div className="bg-white/5 p-4 rounded-2xl border border-white/5 flex flex-col items-center sm:items-start">
+    <div className="bg-gray-50 dark:bg-white/5 p-4 rounded-2xl border border-app-border flex flex-col items-center sm:items-start">
       <p className="text-[10px] text-gray-500 uppercase font-black tracking-widest mb-1">
         {label}
       </p>
