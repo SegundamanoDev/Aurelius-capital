@@ -47,7 +47,8 @@ import FAQ from "./components/FAQ";
 // import PricingSection from "./components/InvestmentPlans";
 import AdminTransactions from "./pages/admin/AdminTransactions";
 import Insurance from "./components/Insurance";
-import ChatWidget from "./components/ChatWidget";
+import TawkMessenger from "./components/TawkMessenger";
+import Contact from "./pages/public/Contact";
 
 // --- PUBLIC LAYOUT WRAPPER ---
 const PublicLayout = () => (
@@ -117,7 +118,6 @@ function App() {
             },
           }}
         />
-
         <Routes>
           {/* 1. PUBLIC ROUTES (Wrapped in GuestRoute) */}
           <Route
@@ -132,6 +132,7 @@ function App() {
             <Route path="/register" element={<Register />} />
             <Route path="/portfolio" element={<Portfolio />} />
             <Route path="/about" element={<About />} />
+            <Route path="/contact" element={<Contact />} />
             <Route path="/academy" element={<Academy />} />
             <Route path="/copy-trading" element={<CopyTradingPage />} />
             <Route path="/aml-policy" element={<AMLPolicy />} />
@@ -181,7 +182,7 @@ function App() {
           {/* CATCH ALL */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
-        <ChatWidget />
+        <TawkMessenger />
       </div>
     </Router>
   );
