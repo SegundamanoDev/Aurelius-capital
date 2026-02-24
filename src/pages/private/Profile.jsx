@@ -10,18 +10,25 @@ import {
 import {
   useGetMyProfileQuery,
   useUpdateMyProfileMutation,
-  useGetTradersQuery,
+  useGetMyCopiesQuery,
+  useGetMyWalletQuery,
 } from "../../api/apiSlice";
 import toast from "react-hot-toast";
 
 const Profile = () => {
+  // 1. Fetch User Profile
   const {
     data: user,
     isLoading: profileLoading,
     refetch: refetchProfile,
   } = useGetMyProfileQuery();
 
-  const { data: allTraders = [] } = useGetTradersQuery();
+  const { data: walletData } = useGetMyWalletQuery();
+  const userWallet = walletData?.data;
+  // 2. Fetch Active Copies (populated with trader data)
+  const { data: myCopiesResponse, isLoading: copiesLoading } =
+    useGetMyCopiesQuery();
+
   const [updateProfile, { isLoading: isSaving }] = useUpdateMyProfileMutation();
 
   const [formData, setFormData] = useState({
@@ -40,7 +47,8 @@ const Profile = () => {
     },
   });
 
-  const normalizeId = (id) => (typeof id === "object" ? id?._id : id);
+  // Safe data extraction
+  const myCopies = myCopiesResponse?.data || [];
 
   useEffect(() => {
     if (user) {
@@ -98,7 +106,7 @@ const Profile = () => {
       {/* HEADER SECTION */}
       <header className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 border-b border-app-border pb-8">
         <div>
-          <h1 className="text-4xl font-black text-text-main uppercase italic tracking-tighter">
+          <h1 className="text-4xl font-black text-text-main dark:text-white uppercase italic tracking-tighter">
             User <span className="text-sky-500">Identity</span>
           </h1>
           <div className="flex items-center gap-3 mt-2">
@@ -111,10 +119,15 @@ const Profile = () => {
           </div>
         </div>
 
-        <div className="flex">
+        <div className="flex gap-4">
           <FinancialChip
-            label="Portfolio"
-            value={`$${user?.balance?.toLocaleString()}`}
+            label="Total Balance"
+            value={`$${userWallet?.totalBalance?.toLocaleString() || "0.00"}`}
+          />
+          <FinancialChip
+            label="Free Funds"
+            value={`$${userWallet?.freeBalance?.toLocaleString() || "0.00"}`}
+            color="text-sky-500"
           />
         </div>
       </header>
@@ -125,7 +138,7 @@ const Profile = () => {
           <form onSubmit={handleSubmit} className="space-y-10">
             {/* PERSONAL DATA */}
             <section className="bg-card-bg border border-app-border rounded-[2.5rem] p-8 shadow-xl shadow-black/5">
-              <h2 className="text-text-main font-black uppercase text-xs tracking-[0.2em] mb-8 flex items-center gap-3">
+              <h2 className="text-text-main dark:text-white font-black uppercase text-xs tracking-[0.2em] mb-8 flex items-center gap-3">
                 <HiOutlineIdentification className="text-sky-500" size={20} />{" "}
                 Personal Dossier
               </h2>
@@ -148,7 +161,6 @@ const Profile = () => {
                   value={formData.lastName}
                   onChange={handleChange}
                 />
-
                 <SelectField
                   label="Sex"
                   name="sex"
@@ -174,7 +186,7 @@ const Profile = () => {
 
             {/* ADDRESS DATA */}
             <section className="bg-card-bg border border-app-border rounded-[2.5rem] p-8 shadow-xl shadow-black/5">
-              <h2 className="text-text-main font-black uppercase text-xs tracking-[0.2em] mb-8 flex items-center gap-3">
+              <h2 className="text-text-main dark:text-white font-black uppercase text-xs tracking-[0.2em] mb-8 flex items-center gap-3">
                 <HiOutlineMapPin className="text-sky-500" size={20} /> Physical
                 Location
               </h2>
@@ -216,7 +228,7 @@ const Profile = () => {
 
             <button
               disabled={isSaving}
-              className="w-full py-6 bg-sky-600 hover:bg-sky-500 text-white font-black uppercase rounded-2xl transition-all shadow-xl shadow-sky-500/20 text-sm tracking-widest active:scale-[0.98]"
+              className="w-full py-6 bg-sky-600 hover:bg-sky-500 text-white font-black uppercase rounded-2xl transition-all shadow-xl shadow-sky-500/20 text-sm tracking-widest active:scale-[0.98] disabled:opacity-50"
             >
               {isSaving ? "Synchronizing..." : "Update Dossier"}
             </button>
@@ -227,37 +239,40 @@ const Profile = () => {
         <div className="lg:col-span-4 space-y-6">
           <div className="bg-card-bg border border-app-border rounded-[2.5rem] p-6 shadow-2xl sticky top-8">
             <div className="flex justify-between items-center mb-8">
-              <h3 className="text-text-main font-black uppercase text-xs tracking-widest flex items-center gap-2">
+              <h3 className="text-text-main dark:text-white font-black uppercase text-xs tracking-widest flex items-center gap-2">
                 <HiOutlineChartBar className="text-sky-500" size={18} /> Managed
                 Portfolio
               </h3>
               <span className="text-[10px] text-gray-500 font-bold uppercase">
-                {user?.copiedTraders?.length || 0} ACTIVE
+                {myCopies.length} ACTIVE
               </span>
             </div>
 
-            {user?.copiedTraders?.length > 0 ? (
+            {copiesLoading ? (
+              <div className="space-y-4 animate-pulse">
+                {[1, 2].map((i) => (
+                  <div
+                    key={i}
+                    className="h-24 bg-gray-100 dark:bg-white/5 rounded-2xl"
+                  />
+                ))}
+              </div>
+            ) : myCopies.length > 0 ? (
               <div className="space-y-4">
-                {user.copiedTraders.map((copy) => {
-                  const tId = normalizeId(copy.traderId);
-                  const trader = allTraders.find(
-                    (t) => t._id?.toString() === tId?.toString(),
-                  );
-
+                {myCopies.map((copy) => {
+                  const trader = copy.trader; // Backend uses .populate("trader")
                   return (
                     <div
-                      key={tId}
+                      key={copy._id}
                       className="bg-gray-50 dark:bg-white/5 border border-app-border p-5 rounded-2xl group hover:border-sky-500/30 transition-all"
                     >
                       <div className="flex justify-between items-start mb-4">
                         <div>
-                          <p className="text-text-main font-black uppercase italic text-sm group-hover:text-sky-500 transition-colors">
-                            {trader?.name || "Strategist"}
+                          <p className="text-text-main dark:text-white font-black uppercase italic text-sm group-hover:text-sky-500 transition-colors">
+                            {trader?.username || "Strategist"}
                           </p>
                           <p className="text-[10px] text-gray-500 font-bold uppercase tracking-tighter">
-                            AUM: $
-                            {trader?.performance?.assetsUnderManagement?.toLocaleString() ||
-                              "N/A"}
+                            Style: {trader?.tradingStyle || "Technical"}
                           </p>
                         </div>
                         <HiOutlineShieldCheck
@@ -266,11 +281,15 @@ const Profile = () => {
                         />
                       </div>
 
-                      <div className="flex py-3 border-y border-app-border">
+                      <div className="grid grid-cols-2 py-3 border-y border-app-border">
                         <StatSmall
-                          label="ROI (30D)"
-                          value={`${trader?.performance?.roi30d || 0}%`}
-                          color="text-sky-600 dark:text-sky-400"
+                          label="Allocation"
+                          value={`$${copy.allocationAmount?.toLocaleString()}`}
+                        />
+                        <StatSmall
+                          label="Profit Share"
+                          value={`${copy.stopCopyLossPercent || 20}% SL`}
+                          color="text-rose-500"
                         />
                       </div>
 
@@ -282,7 +301,7 @@ const Profile = () => {
                           </span>
                         </span>
                         <span className="text-[9px] text-gray-400 font-bold">
-                          {trader?.riskMetrics?.riskScore}/10 Risk
+                          {copy.status}
                         </span>
                       </div>
                     </div>
@@ -296,7 +315,7 @@ const Profile = () => {
                 </p>
                 <a
                   href="/dashboard/copy-trade"
-                  className="px-6 py-3 bg-gray-100 dark:bg-white/5 text-text-main text-[10px] font-black uppercase rounded-xl hover:bg-sky-500 hover:text-white transition-all inline-block"
+                  className="px-6 py-3 bg-gray-100 dark:bg-white/5 text-text-main dark:text-white text-[10px] font-black uppercase rounded-xl hover:bg-sky-500 hover:text-white transition-all inline-block"
                 >
                   Browse Traders
                 </a>
@@ -310,7 +329,6 @@ const Profile = () => {
 };
 
 /* --- HELPER COMPONENTS --- */
-
 const InputField = ({ label, name, value, onChange, type = "text" }) => (
   <div className="flex flex-col gap-2">
     <label className="text-[10px] text-gray-500 uppercase font-black tracking-widest ml-2">
@@ -321,7 +339,7 @@ const InputField = ({ label, name, value, onChange, type = "text" }) => (
       name={name}
       value={value}
       onChange={onChange}
-      className="bg-gray-50 dark:bg-white/5 border border-app-border text-text-main rounded-xl px-4 py-3 text-sm focus:border-sky-500 dark:focus:border-sky-500 outline-none transition-all placeholder:text-gray-400"
+      className="bg-gray-50 dark:bg-white/5 border border-app-border text-text-main dark:text-white rounded-xl px-4 py-3 text-sm focus:border-sky-500 outline-none transition-all"
     />
   </div>
 );
@@ -331,44 +349,27 @@ const SelectField = ({ label, name, value, onChange, options }) => (
     <label className="text-[10px] text-gray-500 uppercase font-black tracking-widest ml-2">
       {label}
     </label>
-    <div className="relative">
-      <select
-        name={name}
-        value={value}
-        onChange={onChange}
-        className="w-full bg-gray-50 dark:bg-white/5 border border-app-border text-text-main rounded-xl px-4 py-3 text-sm focus:border-sky-500 outline-none transition-all appearance-none uppercase"
-      >
-        <option value="" className="bg-card-bg">
-          Select Protocol
+    <select
+      name={name}
+      value={value}
+      onChange={onChange}
+      className="w-full bg-gray-50 dark:bg-white/5 border border-app-border text-text-main dark:text-white rounded-xl px-4 py-3 text-sm focus:border-sky-500 outline-none transition-all uppercase"
+    >
+      <option value="">Select Protocol</option>
+      {options.map((opt) => (
+        <option key={opt} value={opt}>
+          {opt}
         </option>
-        {options.map((opt) => (
-          <option key={opt} value={opt} className="uppercase bg-card-bg">
-            {opt}
-          </option>
-        ))}
-      </select>
-      <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
-        <svg
-          width="10"
-          height="6"
-          viewBox="0 0 10 6"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            d="M1 1L5 5L9 1"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
-      </div>
-    </div>
+      ))}
+    </select>
   </div>
 );
 
-const StatSmall = ({ label, value, color = "text-text-main" }) => (
+const StatSmall = ({
+  label,
+  value,
+  color = "text-text-main dark:text-white",
+}) => (
   <div>
     <p className="text-[8px] text-gray-500 uppercase font-black">{label}</p>
     <p className={`text-[11px] font-black uppercase tracking-tighter ${color}`}>

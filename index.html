@@ -3,26 +3,27 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="google" content="notranslate" />
-
-    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
-    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
-    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <title>Aurelius Capital | Institutional-Grade AI Asset Management</title>
-
-    <link rel="stylesheet" href="/src/index.css" />
+    <title>Aurelius Capital | Private Wealth & Global Arbitrage</title>
 
     <meta
       name="title"
-      content="Aurelius Capital | Institutional-Grade AI Asset Management"
+      content="Aurelius Capital | Private Wealth & Global Arbitrage"
     />
+
     <meta
       name="description"
-      content="Secure your financial legacy with Aurelius Capital. Experience precision-driven wealth growth powered by advanced AI algorithmic models and global market insights."
+      content="Aurelius Capital provides sophisticated market access and strategic wealth management for institutional and private partners. Execute with precision in global markets."
     />
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+
+    <meta name="theme-color" content="#05070a" />
 
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://aurelius.capital/" />
@@ -34,8 +35,10 @@
       property="og:description"
       content="Where Intelligence Meets Capital. Join 124,000+ investors using institutional-grade AI to grow sustainable wealth."
     />
-    <meta property="og:image" content="/og-image.png" />
+    <meta property="og:image" content="/android-chrome-512x512.png" />
+
     <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content="https://aurelius.capital/" />
     <meta
       property="twitter:title"
       content="Aurelius Capital | AI Wealth Management"
@@ -44,7 +47,9 @@
       property="twitter:description"
       content="Access elite asset management strategies previously reserved for billion-dollar hedge funds."
     />
+    <meta property="twitter:image" content="/android-chrome-512x512.png" />
 
+    <link rel="stylesheet" href="/src/index.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -67,26 +72,19 @@
         background: #38bdf8;
       }
 
-      /* 3. Pro Tip: Hide the default Google Translate button so it doesn't 
-         ruin your UI. We will trigger it via code instead. */
       #google_translate_element {
         display: none !important;
       }
-      /* 1. Hide the injected iframe entirely */
       iframe.skiptranslate,
       .goog-te-banner-frame,
       .goog-te-banner-frame.skiptranslate {
         display: none !important;
         visibility: hidden !important;
       }
-
-      /* 2. Force the body back to the top of the screen */
       body {
         top: 0px !important;
-        position: static !important; /* Some Google scripts force 'relative' */
+        position: static !important;
       }
-
-      /* 3. Remove the tooltip that appears on hover */
       #goog-gt-tt,
       .goog-te-balloon-frame {
         display: none !important;

@@ -53,15 +53,17 @@ const Deposit = () => {
   const handleDepositSubmit = async (e) => {
     e.preventDefault();
     const fileInput = e.target.querySelector('input[type="file"]');
+
     if (!fileInput.files[0])
       return toast.error("Please upload proof of payment");
     if (!amount || amount <= 0)
       return toast.error("Please enter a valid amount");
 
-    const toastId = toast.loading("Uploading proof and processing...");
+    const toastId = toast.loading("Uploading proof and updating wallet...");
     setLoading(true);
 
     try {
+      // Create FormData to handle the image file
       const formData = new FormData();
       formData.append("amount", amount);
       formData.append("method", selectedAsset);
@@ -69,16 +71,18 @@ const Deposit = () => {
         "referenceId",
         `DEP-${Math.random().toString(36).toUpperCase().slice(2, 10)}`,
       );
-      formData.append("my_file", fileInput.files[0]);
+      formData.append("my_file", fileInput.files[0]); // Make sure this matches 'upload.single("my_file")'
 
+      // Send to backend
       const result = await depositFunds(formData).unwrap();
 
+      // Send Email Notification
       const emailParams = {
         user_name: user ? `${user.firstName} ${user.lastName}` : "User",
         user_email: user?.email,
         asset: selectedAsset,
         amount: amount,
-        proof_link: result.proofImage,
+        proof_link: result.transaction?.proofImage, // Link to the Cloudinary image
         type: "deposit",
       };
 
@@ -89,7 +93,7 @@ const Deposit = () => {
         import.meta.env.VITE_EMAILJS_PUBLIC_KEY,
       );
 
-      toast.success("Deposit submitted for verification!", { id: toastId });
+      toast.success("Wallet credited successfully!", { id: toastId });
       setAmount("");
       setFileSelected(null);
       e.target.reset();

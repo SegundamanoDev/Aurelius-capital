@@ -49,6 +49,7 @@ import AdminTransactions from "./pages/admin/AdminTransactions";
 import Insurance from "./components/Insurance";
 import TawkMessenger from "./components/TawkMessenger";
 import Contact from "./pages/public/Contact";
+import TraderProfile from "./components/TraderProfile";
 
 // --- PUBLIC LAYOUT WRAPPER ---
 const PublicLayout = () => (
@@ -156,6 +157,7 @@ function App() {
             <Route path="withdraw" element={<Withdraw />} />
             <Route path="transactions" element={<Transactions />} />
             <Route path="copy-trade" element={<CopyTrading />} />
+            <Route path="trader/:id" element={<TraderProfile />} />
             {/* <Route path="upgrade" element={<Upgrade />} />
             <Route path="pricing" element={<PricingSection />} /> */}
           </Route>

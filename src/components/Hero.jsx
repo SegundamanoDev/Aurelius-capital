@@ -52,7 +52,7 @@ const Hero = () => {
         <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
           <Link
             to="/register"
-            className="px-10 py-5 bg-white text-black font-black uppercase text-[11px] tracking-[0.2em] rounded-xl hover:bg-sky-500 hover:text-white transition-all active:scale-95 flex items-center justify-center gap-2"
+            className="px-10 py-5  bg-white/5 border border-white/10 text-white uppercase text-[11px] tracking-[0.2em] rounded-xl hover:bg-sky-500 hover:text-white transition-all active:scale-95 flex items-center justify-center gap-2"
           >
             Access Terminal <HiOutlineArrowRight size={14} />
           </Link>

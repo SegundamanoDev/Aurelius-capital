@@ -127,8 +127,8 @@ const Navbar = () => {
         <div className="max-w-7xl mx-auto px-6 flex justify-between items-center">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2 group z-[110]">
-            <div className="bg-sky-500 p-1.5 rounded-lg group-hover:rotate-12 transition-transform">
-              <RiCopperCoinLine className="text-white text-2xl" />
+            <div className="w-10 h-10 bg-sky-600 rounded-lg flex items-center justify-center shadow-lg shadow-sky-500/20 group-hover:scale-105 transition-transform">
+              <span className="text-white font-black text-xl italic">A</span>
             </div>
             <span className="text-xl font-black tracking-tighter text-white uppercase italic">
               Aurelius
