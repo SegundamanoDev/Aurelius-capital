@@ -14,7 +14,7 @@ export const apiSlice = createApi({
   tagTypes: ["User", "Trader", "Transaction", "Message", "Copy", "Wallet"],
   endpoints: (builder) => ({
     // ==========================================
-    // AUTHENTICATION
+    // AUTHENTICATION & SECURITY
     // ==========================================
     login: builder.mutation({
       query: (credentials) => ({
@@ -31,7 +31,47 @@ export const apiSlice = createApi({
         body: userData,
       }),
     }),
+    get2FASetup: builder.query({
+      query: () => "/auth/2fa/setup",
+      keepUnusedDataFor: 0,
+    }),
+    verifyLogin2FA: builder.mutation({
+      query: (data) => ({
+        url: "/auth/2fa/login-verify",
+        method: "POST",
+        body: data,
+      }),
+    }),
+    enable2FA: builder.mutation({
+      query: (credentials) => ({
+        url: "/auth/2fa/verify",
+        method: "POST",
+        body: { ...credentials },
+      }),
+      invalidatesTags: ["User"],
+    }),
 
+    changePassword: builder.mutation({
+      query: (data) => ({
+        url: "/auth/change-password",
+        method: "POST",
+        body: { ...data },
+      }),
+    }),
+    forgotPassword: builder.mutation({
+      query: (data) => ({
+        url: "/auth/forgot-password",
+        method: "POST",
+        body: data,
+      }),
+    }),
+    resetPassword: builder.mutation({
+      query: ({ token, password }) => ({
+        url: `/auth/reset-password/${token}`,
+        method: "PATCH",
+        body: { password },
+      }),
+    }),
     // ==========================================
     // USER PROFILE & MESSAGING
     // ==========================================
@@ -143,8 +183,6 @@ export const apiSlice = createApi({
       query: () => "/transactions/admin/all",
       providesTags: ["Transaction"],
     }),
-
-    // THE MASTER SETTLEMENT ENDPOINT
     updateTransactionStatus: builder.mutation({
       query: ({ transactionId, status }) => ({
         url: "/transactions/admin/update-status",
@@ -153,8 +191,6 @@ export const apiSlice = createApi({
       }),
       invalidatesTags: ["Transaction", "Wallet", "User"],
     }),
-
-    // SPECIFIC DEPOSIT APPROVAL (Fixed URL Template)
     approveDeposit: builder.mutation({
       query: (transactionId) => ({
         url: `/wallet/approve-deposit/${transactionId}`,
@@ -162,7 +198,6 @@ export const apiSlice = createApi({
       }),
       invalidatesTags: ["Transaction", "Wallet"],
     }),
-
     injectProfit: builder.mutation({
       query: (data) => ({
         url: "/transactions/inject-profit",
@@ -171,8 +206,6 @@ export const apiSlice = createApi({
       }),
       invalidatesTags: ["User", "Transaction", "Wallet"],
     }),
-
-    // TRADER MANAGEMENT
     createTrader: builder.mutation({
       query: (data) => ({ url: "/traders", method: "POST", body: data }),
       invalidatesTags: ["Trader"],
@@ -197,12 +230,44 @@ export const apiSlice = createApi({
       }),
       invalidatesTags: ["Transaction", "Wallet", "User"],
     }),
+    updateFinancialProtocol: builder.mutation({
+      query: (data) => ({
+        url: "/users/financial-protocol",
+        method: "PUT",
+        body: data,
+      }),
+      invalidatesTags: ["User", "Wallet"],
+    }),
+    uploadKyc: builder.mutation({
+      query: (formData) => ({
+        url: "/users/kyc-upload",
+        method: "POST",
+        body: formData,
+      }),
+      invalidatesTags: ["User"],
+    }),
+    getPendingKYCs: builder.query({
+      query: () => "/admin/kyc-pending",
+      providesTags: ["AdminKYC"],
+    }),
+    reviewKYC: builder.mutation({
+      query: ({ id, ...body }) => ({
+        url: `/admin/kyc-status/${id}`,
+        method: "PATCH",
+        body,
+      }),
+      invalidatesTags: ["AdminKYC", "User"],
+    }),
   }),
 });
 
 export const {
   useLoginMutation,
   useRegisterMutation,
+  useGet2FASetupQuery,
+  useVerifyLogin2FAMutation,
+  useEnable2FAMutation,
+  useChangePasswordMutation,
   useGetMyProfileQuery,
   useUpdateMyProfileMutation,
   useGetChatHistoryQuery,
@@ -229,4 +294,10 @@ export const {
   useUpdateTraderMutation,
   useDeleteTraderMutation,
   useInjectLedgerEntryMutation,
+  useForgotPasswordMutation,
+  useResetPasswordMutation,
+  useUpdateFinancialProtocolMutation,
+  useUploadKycMutation,
+  useGetPendingKYCsQuery,
+  useReviewKYCMutation,
 } = apiSlice;

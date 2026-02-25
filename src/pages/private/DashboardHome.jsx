@@ -146,7 +146,6 @@ const DashboardHome = () => {
                     <tr className="text-gray-500 text-[10px] uppercase tracking-wider border-b border-app-border">
                       <th className="pb-4">Trader</th>
                       <th className="pb-4">Allocated</th>
-                      <th className="pb-4">Remaining</th>
                       <th className="pb-4">Status</th>
                     </tr>
                   </thead>
@@ -171,10 +170,6 @@ const DashboardHome = () => {
                         <td className="py-4 text-sm font-medium text-text-main">
                           {currencySymbol}
                           {copy.allocatedAmount.toLocaleString()}
-                        </td>
-                        <td className="py-4 text-sm font-medium text-emerald-500">
-                          {currencySymbol}
-                          {copy.remainingAllocation.toLocaleString()}
                         </td>
                         <td className="py-4">
                           <span className="text-[9px] bg-emerald-500/10 text-emerald-500 px-2 py-0.5 rounded border border-emerald-500/20 uppercase font-black tracking-tighter">

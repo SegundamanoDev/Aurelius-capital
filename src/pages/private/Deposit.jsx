@@ -2,7 +2,10 @@ import React, { useState, useRef } from "react";
 import { useSelector } from "react-redux";
 import emailjs from "@emailjs/browser";
 import toast from "react-hot-toast";
-import { useDepositFundsMutation } from "../../api/apiSlice";
+import {
+  useDepositFundsMutation,
+  useGetMyProfileQuery,
+} from "../../api/apiSlice";
 import {
   HiOutlineDocumentCheck,
   HiOutlineClipboardDocumentCheck,
@@ -11,12 +14,15 @@ import {
 } from "react-icons/hi2";
 import { FaBitcoin, FaEthereum } from "react-icons/fa";
 import { SiTether } from "react-icons/si";
+import { getSymbol } from "../public/Register";
 
 const Deposit = () => {
+  const { data: profileData, isLoading: isProfileLoading } =
+    useGetMyProfileQuery();
+  const currencySymbol = getSymbol(profileData?.wallet?.currency);
   const form = useRef();
   const { user } = useSelector((state) => state.auth);
   const [depositFunds] = useDepositFundsMutation();
-
   const [copied, setCopied] = useState(false);
   const [loading, setLoading] = useState(false);
   const [fileSelected, setFileSelected] = useState(null);
@@ -196,11 +202,11 @@ const Deposit = () => {
             <div className="space-y-5">
               <div className="space-y-2">
                 <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1">
-                  Amount (USD)
+                  Amount ({profileData?.wallet.currency})
                 </label>
                 <div className="relative">
                   <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-black">
-                    $
+                    {currencySymbol}
                   </span>
                   <input
                     type="number"

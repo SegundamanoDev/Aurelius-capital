@@ -1,6 +1,9 @@
 import React, { useState } from "react";
 import { useSelector } from "react-redux";
-import { useGetMyTransactionsQuery } from "../../api/apiSlice";
+import {
+  useGetMyProfileQuery,
+  useGetMyTransactionsQuery,
+} from "../../api/apiSlice";
 import {
   HiOutlineArrowsRightLeft,
   HiOutlineArrowUpRight,
@@ -13,8 +16,9 @@ import {
 import { getSymbol } from "../public/Register";
 
 const Transactions = () => {
-  const { user } = useSelector((state) => state.auth);
-  const currencySymbol = getSymbol(user?.currency);
+  const { data: profileData, isLoading: isProfileLoading } =
+    useGetMyProfileQuery();
+  const currencySymbol = getSymbol(profileData?.wallet?.currency);
 
   const {
     data: transactions = [],
@@ -85,7 +89,7 @@ const Transactions = () => {
                   Settlement Date
                 </th>
                 <th className="p-5 text-[10px] font-black uppercase tracking-[0.2em] text-gray-500 text-right">
-                  Volume ({user?.currency || "USD"})
+                  Volume ({currencySymbol})
                 </th>
                 <th className="p-5 text-[10px] font-black uppercase tracking-[0.2em] text-gray-500 text-center">
                   Protocol Status

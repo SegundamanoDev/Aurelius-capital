@@ -37,11 +37,8 @@ const ManageTraders = () => {
   };
 
   const [formData, setFormData] = useState(initialForm);
-
-  // FIXED: Destructuring data and checking for nested arrays
   const { data: response, isLoading } = useGetTradersQuery();
 
-  // This ensures 'traders' is always an array, regardless of backend structure
   const traders = Array.isArray(response)
     ? response
     : response?.traders || response?.data || [];
@@ -54,7 +51,8 @@ const ManageTraders = () => {
     e.preventDefault();
     try {
       if (editingId) {
-        await updateTrader({ id: editingId, data: formData }).unwrap();
+        // FIXED: Passing ID and Body correctly for req.params.id
+        await updateTrader({ id: editingId, ...formData }).unwrap();
         toast.success("Trader profile updated.");
       } else {
         await createTrader(formData).unwrap();
@@ -96,121 +94,131 @@ const ManageTraders = () => {
 
   if (isLoading)
     return (
-      <div className="p-8 text-white font-black uppercase italic">
+      <div className="p-20 text-center text-sky-600 dark:text-white font-black uppercase italic animate-pulse tracking-widest text-xs">
         Accessing Terminal...
       </div>
     );
 
   return (
     <div className="p-4 md:p-8 space-y-8 animate-in fade-in duration-500">
+      {/* HEADER */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-black uppercase italic text-white tracking-tighter">
-            Master <span className="text-sky-500">Strategists</span>
+          <h1 className="text-2xl font-black uppercase italic text-slate-900 dark:text-white tracking-tighter">
+            Master{" "}
+            <span className="text-sky-600 dark:text-sky-500">Strategists</span>
           </h1>
-          <p className="text-gray-500 text-xs font-bold uppercase tracking-widest mt-1">
-            Database Management
+          <p className="text-slate-400 dark:text-gray-500 text-[10px] font-bold uppercase tracking-widest mt-1">
+            Database Management Console
           </p>
         </div>
         <button
           onClick={() => openModal()}
-          className="flex items-center justify-center gap-2 bg-sky-500 text-black px-6 py-4 rounded-2xl font-black text-xs uppercase hover:bg-sky-400 transition-all"
+          className="flex items-center justify-center gap-2 bg-sky-600 dark:bg-sky-500 text-white dark:text-black px-6 py-4 rounded-2xl font-black text-xs uppercase hover:bg-sky-500 transition-all shadow-lg shadow-sky-500/20"
         >
           <HiOutlinePlus size={20} /> Add New Trader
         </button>
       </div>
 
-      <div className="bg-[#05070A] border border-white/5 rounded-[2.5rem] overflow-hidden shadow-2xl">
-        <table className="w-full text-left">
-          <thead className="bg-white/[0.02] text-[10px] uppercase font-black text-gray-500 border-b border-white/5">
-            <tr>
-              <th className="p-6">Trader</th>
-              <th className="p-6">ROI / Win Rate</th>
-              <th className="p-6">Equity</th>
-              <th className="p-6">Status</th>
-              <th className="p-6 text-right">Actions</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-white/5">
-            {traders.length > 0 ? (
-              traders.map((trader) => (
-                <tr
-                  key={trader._id}
-                  className="hover:bg-white/[0.01] transition-colors"
-                >
-                  <td className="p-6">
-                    <div className="flex items-center gap-4">
-                      <div className="h-10 w-10 bg-sky-500/10 rounded-full flex items-center justify-center text-sky-500 font-black border border-sky-500/20">
-                        {trader.username?.charAt(0).toUpperCase() || "T"}
+      {/* TABLE */}
+      <div className="bg-white dark:bg-[#05070A] border border-slate-200 dark:border-white/5 rounded-[2.5rem] overflow-hidden shadow-sm dark:shadow-2xl transition-colors">
+        <div className="overflow-x-auto">
+          <table className="w-full text-left min-w-[800px]">
+            <thead className="bg-slate-50 dark:bg-white/[0.02] text-[10px] uppercase font-black text-slate-400 dark:text-gray-500 border-b border-slate-100 dark:border-white/5">
+              <tr>
+                <th className="p-6">Trader</th>
+                <th className="p-6">ROI / Win Rate</th>
+                <th className="p-6">Equity</th>
+                <th className="p-6">Status</th>
+                <th className="p-6 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100 dark:divide-white/5">
+              {traders.length > 0 ? (
+                traders.map((trader) => (
+                  <tr
+                    key={trader._id}
+                    className="hover:bg-slate-50 dark:hover:bg-white/[0.01] transition-colors group"
+                  >
+                    <td className="p-6">
+                      <div className="flex items-center gap-4">
+                        <div className="h-10 w-10 bg-sky-500/10 rounded-full flex items-center justify-center text-sky-600 dark:text-sky-500 font-black border border-sky-500/20">
+                          {trader.username?.charAt(0).toUpperCase() || "T"}
+                        </div>
+                        <p className="font-black text-slate-900 dark:text-white uppercase italic">
+                          {trader.username}
+                        </p>
                       </div>
-                      <p className="font-black text-white uppercase italic">
-                        {trader.username}
-                      </p>
-                    </div>
-                  </td>
-                  <td className="p-6">
-                    <span className="text-emerald-500 font-black">
-                      {trader.totalROI}%
-                    </span>
-                    <span className="text-gray-500 text-[10px] ml-2">
-                      ({trader.winRate}% WR)
-                    </span>
-                  </td>
-                  <td className="p-6 text-white font-bold">
-                    ${trader.equity?.toLocaleString()}
-                  </td>
-                  <td className="p-6">
-                    <span
-                      className={`text-[8px] px-2 py-0.5 rounded-full border font-black uppercase ${trader.isActive ? "text-emerald-500 border-emerald-500/20 bg-emerald-500/5" : "text-red-500 border-red-500/20 bg-red-500/5"}`}
-                    >
-                      {trader.isActive ? "Active" : "Inactive"}
-                    </span>
-                  </td>
-                  <td className="p-6 text-right">
-                    <button
-                      onClick={() => openModal(trader)}
-                      className="p-2 text-gray-500 hover:text-sky-500"
-                    >
-                      <HiOutlinePencilSquare size={20} />
-                    </button>
-                    <button
-                      onClick={() => handleDelete(trader._id)}
-                      className="p-2 text-gray-500 hover:text-red-500"
-                    >
-                      <HiOutlineTrash size={20} />
-                    </button>
+                    </td>
+                    <td className="p-6">
+                      <span className="text-emerald-600 dark:text-emerald-500 font-black">
+                        {trader.totalROI}%
+                      </span>
+                      <span className="text-slate-400 dark:text-gray-500 text-[10px] ml-2">
+                        ({trader.winRate}% WR)
+                      </span>
+                    </td>
+                    <td className="p-6 text-slate-700 dark:text-white font-bold">
+                      ${trader.equity?.toLocaleString()}
+                    </td>
+                    <td className="p-6">
+                      <span
+                        className={`text-[8px] px-2 py-0.5 rounded-full border font-black uppercase ${
+                          trader.isActive
+                            ? "text-emerald-600 border-emerald-500/20 bg-emerald-500/5"
+                            : "text-red-500 border-red-500/20 bg-red-500/5"
+                        }`}
+                      >
+                        {trader.isActive ? "Active" : "Inactive"}
+                      </span>
+                    </td>
+                    <td className="p-6 text-right">
+                      <button
+                        onClick={() => openModal(trader)}
+                        className="p-2 text-slate-400 hover:text-sky-600 dark:hover:text-sky-400"
+                      >
+                        <HiOutlinePencilSquare size={20} />
+                      </button>
+                      <button
+                        onClick={() => handleDelete(trader._id)}
+                        className="p-2 text-slate-400 hover:text-red-500"
+                      >
+                        <HiOutlineTrash size={20} />
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td
+                    colSpan="5"
+                    className="p-10 text-center text-slate-400 dark:text-gray-600 uppercase font-black text-xs italic"
+                  >
+                    No Strategists found in database
                   </td>
                 </tr>
-              ))
-            ) : (
-              <tr>
-                <td
-                  colSpan="5"
-                  className="p-10 text-center text-gray-600 uppercase font-black text-xs italic"
-                >
-                  No Strategists found in database
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
 
+      {/* MODAL */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-[200] bg-black/90 backdrop-blur-sm flex justify-center overflow-y-auto p-4">
+        <div className="fixed inset-0 z-[200] bg-slate-900/40 dark:bg-black/90 backdrop-blur-sm flex justify-center overflow-y-auto p-4 animate-in fade-in duration-200">
           <form
             onSubmit={handleSave}
-            className="bg-[#0A0C10] border border-white/10 w-full max-w-4xl rounded-[2.5rem] p-6 md:p-10 my-auto shadow-2xl space-y-8"
+            className="bg-white dark:bg-[#0A0C10] border border-slate-200 dark:border-white/10 w-full max-w-4xl rounded-[2.5rem] p-6 md:p-10 my-auto shadow-2xl space-y-8"
           >
             <div className="flex justify-between items-center">
-              <h2 className="text-xl font-black uppercase italic text-white">
+              <h2 className="text-xl font-black uppercase italic text-slate-900 dark:text-white">
                 {editingId ? "Edit" : "Register"}{" "}
-                <span className="text-sky-500">Trader</span>
+                <span className="text-sky-600 dark:text-sky-500">Trader</span>
               </h2>
               <button
                 type="button"
                 onClick={closeModal}
-                className="text-gray-500 hover:text-white"
+                className="text-slate-400 dark:text-gray-500 hover:text-slate-900 dark:hover:text-white"
               >
                 <HiOutlineXMark size={24} />
               </button>
@@ -229,11 +237,11 @@ const ManageTraders = () => {
                 onChange={(v) => setFormData({ ...formData, username: v })}
               />
               <div className="space-y-1">
-                <label className="text-[9px] text-gray-500 uppercase font-black ml-1">
+                <label className="text-[9px] text-slate-400 dark:text-gray-500 uppercase font-black ml-1">
                   Trading Style
                 </label>
                 <select
-                  className="w-full bg-white/5 border border-white/10 p-4 rounded-xl text-white outline-none focus:border-sky-500"
+                  className="w-full bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 p-4 rounded-xl text-slate-900 dark:text-white outline-none focus:border-sky-500"
                   value={formData.tradingStyle}
                   onChange={(e) =>
                     setFormData({ ...formData, tradingStyle: e.target.value })
@@ -309,7 +317,7 @@ const ManageTraders = () => {
             </div>
 
             <textarea
-              className="w-full bg-white/5 border border-white/10 p-4 rounded-xl text-white h-24 outline-none focus:border-sky-500"
+              className="w-full bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 p-4 rounded-xl text-slate-900 dark:text-white h-24 outline-none focus:border-sky-500"
               placeholder="Bio"
               value={formData.bio}
               onChange={(e) =>
@@ -318,9 +326,10 @@ const ManageTraders = () => {
             />
 
             <div className="flex gap-6">
-              <label className="flex items-center gap-2 text-xs text-gray-400 font-black uppercase cursor-pointer">
+              <label className="flex items-center gap-2 text-xs text-slate-500 dark:text-gray-400 font-black uppercase cursor-pointer">
                 <input
                   type="checkbox"
+                  className="accent-sky-500"
                   checked={formData.verified}
                   onChange={(e) =>
                     setFormData({ ...formData, verified: e.target.checked })
@@ -328,9 +337,10 @@ const ManageTraders = () => {
                 />{" "}
                 Verified
               </label>
-              <label className="flex items-center gap-2 text-xs text-gray-400 font-black uppercase cursor-pointer">
+              <label className="flex items-center gap-2 text-xs text-slate-500 dark:text-gray-400 font-black uppercase cursor-pointer">
                 <input
                   type="checkbox"
+                  className="accent-sky-500"
                   checked={formData.isActive}
                   onChange={(e) =>
                     setFormData({ ...formData, isActive: e.target.checked })
@@ -343,9 +353,13 @@ const ManageTraders = () => {
             <button
               type="submit"
               disabled={isCreating || isUpdating}
-              className="w-full py-4 bg-sky-500 text-black font-black uppercase rounded-2xl hover:bg-sky-400 transition-all disabled:opacity-50"
+              className="w-full py-4 bg-sky-600 dark:bg-sky-500 text-white dark:text-black font-black uppercase rounded-2xl hover:bg-sky-500 transition-all disabled:opacity-50 shadow-lg shadow-sky-500/20"
             >
-              {editingId ? "Update Profile" : "Create Trader Profile"}
+              {isCreating || isUpdating
+                ? "Processing..."
+                : editingId
+                  ? "Update Profile"
+                  : "Create Trader Profile"}
             </button>
           </form>
         </div>
@@ -356,12 +370,12 @@ const ManageTraders = () => {
 
 const InputGroup = ({ label, value, onChange, placeholder, type = "text" }) => (
   <div className="space-y-1">
-    <label className="text-[9px] text-gray-500 uppercase font-black ml-1">
+    <label className="text-[9px] text-slate-400 dark:text-gray-500 uppercase font-black ml-1">
       {label}
     </label>
     <input
       type={type}
-      className="w-full bg-white/5 border border-white/10 p-4 rounded-xl text-white outline-none focus:border-sky-500 transition-all placeholder:text-gray-700"
+      className="w-full bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 p-4 rounded-xl text-slate-900 dark:text-white outline-none focus:border-sky-500 transition-all placeholder:text-slate-300 dark:placeholder:text-gray-700"
       placeholder={placeholder}
       value={value}
       onChange={(e) => onChange(e.target.value)}

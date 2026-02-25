@@ -9,10 +9,12 @@ import {
 import { useSelector } from "react-redux";
 import { Toaster } from "react-hot-toast";
 import { initAutoTranslate } from "./utils/translate";
+
 // Layouts
 import DashboardLayout from "./layouts/DashboardLayout";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
+
 // Pages
 import Home from "./pages/public/Home";
 import Login from "./pages/public/Login";
@@ -24,15 +26,19 @@ import Profile from "./pages/private/Profile";
 import Withdraw from "./pages/private/Withdraw";
 import Transactions from "./pages/private/Transactions";
 
+// --- SETTINGS COMPONENTS (Create these next) ---
+import SettingsMain from "./pages/private/settings/SettingsMain";
+import SecuritySettings from "./pages/private/settings/SecuritySettings";
+import FinancialSettings from "./pages/private/settings/FinancialSettings";
+import ProfileKYCSettings from "./pages/private/settings/ProfileKYCSettings";
+
 // Admin Pages
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminLayout from "./pages/admin/AdminLayout";
 import AdminUserList from "./pages/admin/AdminUserList";
 import AdminDeposits from "./pages/admin/AdminDeposits";
 import AdminWithdrawals from "./pages/admin/AdminWithdrawals";
-// import AdminInvestments from "./pages/admin/AdminInvestments";
 import CopyTrading from "./pages/private/CopyTrading";
-// import Upgrade from "./pages/private/Upgrade";
 import ManageTraders from "./pages/admin/ManageTraders";
 import AdminLedger from "./pages/admin/AdminLedger";
 import Market from "./pages/public/Market";
@@ -43,13 +49,14 @@ import ScrollToTop from "./components/ScrollToTop";
 import CopyTradingPage from "./components/CopyTradingPage";
 import AMLPolicy from "./components/AMLPolicy";
 import FAQ from "./components/FAQ";
-// import MadeToTradeVideo from "./pages/private/Invest";
-// import PricingSection from "./components/InvestmentPlans";
 import AdminTransactions from "./pages/admin/AdminTransactions";
 import Insurance from "./components/Insurance";
 import TawkMessenger from "./components/TawkMessenger";
 import Contact from "./pages/public/Contact";
 import TraderProfile from "./components/TraderProfile";
+import ResetPassword from "./components/ResetPassword";
+import ForgotPassword from "./components/ForgotPassword";
+import KycReview from "./pages/admin/KycReview";
 
 // --- PUBLIC LAYOUT WRAPPER ---
 const PublicLayout = () => (
@@ -60,15 +67,12 @@ const PublicLayout = () => (
   </>
 );
 
-// --- GUEST ROUTE (Redirects Auth users away from Landing/Login) ---
+// --- GUEST ROUTE ---
 const GuestRoute = ({ children }) => {
   const { user, isLoading } = useSelector(
     (state) => state.auth || { user: null, isLoading: false },
   );
-
-  if (isLoading) return null; // Or a smaller loader
-
-  // If user exists, send them to dashboard instead of Home/Login
+  if (isLoading) return null;
   return user ? <Navigate to="/dashboard" replace /> : children;
 };
 
@@ -77,7 +81,6 @@ const ProtectedRoute = ({ children }) => {
   const { user, isLoading } = useSelector(
     (state) => state.auth || { user: null, isLoading: false },
   );
-
   if (isLoading) {
     return (
       <div className="h-screen w-full bg-[#05070A] flex items-center justify-center">
@@ -92,17 +95,14 @@ const ProtectedRoute = ({ children }) => {
 const ProtectedAdminRoute = ({ children }) => {
   const { user } = useSelector((state) => state.auth || { user: null });
   const isAdmin = user?.role === "admin";
-
   return isAdmin ? children : <Navigate to="/dashboard" replace />;
 };
 
 function App() {
-  // --- TRIGGER AUTO TRANSLATE ON MOUNT ---
   useEffect(() => {
-    // This checks if the user has a preferred language or
-    // if their browser language differs from English.
     initAutoTranslate();
   }, []);
+
   return (
     <Router>
       <ScrollToTop />
@@ -120,7 +120,7 @@ function App() {
           }}
         />
         <Routes>
-          {/* 1. PUBLIC ROUTES (Wrapped in GuestRoute) */}
+          {/* 1. PUBLIC ROUTES */}
           <Route
             element={
               <GuestRoute>
@@ -130,6 +130,8 @@ function App() {
           >
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/forgot" element={<ForgotPassword />} />
+            <Route path="/reset-password/:token" element={<ResetPassword />} />
             <Route path="/register" element={<Register />} />
             <Route path="/portfolio" element={<Portfolio />} />
             <Route path="/about" element={<About />} />
@@ -151,15 +153,19 @@ function App() {
             }
           >
             <Route index element={<DashboardHome />} />
-            {/* <Route path="trade" element={<MadeToTradeVideo />} /> */}
             <Route path="profile" element={<Profile />} />
             <Route path="deposit" element={<Deposit />} />
             <Route path="withdraw" element={<Withdraw />} />
             <Route path="transactions" element={<Transactions />} />
             <Route path="copy-trade" element={<CopyTrading />} />
             <Route path="trader/:id" element={<TraderProfile />} />
-            {/* <Route path="upgrade" element={<Upgrade />} />
-            <Route path="pricing" element={<PricingSection />} /> */}
+
+            {/* --- NEW NESTED SETTINGS ROUTES --- */}
+            <Route path="settings" element={<SettingsMain />}>
+              <Route index element={<SecuritySettings />} />
+              <Route path="financial" element={<FinancialSettings />} />
+              <Route path="profile" element={<ProfileKYCSettings />} />
+            </Route>
           </Route>
 
           {/* 3. ADMIN PANEL ROUTES */}
@@ -172,16 +178,15 @@ function App() {
             }
           >
             <Route index element={<AdminDashboard />} />
+            <Route path="kyc" element={<KycReview />} />
             <Route path="users" element={<AdminUserList />} />
             <Route path="ledger" element={<AdminLedger />} />
             <Route path="traders" element={<ManageTraders />} />
             <Route path="deposits" element={<AdminDeposits />} />
             <Route path="withdrawals" element={<AdminWithdrawals />} />
             <Route path="transactions" element={<AdminTransactions />} />
-            {/* <Route path="investments" element={<AdminInvestments />} /> */}
           </Route>
 
-          {/* CATCH ALL */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
         <TawkMessenger />

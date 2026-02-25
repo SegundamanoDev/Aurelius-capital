@@ -12,6 +12,7 @@ import {
   HiX,
   HiOutlineSun,
   HiOutlineMoon,
+  HiOutlineCog, // 1. Moved this import to the top level
 } from "react-icons/hi";
 import { HiOutlineArrowsRightLeft } from "react-icons/hi2";
 
@@ -47,6 +48,7 @@ const DashboardLayout = () => {
     }
   };
 
+  // 2. menuItems defined correctly at the component level
   const menuItems = [
     { name: "Overview", icon: <HiOutlineHome />, path: "/dashboard" },
     {
@@ -69,13 +71,17 @@ const DashboardLayout = () => {
       icon: <HiOutlineArrowsRightLeft />,
       path: "/dashboard/transactions",
     },
-    { name: "Profile", icon: <HiOutlineUser />, path: "/dashboard/profile" },
+    // Changed "Profile" to "Settings"
+    {
+      name: "Settings",
+      icon: <HiOutlineCog />,
+      path: "/dashboard/settings",
+    },
   ];
 
   const toggleSidebar = () => setSidebarOpen(!isSidebarOpen);
 
   return (
-    /* Changed bg-[#020408] to bg-app-bg and text-white to text-text-main */
     <div className="flex h-screen bg-app-bg text-text-main overflow-hidden relative transition-colors duration-500">
       {/* --- SIDEBAR --- */}
       <aside
@@ -138,7 +144,6 @@ const DashboardLayout = () => {
 
       {/* --- MAIN CONTENT --- */}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-        {/* Header updated with Backdrop Blur and Theme Toggle */}
         <header className="h-20 border-b border-app-border flex items-center justify-between px-4 md:px-8 bg-card-bg/50 backdrop-blur-md z-50">
           <div className="flex items-center gap-4">
             <button
@@ -154,7 +159,6 @@ const DashboardLayout = () => {
           </div>
 
           <div className="flex items-center gap-4 md:gap-6">
-            {/* Theme Toggle Button */}
             <button
               onClick={toggleTheme}
               className="p-2 rounded-xl bg-gray-100 dark:bg-white/5 border border-app-border text-gray-500 hover:text-sky-500 transition-all"
@@ -191,7 +195,6 @@ const DashboardLayout = () => {
         </main>
       </div>
 
-      {/* Mobile Overlay */}
       {isSidebarOpen && (
         <div
           className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[90] md:hidden"
