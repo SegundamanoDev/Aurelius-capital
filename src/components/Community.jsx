@@ -37,13 +37,6 @@ const Community = () => {
             loading="lazy"
           />
         </div>
-
-        {/* Bottom Metadata Label */}
-        <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 px-6 py-2 bg-gray-900 dark:bg-white rounded-full shadow-xl">
-          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white dark:text-gray-900 whitespace-nowrap">
-            Real-time Network Activity: 10,402 Active Nodes
-          </p>
-        </div>
       </div>
     </section>
   );

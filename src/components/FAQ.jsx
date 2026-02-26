@@ -3,6 +3,7 @@ import {
   HiOutlineChevronDown,
   HiOutlineQuestionMarkCircle,
 } from "react-icons/hi2";
+import { Link } from "react-router-dom";
 
 const FAQ = () => {
   const [openIndex, setOpenIndex] = useState(null);
@@ -117,9 +118,12 @@ const FAQ = () => {
           <p className="text-gray-500 text-sm mb-4">
             Still have questions regarding the Alpha Protocol?
           </p>
-          <button className="text-sky-500 font-black uppercase text-[10px] tracking-[0.2em] hover:text-white transition-colors">
+          <Link
+            to="/contact"
+            className="text-sky-500 font-black uppercase text-[10px] tracking-[0.2em] hover:text-white transition-colors"
+          >
             Connect with an Advisor →
-          </button>
+          </Link>
         </div>
       </div>
     </section>

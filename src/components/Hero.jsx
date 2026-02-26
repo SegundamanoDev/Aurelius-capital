@@ -45,7 +45,7 @@ const Hero = () => {
 
         <p className="text-gray-400 text-base md:text-lg font-medium max-w-xl mx-auto leading-relaxed mb-10 tracking-tight">
           The global standard for high-frequency analysis and elite social
-          sentiment. Stop trading the noise—start trading the signal.
+          sentiment. Stop trading the noise start trading the signal.
         </p>
 
         {/* PRIMARY CALLS TO ACTION */}

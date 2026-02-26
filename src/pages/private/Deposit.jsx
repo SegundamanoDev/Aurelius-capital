@@ -202,11 +202,11 @@ const Deposit = () => {
             <div className="space-y-5">
               <div className="space-y-2">
                 <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1">
-                  Amount ({profileData?.wallet.currency})
+                  Amount ({profileData?.wallet?.currency || "$"})
                 </label>
                 <div className="relative">
                   <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-black">
-                    {currencySymbol}
+                    {currencySymbol || "$"}
                   </span>
                   <input
                     type="number"

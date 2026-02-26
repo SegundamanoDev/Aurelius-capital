@@ -26,10 +26,13 @@ const FinalCTA = () => {
           {/* Primary Action: Conversion */}
           <Link
             to="/register"
-            className="group w-full sm:w-auto bg-gray-900 dark:bg-white text-white dark:text-gray-900 px-10 py-5 rounded-lg font-bold uppercase text-[11px] tracking-[0.2em] hover:bg-sky-600 dark:hover:bg-sky-500 hover:text-white transition-all active:scale-95 flex items-center justify-center gap-3 shadow-xl shadow-sky-500/10"
+            className="group w-full sm:w-auto py-5 px-10 bg-sky-600 hover:bg-sky-500 text-white font-bold uppercase text-[11px] tracking-[0.2em] rounded-xl transition-all shadow-lg shadow-sky-600/20 active:scale-[0.98] flex items-center justify-center gap-3"
           >
             Open Live Account
-            <HiOutlineArrowRight className="group-hover:translate-x-1 transition-transform" />
+            <HiOutlineArrowRight
+              className="group-hover:translate-x-1 transition-transform"
+              size={18}
+            />
           </Link>
 
           {/* Secondary Action: Support/Trust */}

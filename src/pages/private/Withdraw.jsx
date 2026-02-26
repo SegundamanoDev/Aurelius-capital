@@ -28,7 +28,7 @@ const Withdraw = () => {
   const freeBalance = walletData?.wallet?.freeBalance || 0;
   const isLocked = walletData?.wallet?.isLocked || false;
   const displayCurrency = walletData?.wallet?.currency || "USD";
-
+  const currencySymbol = getSymbol(displayCurrency);
   const [amount, setAmount] = useState("");
   const [method, setMethod] = useState("USDT_TRC20");
   const [address, setAddress] = useState("");

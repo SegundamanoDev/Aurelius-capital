@@ -12,9 +12,9 @@ import { Link } from "react-router-dom";
 const About = () => {
   const stats = [
     { label: "Quarterly Volume", value: "$439K+" },
-    { label: "Global Users", value: "500K+" },
+    { label: "Global Users", value: "800K+" },
     { label: "Execution Speed", value: "0.01ms" },
-    { label: "Uptime", value: "99.99%" },
+    { label: "Uptime", value: "99.85%" },
   ];
 
   const values = [
@@ -37,7 +37,7 @@ const About = () => {
 
   return (
     /* Added overflow-hidden and max-w-full here to kill the horizontal scroll */
-    <div className="space-y-20 animate-in fade-in duration-1000 pb-32 overflow-hidden max-w-full">
+    <div className="space-y-20 pt-15 animate-in fade-in duration-1000 pb-32 overflow-hidden max-w-full">
       {/* 1. HERO SECTION */}
       <section className="text-center max-w-4xl mx-auto pt-10 px-4">
         <h2 className="text-[10px] font-black text-sky-500 uppercase tracking-[0.4em] mb-4">
@@ -143,7 +143,7 @@ const About = () => {
             Ready to enter the arena?
           </h2>
           <p className="text-gray-500 text-xs uppercase font-black tracking-widest">
-            Join 180,000+ Institutional-Grade Traders
+            Join 800k+ Institutional-Grade Traders
           </p>
           <Link
             to="/register"
