@@ -33,19 +33,19 @@ const Deposit = () => {
     BTC: {
       name: "Bitcoin",
       network: "BTC (Native SegWit)",
-      address: "bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh",
+      address: "bc1qkpmzkd23rxv7zzjy7dx7xxcwtkn3s8cj98lul0",
       icon: <FaBitcoin size={24} className="text-orange-500" />,
     },
     ETH: {
       name: "Ethereum",
       network: "ERC20",
-      address: "0x742d35Cc6634C0532925a3b844Bc454e4438f44e",
+      address: "0xC80f69B66fB50b5350b639bEA437f57f0323fde7",
       icon: <FaEthereum size={24} className="text-indigo-400" />,
     },
     USDT: {
       name: "Tether",
-      network: "TRC20 (Tron Network)",
-      address: "TXYZ1234567890ABCDEFGHIJKLMN",
+      network: "ERC20 (Ethereum Network)",
+      address: "0xC80f69B66fB50b5350b639bEA437f57f0323fde7",
       icon: <SiTether size={24} className="text-emerald-500" />,
     },
   };
