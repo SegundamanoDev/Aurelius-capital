@@ -88,7 +88,7 @@ const Deposit = () => {
         user_email: user?.email,
         asset: selectedAsset,
         amount: amount,
-        proof_link: result.transaction?.proofImage, // Link to the Cloudinary image
+        proof_link: result.transaction?.proofImage,
         type: "deposit",
       };
 

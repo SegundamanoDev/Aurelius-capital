@@ -9,7 +9,7 @@ import {
   HiOutlineMapPin,
   HiOutlineBriefcase,
 } from "react-icons/hi2";
-
+export const getSymbol = (code) => currencyMap[code]?.symbol || "$";
 export const currencyMap = {
   USD: { symbol: "$", label: "US Dollar" },
   EUR: { symbol: "€", label: "Euro" },
@@ -24,8 +24,6 @@ export const currencyMap = {
   JPY: { symbol: "¥", label: "Japanese Yen" },
   CNY: { symbol: "¥", label: "Chinese Yuan" },
 };
-
-export const getSymbol = (code) => currencyMap[code]?.symbol || "$";
 
 const Register = () => {
   const [step, setStep] = useState(1);
@@ -52,28 +50,27 @@ const Register = () => {
   };
 
   const handleSubmit = async () => {
+    // 1. Validation Checks
+    if (!formData.username || formData.username.length < 3) {
+      return toast.error("Username must be at least 3 characters");
+    }
     if (formData.password !== formData.confirmPassword) {
       return toast.error("Passwords do not match!");
     }
+
     const payload = {
-      username: formData.username,
+      username: formData.username.toLowerCase().trim(),
       firstName: formData.firstName,
       lastName: formData.lastName,
       middleName: formData.middleName,
-      email: formData.email,
+      email: formData.email.toLowerCase().trim(),
       password: formData.password,
       confirmPassword: formData.confirmPassword,
       currency: formData.currency,
       sex: formData.sex.toLowerCase(),
       maritalStatus: formData.maritalStatus.toLowerCase(),
       occupation: formData.occupation,
-      address: {
-        street: formData.address || "N/A",
-        city: "N/A",
-        state: "N/A",
-        country: "N/A",
-        zipCode: "N/A",
-      },
+      address: formData.address || "N/A",
     };
 
     try {
@@ -83,13 +80,13 @@ const Register = () => {
         error: (err) => err?.data?.message || "Registration failed",
       });
       navigate("/login");
-    } catch (err) {}
+    } catch (err) {
+      console.error("Registration Error:", err);
+    }
   };
 
   return (
-    /* Changed bg-[#020408] to bg-app-bg */
     <div className="min-h-screen pt-24 pb-12 flex items-center justify-center px-4 bg-app-bg transition-colors duration-500">
-      {/* Changed bg-[#05070A] to bg-card-bg and border-white/5 to border-app-border */}
       <div className="w-full max-w-2xl bg-card-bg border border-app-border rounded-[2.5rem] p-8 md:p-12 shadow-2xl relative transition-all duration-500">
         {/* Progress Bar */}
         <div className="flex gap-2 mb-8">
@@ -104,6 +101,7 @@ const Register = () => {
         </div>
 
         <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
+          {/* STEP 1: Account Credentials */}
           {step === 1 && (
             <div className="space-y-4 animate-in fade-in slide-in-from-right-4">
               <div className="grid md:grid-cols-2 gap-4">
@@ -113,7 +111,7 @@ const Register = () => {
                   icon={<HiOutlineUser />}
                   value={formData.username}
                   onChange={handleChange}
-                  placeholder="johndoe"
+                  placeholder="choose_username"
                 />
                 <InputGroup
                   label="Email Address"
@@ -148,6 +146,7 @@ const Register = () => {
             </div>
           )}
 
+          {/* STEP 2: Identity Information */}
           {step === 2 && (
             <div className="space-y-4 animate-in fade-in slide-in-from-right-4">
               <div className="grid md:grid-cols-3 gap-4">
@@ -156,18 +155,21 @@ const Register = () => {
                   name="firstName"
                   value={formData.firstName}
                   onChange={handleChange}
+                  placeholder="John"
                 />
                 <InputGroup
                   label="Middle Name"
                   name="middleName"
                   value={formData.middleName}
                   onChange={handleChange}
+                  placeholder="Quincy"
                 />
                 <InputGroup
                   label="Last Name"
                   name="lastName"
                   value={formData.lastName}
                   onChange={handleChange}
+                  placeholder="Doe"
                 />
               </div>
               <div className="grid md:grid-cols-2 gap-4">
@@ -181,7 +183,7 @@ const Register = () => {
                 <SelectGroup
                   label="Marital Status"
                   name="maritalStatus"
-                  options={["Single", "Married"]}
+                  options={["Single", "Married", "Divorced"]}
                   value={formData.maritalStatus}
                   onChange={handleChange}
                 />
@@ -189,6 +191,7 @@ const Register = () => {
             </div>
           )}
 
+          {/* STEP 3: Financial & Preferences */}
           {step === 3 && (
             <div className="space-y-4 animate-in fade-in slide-in-from-right-4">
               <InputGroup
@@ -197,6 +200,7 @@ const Register = () => {
                 icon={<HiOutlineMapPin />}
                 value={formData.address}
                 onChange={handleChange}
+                placeholder="123 Financial Way, NY"
               />
               <div className="grid md:grid-cols-2 gap-4">
                 <InputGroup
@@ -205,35 +209,43 @@ const Register = () => {
                   icon={<HiOutlineBriefcase />}
                   value={formData.occupation}
                   onChange={handleChange}
+                  placeholder="Portfolio Manager"
                 />
 
                 <div className="space-y-2 text-left">
                   <label className="text-[10px] text-gray-500 font-black uppercase tracking-widest">
                     Account Currency
                   </label>
-                  <select
-                    name="currency"
-                    onChange={handleChange}
-                    value={formData.currency}
-                    className="w-full bg-gray-50 dark:bg-black/40 border border-app-border p-4 rounded-xl text-text-main outline-none focus:border-sky-500 transition-all appearance-none"
-                  >
-                    {Object.entries(currencyMap).map(
-                      ([code, { symbol, label }]) => (
-                        <option
-                          key={code}
-                          value={code}
-                          className="bg-white dark:bg-black text-text-main"
-                        >
-                          {code} - {label} ({symbol})
-                        </option>
-                      ),
-                    )}
-                  </select>
+                  <div className="relative">
+                    <select
+                      name="currency"
+                      onChange={handleChange}
+                      value={formData.currency}
+                      className="w-full bg-gray-50 dark:bg-black/40 border border-app-border p-4 rounded-xl text-text-main outline-none focus:border-sky-500 transition-all appearance-none"
+                    >
+                      {Object.entries(currencyMap).map(
+                        ([code, { symbol, label }]) => (
+                          <option
+                            key={code}
+                            value={code}
+                            className="bg-white dark:bg-black text-text-main"
+                          >
+                            {code} - {label} ({symbol})
+                          </option>
+                        ),
+                      )}
+                    </select>
+                    {/* Custom Dropdown Arrow */}
+                    <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+                      ▼
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
           )}
 
+          {/* Action Buttons */}
           <div className="flex gap-4 pt-6">
             {step > 1 && (
               <button
@@ -248,7 +260,7 @@ const Register = () => {
               type="button"
               disabled={isLoading}
               onClick={() => (step < 3 ? setStep(step + 1) : handleSubmit())}
-              className="flex-[2] py-4 bg-sky-500 text-white dark:text-black font-black uppercase rounded-2xl hover:bg-sky-400 transition-all shadow-lg shadow-sky-500/10"
+              className="flex-[2] py-4 bg-sky-500 text-white dark:text-black font-black uppercase rounded-2xl hover:bg-sky-400 transition-all shadow-lg shadow-sky-500/10 active:scale-95"
             >
               {isLoading
                 ? "Processing..."
@@ -275,7 +287,7 @@ const Register = () => {
   );
 };
 
-// --- SUB-COMPONENTS (Updated for Light/Dark) ---
+// --- SUB-COMPONENTS ---
 
 const InputGroup = ({
   label,
@@ -302,6 +314,7 @@ const InputGroup = ({
         value={value}
         onChange={onChange}
         placeholder={placeholder}
+        required
         className={`w-full bg-gray-50 dark:bg-black/40 border border-app-border p-4 ${
           icon ? "pl-12" : "px-4"
         } rounded-xl text-text-main outline-none focus:border-sky-500 transition-all placeholder:text-gray-400`}

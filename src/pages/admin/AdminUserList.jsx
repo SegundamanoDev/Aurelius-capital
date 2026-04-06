@@ -196,12 +196,12 @@ const AdminUserList = () => {
 
       {/* REFINED PROFIT INJECTION MODAL */}
       {isEditModalOpen && (
-        <div className="fixed inset-0 z-[200] flex justify-center bg-slate-900/60 dark:bg-black/90 backdrop-blur-md transition-colors overflow-y-auto pt-20 pb-20 px-4">
+        <div className="fixed min-h-screen inset-0 z-[200] flex justify-center bg-slate-900/60 dark:bg-black/90 backdrop-blur-md transition-colors overflow-y-auto pt-20 pb-20 px-4">
           <div className="bg-white dark:bg-[#05070A] border border-slate-200 dark:border-white/10 w-full max-w-md rounded-[2.5rem] shadow-2xl relative animate-in zoom-in-95 duration-200 h-fit overflow-hidden">
             {/* Header */}
             <div className="p-8 pb-4 flex justify-between items-center bg-slate-50 dark:bg-white/[0.02] border-b border-slate-100 dark:border-white/5">
               <h3 className="text-lg font-black text-slate-900 dark:text-white uppercase italic tracking-tighter">
-                Profit <span className="text-sky-600">Injection</span>
+                Add Profit To User
               </h3>
               <button
                 onClick={() => setEditModalOpen(false)}
@@ -227,7 +227,8 @@ const AdminUserList = () => {
                     Live Balance
                   </p>
                   <div className="w-full bg-sky-500/5 p-3 rounded-xl text-sky-600 dark:text-sky-400 text-sm font-mono font-bold border border-sky-500/10">
-                    ${(selectedUser?.balance || 0).toLocaleString()}
+                    $
+                    {(selectedUser?.wallet?.totalBalance || 0).toLocaleString()}
                   </div>
                 </div>
               </div>
@@ -240,7 +241,7 @@ const AdminUserList = () => {
                   Enter Credit Amount
                 </label>
 
-                <div className="relative">
+                <div className="">
                   <span className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 font-mono font-bold">
                     $
                   </span>

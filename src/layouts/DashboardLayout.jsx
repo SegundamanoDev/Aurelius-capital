@@ -6,17 +6,19 @@ import {
   HiOutlineHome,
   HiOutlineCreditCard,
   HiOutlineLogout,
-  HiOutlineUser,
   HiOutlineUsers,
   HiMenuAlt3,
   HiX,
   HiOutlineSun,
   HiOutlineMoon,
-  HiOutlineCog, // 1. Moved this import to the top level
+  HiOutlineCog,
 } from "react-icons/hi";
 import { HiOutlineArrowsRightLeft } from "react-icons/hi2";
+import { useGetMyWalletQuery } from "../api/apiSlice";
 
 const DashboardLayout = () => {
+  const { data: walletData } = useGetMyWalletQuery();
+  const wallet = walletData?.wallet || {};
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [isDark, setIsDark] = useState(
     document.documentElement.classList.contains("dark"),
@@ -27,9 +29,17 @@ const DashboardLayout = () => {
 
   const { user } = useSelector((state) => state.auth);
 
+  // --- Helpers ---
   const getInitials = () => {
     if (!user) return "??";
     return `${user.firstName?.charAt(0) || ""}${user.lastName?.charAt(0) || ""}`.toUpperCase();
+  };
+
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return "Good Morning";
+    if (hour < 18) return "Good Afternoon";
+    return "Good Evening";
   };
 
   const handleLogout = () => {
@@ -37,7 +47,6 @@ const DashboardLayout = () => {
     navigate("/login");
   };
 
-  // Toggle Theme Function
   const toggleTheme = () => {
     if (document.documentElement.classList.contains("dark")) {
       document.documentElement.classList.remove("dark");
@@ -48,7 +57,6 @@ const DashboardLayout = () => {
     }
   };
 
-  // 2. menuItems defined correctly at the component level
   const menuItems = [
     { name: "Overview", icon: <HiOutlineHome />, path: "/dashboard" },
     {
@@ -71,12 +79,7 @@ const DashboardLayout = () => {
       icon: <HiOutlineArrowsRightLeft />,
       path: "/dashboard/transactions",
     },
-    // Changed "Profile" to "Settings"
-    {
-      name: "Settings",
-      icon: <HiOutlineCog />,
-      path: "/dashboard/settings",
-    },
+    { name: "Settings", icon: <HiOutlineCog />, path: "/dashboard/settings" },
   ];
 
   const toggleSidebar = () => setSidebarOpen(!isSidebarOpen);
@@ -90,7 +93,7 @@ const DashboardLayout = () => {
         }`}
       >
         <div className="p-6 flex items-center justify-between border-b border-app-border">
-          <h1 className="text-xl font-bold bg-gradient-to-r from-sky-500 to-emerald-500 bg-clip-text text-transparent">
+          <h1 className="text-xl font-bold bg-gradient-to-r from-sky-500 to-emerald-500 bg-clip-text text-transparent tracking-tighter">
             AURELIUS
           </h1>
           <button className="md:hidden text-gray-500" onClick={toggleSidebar}>
@@ -118,11 +121,6 @@ const DashboardLayout = () => {
                   {item.icon}
                 </span>
                 <span className="text-sm">{item.name}</span>
-                {item.name === "Upgrade" && user?.accountType === "vip" && (
-                  <span className="ml-auto text-[8px] bg-emerald-500/20 text-emerald-500 px-1.5 py-0.5 rounded font-black uppercase">
-                    VIP
-                  </span>
-                )}
               </Link>
             );
           })}
@@ -152,10 +150,29 @@ const DashboardLayout = () => {
             >
               <HiMenuAlt3 size={24} />
             </button>
-            <h2 className="hidden sm:block text-xs font-black uppercase tracking-[0.2em] text-gray-500">
-              Terminal <span className="text-sky-500/50">//</span>{" "}
-              {user?.accountType || "User"}
-            </h2>
+
+            {/* DYNAMIC GREETING & STATUS */}
+            <div className="hidden sm:block">
+              <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 leading-none mb-1">
+                {getGreeting()}
+              </h2>
+              <div className="flex items-center gap-2">
+                <p className="text-sm font-bold text-text-main">
+                  Welcome back,{" "}
+                  <span className="text-sky-500">{user?.firstName}</span>
+                </p>
+                <span className="h-1 w-1 rounded-full bg-gray-300 dark:bg-white/20" />
+                <div className="flex items-center gap-1.5">
+                  <span className="relative flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                  </span>
+                  <span className="text-[9px] font-bold text-emerald-500 uppercase tracking-tighter">
+                    Live Market
+                  </span>
+                </div>
+              </div>
+            </div>
           </div>
 
           <div className="flex items-center gap-4 md:gap-6">
@@ -170,14 +187,15 @@ const DashboardLayout = () => {
               )}
             </button>
 
-            <div className="text-right hidden xs:block">
-              <p className="text-[9px] text-gray-500 uppercase font-black tracking-widest">
+            <div className="text-right hidden sm:block">
+              <p className="text-[9px] text-gray-500 uppercase font-black tracking-widest leading-none mb-1">
                 Net Equity
               </p>
               <p className="text-sky-500 font-bold text-sm">
-                {user?.currency}{" "}
-                {(user?.balance || 0).toLocaleString(undefined, {
+                {wallet.currency || user?.currency || "USD"}{" "}
+                {(wallet.totalBalance || 0).toLocaleString(undefined, {
                   minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
                 })}
               </p>
             </div>

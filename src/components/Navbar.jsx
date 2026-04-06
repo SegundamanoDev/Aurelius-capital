@@ -1,6 +1,14 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
-import { HiMenuAlt2, HiX, HiChevronDown, HiSun, HiMoon } from "react-icons/hi";
+import {
+  HiMenuAlt2,
+  HiX,
+  HiChevronDown,
+  HiSun,
+  HiMoon,
+  HiGlobeAlt,
+  HiSearch,
+} from "react-icons/hi";
 import { setLanguage, getSelectedLanguage } from "../utils/translate";
 import { useDarkMode } from "../utils/useDarkMode";
 
@@ -9,6 +17,7 @@ const Navbar = () => {
   const [nav, setNav] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [langOpen, setLangOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
   const dropdownRef = useRef(null);
   const currentLang = getSelectedLanguage();
 
@@ -77,10 +86,22 @@ const Navbar = () => {
     { name: "Tiếng Việt", code: "vi", flag: "🇻🇳" },
   ];
 
+  // Logic: Filter languages based on search input
+  const filteredLanguages = languages.filter((lang) =>
+    lang.name.toLowerCase().includes(searchTerm.toLowerCase()),
+  );
+
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+    const handleScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
         setLangOpen(false);
+        setSearchTerm("");
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
@@ -88,18 +109,8 @@ const Navbar = () => {
   }, []);
 
   useEffect(() => {
-    if (nav) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "unset";
-    }
+    document.body.style.overflow = nav ? "hidden" : "unset";
   }, [nav]);
-
-  useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 20);
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
 
   const links = [
     { name: "Home", path: "/" },
@@ -116,14 +127,14 @@ const Navbar = () => {
   return (
     <>
       <nav
-        className={`fixed w-full z-[100] transition-all duration-500 ${
+        className={`fixed w-full z-[120] transition-all duration-500 ease-in-out ${
           scrolled || nav
-            ? "bg-white dark:bg-[#05070A]/90 backdrop-blur-lg border-b border-gray-100 dark:border-white/5 py-4 shadow-sm dark:shadow-none"
-            : "bg-transparent py-6"
+            ? "py-3 bg-white/90 dark:bg-[#05070A]/90 backdrop-blur-xl border-b border-gray-200/50 dark:border-white/5"
+            : "py-6 bg-transparent"
         }`}
       >
-        <div className="max-w-7xl mx-auto px-6 flex justify-between items-center">
-          {/* Logo */}
+        <div className="max-w-[1400px] mx-auto px-6 lg:px-10 flex justify-between items-center">
+          {/* LOGO */}
           <Link to="/" className="flex items-center gap-2 group z-[110]">
             <div className="w-10 h-10 bg-sky-600 rounded-lg flex items-center justify-center shadow-lg shadow-sky-500/20 group-hover:scale-105 transition-transform">
               <span className="text-white font-black text-xl italic">A</span>
@@ -133,136 +144,195 @@ const Navbar = () => {
             </span>
           </Link>
 
-          {/* Right Side Controls */}
-          <div className="flex items-center gap-4 z-[110]">
-            <button
-              onClick={() => setTheme(colorTheme)}
-              className="p-2 rounded-xl bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-800 dark:text-yellow-400 hover:scale-110 transition-all"
-            >
-              {colorTheme === "light" ? (
-                <HiSun size={20} />
-              ) : (
-                <HiMoon size={20} className="text-sky-400" />
-              )}
-            </button>
-
-            {/* Language Selector */}
-            <div className="relative" ref={dropdownRef}>
-              <button
-                onClick={() => setLangOpen(!langOpen)}
-                className="flex items-center gap-2 bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 px-3 py-1.5 rounded-xl hover:bg-gray-200 dark:hover:bg-white/10 transition-all text-gray-900 dark:text-white text-[10px] font-bold uppercase tracking-widest"
-              >
-                <span className="text-sm">
-                  {languages.find((l) => l.code === currentLang)?.flag || "🌐"}
-                </span>
-                <span className="hidden sm:inline">{currentLang}</span>
-                <HiChevronDown
-                  className={`transition-transform duration-300 ${langOpen ? "rotate-180" : ""}`}
-                />
-              </button>
-
-              {langOpen && (
-                <div className="absolute right-0 mt-3 w-48 bg-white dark:bg-[#05070A] border border-gray-200 dark:border-white/10 rounded-2xl overflow-hidden shadow-2xl animate-in fade-in zoom-in duration-200 backdrop-blur-xl">
-                  <div className="max-h-[300px] overflow-y-auto no-scrollbar">
-                    {languages.map((lang) => (
-                      <button
-                        key={lang.code}
-                        onClick={() => {
-                          setLanguage(lang.code);
-                          setLangOpen(false);
-                        }}
-                        className={`w-full flex items-center gap-3 px-4 py-3 text-left text-[10px] font-bold tracking-widest uppercase transition-colors hover:bg-sky-500/10 ${
-                          currentLang === lang.code
-                            ? "text-sky-500 bg-sky-500/5"
-                            : "text-gray-500 dark:text-gray-400"
-                        }`}
-                      >
-                        <span className="text-base">{lang.flag}</span>
-                        {lang.name}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Menu Toggle */}
-            <button
-              onClick={() => setNav(!nav)}
-              className="text-gray-900 dark:text-white p-2 hover:bg-gray-100 dark:hover:bg-white/5 rounded-full transition-all"
-            >
-              {nav ? (
-                <HiX size={30} className="text-sky-500" />
-              ) : (
-                <HiMenuAlt2 size={30} />
-              )}
-            </button>
-          </div>
-        </div>
-      </nav>
-
-      {/* Mobile Sidebar Overlay */}
-      <div
-        className={`fixed inset-0 bg-black/60 dark:bg-black/80 backdrop-blur-md z-[101] transition-opacity duration-500 ${
-          nav
-            ? "opacity-100 pointer-events-auto"
-            : "opacity-0 pointer-events-none"
-        }`}
-        onClick={() => setNav(false)}
-      />
-
-      <aside
-        className={`fixed top-0 left-0 h-screen w-full md:w-[450px] bg-white dark:bg-[#0a0c10] text-gray-900 dark:text-white border-r border-gray-200 dark:border-white/10 z-[102] transition-transform duration-700 ease-[cubic-bezier(0.77,0,0.175,1)] ${
-          nav ? "translate-x-0" : "-translate-x-full"
-        }`}
-      >
-        <div className="flex flex-col h-full p-8 md:p-10 pt-24 md:pt-28">
-          <p className="text-[10px] font-black uppercase tracking-[0.4em] mb-6 text-gray-500 dark:text-gray-400">
-            Navigation Protocol
-          </p>
-
-          <ul className="space-y-4 overflow-y-auto no-scrollbar pb-10 flex-grow">
-            {links.map((link, i) => (
-              <li
-                key={link.name}
-                style={{ transitionDelay: `${nav ? i * 50 + 200 : 0}ms` }}
-                className={`transform transition-all duration-700 ${
-                  nav
-                    ? "translate-x-0 opacity-100"
-                    : "-translate-x-10 opacity-0"
-                }`}
-              >
+          {/* DESKTOP LINKS (Truncated for space) */}
+          <ul className="hidden xl:flex items-center gap-8">
+            {links.map((link) => (
+              <li key={link.name}>
                 <Link
                   to={link.path}
-                  onClick={() => setNav(false)}
-                  className="text-3xl md:text-4xl font-black text-gray-900 dark:text-white hover:text-sky-600 dark:hover:text-sky-400 hover:italic transition-all flex items-center gap-4 group"
+                  className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-500 dark:text-gray-400 hover:text-sky-500 dark:hover:text-white transition-colors"
                 >
-                  <span className="text-xs font-mono text-sky-500/40 group-hover:text-sky-500 italic">
-                    0{i + 1}
-                  </span>
                   {link.name}
                 </Link>
               </li>
             ))}
           </ul>
 
-          <div
-            className={`mt-auto pt-6 border-t border-gray-100 dark:border-white/5 transition-all duration-700 delay-500 ${
-              nav ? "opacity-100" : "opacity-0"
-            }`}
-          >
-            {/* FIXED SIGN UP BUTTON */}
-            <Link
-              to="/register"
-              onClick={() => setNav(false)}
-              className="block text-center w-full md:w-auto px-12 py-4 bg-blue-600 text-white rounded-xl font-bold text-lg hover:bg-blue-700 transition shadow-lg shadow-blue-600/20 active:scale-95"
-            >
-              Start Trading Now
-            </Link>
+          {/* CONTROLS */}
+          <div className="flex items-center gap-2 sm:gap-4 z-[130]">
+            {/* Desktop Language Selector */}
+            <div className="relative hidden md:block" ref={dropdownRef}>
+              <button
+                onClick={() => setLangOpen(!langOpen)}
+                className="flex items-center gap-2 px-3 py-2 rounded-full hover:bg-gray-100 dark:hover:bg-white/5 transition-all border border-transparent dark:border-white/5"
+              >
+                <span className="text-sm">
+                  {languages.find((l) => l.code === currentLang)?.flag || "🌐"}
+                </span>
+                <HiChevronDown
+                  size={12}
+                  className={`text-gray-400 transition-transform ${langOpen ? "rotate-180" : ""}`}
+                />
+              </button>
 
-            <div className="mt-6 flex justify-between text-[9px] font-black text-gray-500 dark:text-gray-600 uppercase tracking-widest">
-              <span>V3.0 ALPHA PROTOCOL</span>
-              <span>© 2026</span>
+              {langOpen && (
+                <div className="absolute right-0 mt-4 w-64 bg-white dark:bg-[#0A0C10] border border-gray-200 dark:border-white/10 rounded-2xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-2">
+                  {/* SEARCH INPUT */}
+                  <div className="p-3 border-b border-gray-100 dark:border-white/5">
+                    <div className="relative">
+                      <HiSearch
+                        className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                        size={14}
+                      />
+                      <input
+                        autoFocus
+                        type="text"
+                        placeholder="Search country..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="w-full bg-gray-50 dark:bg-white/5 border-none rounded-xl py-2 pl-9 pr-4 text-[11px] font-medium outline-none text-gray-900 dark:text-white placeholder:text-gray-400 focus:ring-1 focus:ring-sky-500"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="max-h-64 overflow-y-auto py-2 custom-scrollbar">
+                    {filteredLanguages.length > 0 ? (
+                      filteredLanguages.map((lang) => (
+                        <button
+                          key={lang.code}
+                          onClick={() => {
+                            setLanguage(lang.code);
+                            setLangOpen(false);
+                            setSearchTerm("");
+                          }}
+                          className={`w-full flex items-center gap-3 px-4 py-2.5 text-[10px] font-bold uppercase tracking-widest hover:bg-sky-500/10 transition-colors ${currentLang === lang.code ? "text-sky-500 bg-sky-500/5" : "text-gray-600 dark:text-gray-400"}`}
+                        >
+                          <span>{lang.flag}</span> {lang.name}
+                        </button>
+                      ))
+                    ) : (
+                      <div className="py-4 text-center text-[10px] text-gray-400 uppercase tracking-widest">
+                        No results found
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <button
+              onClick={() => setTheme(colorTheme)}
+              className="p-2.5 rounded-full bg-gray-100 dark:bg-white/5 text-gray-600 dark:text-gray-400"
+            >
+              {colorTheme === "light" ? (
+                <HiSun size={18} />
+              ) : (
+                <HiMoon size={18} className="text-sky-400" />
+              )}
+            </button>
+
+            <button
+              onClick={() => setNav(!nav)}
+              className={`p-2.5 rounded-full transition-all lg:hidden ${nav ? "bg-sky-500 text-white" : "bg-gray-900 dark:bg-white text-white dark:text-black"}`}
+            >
+              {nav ? <HiX size={20} /> : <HiMenuAlt2 size={20} />}
+            </button>
+          </div>
+        </div>
+      </nav>
+
+      {/* MOBILE SIDEBAR */}
+      <aside
+        className={`fixed inset-0 z-[115] bg-white dark:bg-[#05070A] transition-transform duration-[800ms] cubic-bezier(0.85, 0, 0.15, 1) ${
+          nav ? "translate-y-0" : "-translate-y-full"
+        }`}
+      >
+        <div className="h-full flex flex-col px-8 pt-28 pb-10 max-w-lg mx-auto">
+          {/* MOBILE SEARCH & LANGUAGE */}
+          <div
+            className={`mb-10 transition-all duration-700 delay-100 ${nav ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-4"}`}
+          >
+            <div className="flex items-center justify-between mb-4">
+              <p className="text-[9px] font-bold uppercase tracking-[0.4em] text-gray-400 flex items-center gap-2">
+                <HiGlobeAlt /> Language
+              </p>
+              <div className="relative flex-1 max-w-[160px] ml-4">
+                <HiSearch
+                  className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                  size={12}
+                />
+                <input
+                  type="text"
+                  placeholder="SEARCH..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full bg-gray-100 dark:bg-white/5 border-none rounded-lg py-1.5 pl-8 pr-4 text-[9px] font-bold tracking-widest outline-none text-gray-900 dark:text-white focus:ring-1 focus:ring-sky-500"
+                />
+              </div>
+            </div>
+
+            <div className="flex gap-2 overflow-x-auto no-scrollbar pb-2">
+              {filteredLanguages.map((lang) => (
+                <button
+                  key={lang.code}
+                  onClick={() => {
+                    setLanguage(lang.code);
+                    setSearchTerm("");
+                  }}
+                  className={`flex-shrink-0 px-4 py-2 rounded-xl border text-[10px] font-bold uppercase tracking-widest transition-all ${
+                    currentLang === lang.code
+                      ? "bg-sky-500 border-sky-500 text-white shadow-lg shadow-sky-500/20"
+                      : "border-gray-100 dark:border-white/5 text-gray-500 dark:text-gray-400"
+                  }`}
+                >
+                  {lang.flag} {lang.name}
+                </button>
+              ))}
+              {filteredLanguages.length === 0 && (
+                <span className="text-[9px] text-gray-400 uppercase italic py-2">
+                  No results
+                </span>
+              )}
+            </div>
+          </div>
+
+          <nav className="flex flex-col space-y-4 overflow-y-auto custom-scrollbar flex-1 pr-2">
+            {links.map((link, i) => (
+              <Link
+                key={link.name}
+                to={link.path}
+                onClick={() => setNav(false)}
+                style={{ transitionDelay: `${i * 60 + 200}ms` }}
+                className={`flex items-baseline gap-4 group transition-all duration-700 ${nav ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-4"}`}
+              >
+                <span className="text-[10px] font-mono text-gray-400 dark:text-gray-600">
+                  0{i + 1}
+                </span>
+                <span className="text-4xl font-black tracking-tighter text-gray-900 dark:text-white uppercase group-hover:italic group-hover:text-sky-500 transition-all">
+                  {link.name}
+                </span>
+              </Link>
+            ))}
+          </nav>
+
+          <div
+            className={`mt-auto pt-6 space-y-6 transition-all duration-1000 delay-400 ${nav ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}
+          >
+            <div className="grid grid-cols-2 gap-4">
+              <Link
+                to="/login"
+                onClick={() => setNav(false)}
+                className="flex items-center justify-center py-4 border border-gray-200 dark:border-white/10 rounded-2xl text-[10px] font-black uppercase tracking-widest text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-white/5 transition-colors"
+              >
+                Sign In
+              </Link>
+              <Link
+                to="/register"
+                onClick={() => setNav(false)}
+                className="flex items-center justify-center py-4 bg-sky-600 rounded-2xl text-[10px] font-black uppercase tracking-widest text-white hover:bg-sky-500 transition-colors"
+              >
+                Sign Up
+              </Link>
             </div>
           </div>
         </div>

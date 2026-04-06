@@ -4,7 +4,7 @@ import { HiOutlineArrowRight } from "react-icons/hi2";
 
 const Hero = () => {
   return (
-    <section className="relative min-h-screen w-full bg-[#05070A] flex flex-col items-center pt-32 pb-24 overflow-hidden selection:bg-sky-500/30">
+    <section className="relative min-h-screen w-full bg-[#05070A] flex flex-col items-center pt-32 pb-24 overflow-hidden selection:bg-sky-500/30 font-sans">
       {/* LAYER 1: THE AURORA BACKDROP */}
       <div className="absolute inset-0 z-0 flex justify-center items-start overflow-hidden pointer-events-none">
         <picture role="presentation" className="w-full h-full max-w-[2560px]">
@@ -27,15 +27,6 @@ const Hero = () => {
 
       {/* LAYER 2: HERO TEXT & ACTIONS */}
       <div className="relative z-20 text-center max-w-5xl px-6 mb-16 mt-12 flex flex-col items-center">
-        {/* Badge Indicator */}
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-sky-500/20 bg-sky-500/5 text-sky-500 text-[10px] font-bold uppercase tracking-[0.2em] mb-8 animate-fade-in">
-          <span className="relative flex h-2 w-2">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-sky-500"></span>
-          </span>
-          Institutional Terminal Live
-        </div>
-
         <h1 className="text-5xl md:text-8xl font-black text-white tracking-tighter leading-[0.9] mb-8 uppercase italic">
           Aurelius Capital <br />
           <span className="text-transparent bg-clip-text bg-gradient-to-b from-white via-white to-white/40">

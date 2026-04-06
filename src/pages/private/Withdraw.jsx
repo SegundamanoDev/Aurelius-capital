@@ -122,7 +122,7 @@ const Withdraw = () => {
       {/* Header */}
       <div>
         <h1 className="text-4xl font-black text-slate-900 dark:text-white tracking-tighter uppercase italic">
-          Asset <span className="text-emerald-500">Liquidation</span>
+          Asset <span className="text-sky-500">Liquidation</span>
         </h1>
         <p className="text-slate-400 text-[10px] font-bold uppercase tracking-widest mt-1">
           Identity: {userProfile?.email}
@@ -139,19 +139,19 @@ const Withdraw = () => {
             <h2
               className={`text-4xl font-black mt-2 tracking-tighter ${isLocked ? "text-red-500" : "text-slate-900 dark:text-white"}`}
             >
-              <span className="text-emerald-500 mr-2 text-2xl">
+              <span className="text-sky-500 mr-2 text-2xl">
                 {currencySymbol}
               </span>
               {freeBalance.toLocaleString()}
             </h2>
           </div>
 
-          <div className="bg-slate-900 dark:bg-emerald-500/5 p-6 rounded-[2rem] border border-white/5">
-            <h4 className="text-emerald-400 text-[10px] font-black uppercase tracking-widest mb-3 flex items-center gap-2">
+          <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-white/5 p-8 rounded-[2rem] shadow-xl shadow-slate-200/40 dark:shadow-none">
+            <h4 className="text-sky-500 text-[10px] font-black uppercase tracking-widest mb-3 flex items-center gap-2">
               <HiOutlineShieldCheck size={16} /> Destination Vault
             </h4>
-            <div className="bg-black/20 p-4 rounded-xl border border-white/5">
-              <p className="text-[10px] font-mono break-all text-emerald-100/60 leading-relaxed">
+            <div>
+              <p className="text-[10px] font-mono break-all text-slate-900 dark:text-white leading-relaxed">
                 {address || "NOT CONFIGURED"}
               </p>
             </div>
@@ -261,7 +261,7 @@ const Withdraw = () => {
               className={`w-full py-6 rounded-3xl font-black uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-3 text-xs ${
                 isWithdrawing || isLocked || !address
                   ? "bg-slate-100 dark:bg-slate-800 text-slate-300 dark:text-slate-600 cursor-not-allowed"
-                  : "bg-emerald-500 hover:bg-emerald-400 text-white dark:text-slate-900 shadow-2xl shadow-emerald-500/40 active:scale-95"
+                  : "bg-sky-500 hover:bg-sky-400 text-white dark:text-slate-900 shadow-2xl shadow-emerald-500/40 active:scale-95"
               }`}
             >
               {isWithdrawing

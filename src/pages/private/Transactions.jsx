@@ -1,311 +1,199 @@
-import React, { useState } from "react";
-import { useSelector } from "react-redux";
+import React from "react";
+import { useNavigate } from "react-router-dom";
+import clsx from "clsx";
+
 import {
   useGetMyProfileQuery,
   useGetMyTransactionsQuery,
 } from "../../api/apiSlice";
+
 import {
-  HiOutlineArrowsRightLeft,
-  HiOutlineArrowUpRight,
-  HiOutlineArrowDownLeft,
-  HiXMark,
   HiOutlineArrowPath,
-  HiOutlineDocumentText,
-  HiOutlineCreditCard,
+  HiOutlineArrowDownLeft,
+  HiOutlineArrowUpRight,
+  HiOutlineArrowsRightLeft,
 } from "react-icons/hi2";
+
 import { getSymbol } from "../public/Register";
 
 const Transactions = () => {
-  const { data: profileData, isLoading: isProfileLoading } =
-    useGetMyProfileQuery();
+  const navigate = useNavigate();
+
+  const { data: profileData } = useGetMyProfileQuery();
   const currencySymbol = getSymbol(profileData?.wallet?.currency);
 
   const {
     data: transactions = [],
     isLoading,
+    isError,
     refetch,
   } = useGetMyTransactionsQuery();
-  const [selectedTx, setSelectedTx] = useState(null);
+
+  // ---------------- STATUS STYLE ----------------
 
   const getStatusStyle = (status) => {
     switch (status?.toLowerCase()) {
       case "completed":
-        return "bg-emerald-500/10 text-emerald-600 dark:text-emerald-500 border-emerald-500/20";
+        return "bg-emerald-100 text-emerald-600 border-emerald-200";
       case "pending":
-        return "bg-amber-500/10 text-amber-600 dark:text-amber-500 border-amber-500/20";
+        return "bg-amber-100 text-amber-600 border-amber-200";
       case "failed":
-        return "bg-rose-500/10 text-rose-600 dark:text-rose-500 border-rose-500/20";
+        return "bg-rose-100 text-rose-600 border-rose-200";
       default:
-        return "bg-gray-500/10 text-gray-500 dark:text-gray-400 border-app-border";
+        return "bg-gray-100 text-gray-500 border-gray-200";
     }
   };
 
+  // ---------------- ICON ----------------
+
   const getTxIcon = (type) => {
     const t = type?.toLowerCase();
-    if (t.includes("deposit") || t.includes("yield") || t.includes("profit"))
-      return <HiOutlineArrowDownLeft className="text-emerald-500" />;
+
+    if (t.includes("deposit") || t.includes("profit"))
+      return <HiOutlineArrowDownLeft className="text-emerald-500" size={20} />;
+
     if (t.includes("withdraw"))
-      return <HiOutlineArrowUpRight className="text-rose-500" />;
-    return <HiOutlineArrowsRightLeft className="text-sky-500" />;
+      return <HiOutlineArrowUpRight className="text-rose-500" size={20} />;
+
+    return <HiOutlineArrowsRightLeft className="text-sky-500" size={20} />;
   };
 
+  // ---------------- AMOUNT STYLE ----------------
+
+  const getAmountStyle = (type) => {
+    const t = type?.toLowerCase();
+
+    if (t.includes("deposit") || t.includes("profit")) {
+      return {
+        color: "text-emerald-600",
+        sign: "+",
+      };
+    }
+
+    if (t.includes("withdraw")) {
+      return {
+        color: "text-rose-600",
+        sign: "-",
+      };
+    }
+
+    return {
+      color: "text-gray-700",
+      sign: "",
+    };
+  };
+
+  // ---------------- OPEN RECEIPT ----------------
+
+  const openReceipt = (tx) => {
+    localStorage.setItem("receipt_tx", JSON.stringify(tx));
+    window.open("/dashboard/receipt", "_blank");
+  };
+
+  // ---------------- UI ----------------
+
   return (
-    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700 transition-colors duration-500">
-      {/* Header Section */}
-      <div className="flex justify-between items-center px-2">
+    <div className="space-y-6">
+      {/* HEADER */}
+
+      <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-black text-text-main tracking-tight uppercase italic">
-            Financial <span className="text-sky-500">Ledger</span>
-          </h1>
-          <p className="text-gray-500 text-xs font-medium tracking-wide">
-            Immutable record of all account settlements and activity.
+          <h1 className="text-2xl font-bold">Transactions</h1>
+          <p className="text-gray-500 text-sm">
+            View all your transaction history
           </p>
         </div>
 
         <button
-          onClick={() => refetch()}
-          className="group flex items-center gap-2 px-4 py-2 rounded-full bg-card-bg border border-app-border hover:bg-gray-100 dark:hover:bg-white/10 transition-all active:scale-95 shadow-sm"
+          onClick={refetch}
+          className="flex items-center gap-2 px-4 py-2 border rounded-lg hover:bg-gray-50 transition"
         >
-          <span className="text-[10px] font-black uppercase tracking-widest text-gray-400 group-hover:text-text-main">
-            Sync Feed
-          </span>
-          <HiOutlineArrowPath
-            size={16}
-            className={`text-sky-500 ${isLoading ? "animate-spin" : "group-hover:rotate-180 transition-transform duration-500"}`}
-          />
+          <HiOutlineArrowPath className={clsx(isLoading && "animate-spin")} />
+          Refresh
         </button>
       </div>
 
-      {/* Main Table Container */}
-      <div className="bg-card-bg border border-app-border rounded-[2rem] overflow-hidden shadow-xl backdrop-blur-3xl">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left">
-            <thead>
-              <tr className="bg-gray-50 dark:bg-white/[0.02] border-b border-app-border">
-                <th className="p-5 text-[10px] font-black uppercase tracking-[0.2em] text-gray-500">
-                  Event Type
-                </th>
-                <th className="p-5 text-[10px] font-black uppercase tracking-[0.2em] text-gray-500">
-                  Settlement Date
-                </th>
-                <th className="p-5 text-[10px] font-black uppercase tracking-[0.2em] text-gray-500 text-right">
-                  Volume ({currencySymbol})
-                </th>
-                <th className="p-5 text-[10px] font-black uppercase tracking-[0.2em] text-gray-500 text-center">
-                  Protocol Status
-                </th>
+      {/* TABLE */}
+
+      <div className="bg-white rounded-2xl border overflow-hidden shadow-sm">
+        {isLoading ? (
+          <div className="p-10 text-center text-gray-500">
+            Loading transactions...
+          </div>
+        ) : isError ? (
+          <div className="p-10 text-center text-red-500">
+            Failed to load transactions
+          </div>
+        ) : transactions.length === 0 ? (
+          <div className="p-10 text-center text-gray-500">
+            No transactions yet
+          </div>
+        ) : (
+          <table className="w-full">
+            <thead className="bg-gray-50 border-b">
+              <tr>
+                <th className="p-4 text-left text-sm">Type</th>
+                <th className="p-4 text-left text-sm">Date</th>
+                <th className="p-4 text-right text-sm">Amount</th>
+                <th className="p-4 text-center text-sm">Status</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-app-border">
-              {isLoading ? (
-                <LoadingSkeleton />
-              ) : transactions.length > 0 ? (
-                transactions.map((tx) => {
-                  const isPositive = [
-                    "profit",
-                    "trading_yield",
-                    "deposit",
-                  ].includes(tx.type);
 
-                  return (
-                    <tr
-                      key={tx._id || tx.id}
-                      onClick={() => setSelectedTx(tx)}
-                      className="hover:bg-sky-500/[0.03] transition-all cursor-pointer group relative"
+            <tbody>
+              {transactions.map((tx) => {
+                const amountStyle = getAmountStyle(tx.type);
+
+                return (
+                  <tr
+                    key={tx._id}
+                    onClick={() => openReceipt(tx)}
+                    className="hover:bg-gray-50 cursor-pointer transition"
+                  >
+                    <td className="p-4 flex items-center gap-3">
+                      {getTxIcon(tx.type)}
+                      <span className="capitalize">{tx.type}</span>
+                    </td>
+
+                    <td className="p-4 text-gray-600">
+                      {new Date(tx.createdAt).toLocaleDateString()}
+                    </td>
+
+                    {/* UPDATED AMOUNT */}
+
+                    <td
+                      className={clsx(
+                        "p-4 text-right font-semibold",
+                        amountStyle.color,
+                      )}
                     >
-                      <td className="p-5 flex items-center gap-4">
-                        <div className="h-10 w-10 rounded-xl bg-gray-100 dark:bg-white/5 border border-app-border flex items-center justify-center">
-                          {getTxIcon(tx.type)}
-                        </div>
-                        <div>
-                          <p className="text-sm font-black text-text-main uppercase tracking-tight">
-                            {tx.type === "profit" || tx.type === "trading_yield"
-                              ? "TRADING PROFIT"
-                              : tx.type.replace("_", " ")}
-                          </p>
-                          <p className="text-[10px] text-gray-500 font-mono">
-                            ID: {tx._id?.slice(-8).toUpperCase()}
-                          </p>
-                        </div>
-                      </td>
+                      {amountStyle.sign}
+                      {currencySymbol}
+                      {tx.amount.toLocaleString()}
+                    </td>
 
-                      <td className="p-5 text-sm text-gray-500 dark:text-gray-400 font-medium">
-                        {new Date(tx.createdAt).toLocaleDateString(undefined, {
-                          month: "short",
-                          day: "numeric",
-                          year: "numeric",
-                        })}
-                      </td>
-
-                      <td
-                        className={`p-5 text-sm font-black text-right ${isPositive ? "text-emerald-500" : "text-rose-500"}`}
+                    <td className="p-4 text-center">
+                      <span
+                        className={clsx(
+                          "px-3 py-1 rounded-full text-xs border",
+                          getStatusStyle(tx.status),
+                        )}
                       >
-                        {isPositive ? "+" : "-"}
-                        {currencySymbol}
-                        {tx.amount.toLocaleString(undefined, {
-                          minimumFractionDigits: 2,
-                        })}
-                      </td>
-
-                      <td className="p-5 text-center">
-                        <span
-                          className={`px-3 py-1 rounded-lg text-[9px] font-black uppercase border tracking-tighter ${getStatusStyle(tx.status)}`}
-                        >
-                          {tx.status}
-                        </span>
-                      </td>
-                    </tr>
-                  );
-                })
-              ) : (
-                <EmptyState />
-              )}
+                        {tx.status}
+                      </span>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
-        </div>
+        )}
       </div>
 
-      {/* Details Slide-over */}
-      {selectedTx && (
-        <>
-          <div
-            className="fixed inset-0 bg-black/40 dark:bg-black/60 backdrop-blur-sm z-[100] animate-in fade-in"
-            onClick={() => setSelectedTx(null)}
-          />
-          <div className="fixed top-4 right-4 bottom-4 w-full max-w-[420px] bg-card-bg border border-app-border z-[110] rounded-[2.5rem] p-8 shadow-2xl animate-in slide-in-from-right duration-500 flex flex-col">
-            <div className="flex items-center justify-between mb-10">
-              <div className="flex items-center gap-2">
-                <HiOutlineDocumentText className="text-sky-500" size={20} />
-                <h2 className="text-lg font-black text-text-main uppercase italic">
-                  Transaction <span className="text-sky-500">Receipt</span>
-                </h2>
-              </div>
-              <button
-                onClick={() => setSelectedTx(null)}
-                className="p-2 hover:bg-gray-100 dark:hover:bg-white/10 rounded-full text-gray-500 transition-colors"
-              >
-                <HiXMark size={24} />
-              </button>
-            </div>
-
-            <div className="flex-grow space-y-8">
-              <div className="text-center py-12 rounded-[2rem] bg-gray-50 dark:bg-white/[0.03] border border-app-border">
-                <p className="text-gray-500 text-[10px] uppercase font-black tracking-[0.2em] mb-3">
-                  Gross Settlement
-                </p>
-                <h3
-                  className={`text-5xl font-black tracking-tighter ${
-                    ["profit", "trading_yield", "deposit"].includes(
-                      selectedTx.type,
-                    )
-                      ? "text-emerald-500"
-                      : "text-text-main"
-                  }`}
-                >
-                  <span className="text-2xl mr-1">
-                    {["profit", "trading_yield", "deposit"].includes(
-                      selectedTx.type,
-                    )
-                      ? "+"
-                      : "-"}
-                  </span>
-                  {currencySymbol}
-                  {selectedTx.amount.toLocaleString()}
-                </h3>
-                <div
-                  className={`mt-6 inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-[10px] font-black border ${getStatusStyle(selectedTx.status)}`}
-                >
-                  <div
-                    className={`h-1.5 w-1.5 rounded-full animate-pulse ${selectedTx.status === "completed" ? "bg-emerald-500" : "bg-amber-500"}`}
-                  />
-                  {selectedTx.status}
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 gap-1">
-                <DetailRow
-                  label="Transaction Type"
-                  value={
-                    ["trading_yield", "profit"].includes(selectedTx.type)
-                      ? "TRADING PROFIT"
-                      : selectedTx.type.toUpperCase()
-                  }
-                />
-                <DetailRow
-                  label="Funding Method"
-                  value={selectedTx.method || "System Protocol"}
-                />
-                <DetailRow
-                  label="Execution Time"
-                  value={new Date(selectedTx.createdAt).toLocaleString()}
-                />
-                <DetailRow
-                  label="Internal Hash"
-                  value={selectedTx._id}
-                  isMono
-                />
-              </div>
-            </div>
-
-            <button className="w-full py-5 bg-sky-600 hover:bg-sky-500 text-white font-black rounded-2xl transition-all text-xs uppercase tracking-[0.2em] mt-6 shadow-lg shadow-sky-500/20">
-              Download Official PDF
-            </button>
-          </div>
-        </>
-      )}
+      <p className="text-xs text-gray-400 text-center">
+        Click any transaction to open receipt
+      </p>
     </div>
   );
 };
-
-const DetailRow = ({ label, value, isMono }) => (
-  <div className="flex flex-col py-4 border-b border-app-border last:border-0">
-    <span className="text-gray-500 text-[10px] font-black uppercase tracking-widest mb-1">
-      {label}
-    </span>
-    <span
-      className={`text-text-main text-sm font-bold uppercase truncate ${isMono ? "font-mono text-sky-500 dark:text-sky-400 text-xs" : ""}`}
-    >
-      {value}
-    </span>
-  </div>
-);
-
-const LoadingSkeleton = () => (
-  <tr>
-    <td colSpan="4" className="p-24 text-center">
-      <div className="flex flex-col items-center gap-4">
-        <div className="relative">
-          <div className="h-12 w-12 rounded-full border-2 border-sky-500/20 border-t-sky-500 animate-spin" />
-          <HiOutlineCreditCard
-            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-sky-500"
-            size={20}
-          />
-        </div>
-        <p className="text-gray-500 text-[10px] font-black uppercase tracking-[0.3em] animate-pulse">
-          Syncing Blockchain Data...
-        </p>
-      </div>
-    </td>
-  </tr>
-);
-
-const EmptyState = () => (
-  <tr>
-    <td colSpan="4" className="p-24 text-center">
-      <div className="max-w-xs mx-auto">
-        <HiOutlineArrowsRightLeft
-          size={48}
-          className="mx-auto text-gray-300 dark:text-white/5 mb-6"
-        />
-        <h3 className="text-text-main font-black uppercase text-sm mb-2">
-          No Transactions Detected
-        </h3>
-        <p className="text-gray-500 text-xs leading-relaxed">
-          Your ledger is currently empty. Start trading to see activity.
-        </p>
-      </div>
-    </td>
-  </tr>
-);
 
 export default Transactions;

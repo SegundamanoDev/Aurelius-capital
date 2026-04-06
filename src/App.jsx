@@ -57,6 +57,7 @@ import TraderProfile from "./components/TraderProfile";
 import ResetPassword from "./components/ResetPassword";
 import ForgotPassword from "./components/ForgotPassword";
 import KycReview from "./pages/admin/KycReview";
+import Receipt from "./pages/private/Receipt";
 
 // --- PUBLIC LAYOUT WRAPPER ---
 const PublicLayout = () => (
@@ -159,6 +160,7 @@ function App() {
             <Route path="transactions" element={<Transactions />} />
             <Route path="copy-trade" element={<CopyTrading />} />
             <Route path="trader/:id" element={<TraderProfile />} />
+            <Route path="receipt" element={<Receipt />} />
 
             {/* --- NEW NESTED SETTINGS ROUTES --- */}
             <Route path="settings" element={<SettingsMain />}>

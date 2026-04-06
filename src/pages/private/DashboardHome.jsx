@@ -4,65 +4,94 @@ import {
   useGetMyProfileQuery,
   useGetMyTransactionsQuery,
   useGetMyWalletQuery,
-  useGetMyCopiesQuery,
+  useGetMyCopiesQuery, // Ensure this is in your apiSlice
 } from "../../api/apiSlice";
 import {
   HiOutlineArrowTrendingUp,
   HiOutlineWallet,
   HiOutlineArrowsRightLeft,
-  HiOutlineLockClosed,
+  HiOutlineBanknotes,
   HiOutlineChartBar,
 } from "react-icons/hi2";
 import { getSymbol } from "../public/Register";
+import { Link } from "react-router-dom";
 
 const DashboardHome = () => {
-  // 1. Fetching live data from all streams
+  // 1. Data Fetching
   const { data: freshUser, isLoading: userLoading } = useGetMyProfileQuery();
   const { data: walletData, isLoading: walletLoading } = useGetMyWalletQuery();
   const { data: transactionsData } = useGetMyTransactionsQuery();
-  const { data: copiesData } = useGetMyCopiesQuery();
+  const { data: copiesData, isLoading: copiesLoading } = useGetMyCopiesQuery();
 
   const { user: authUser } = useSelector((state) => state.auth);
 
-  // Data Normalization
+  // 2. Data Normalization (Prevents 'undefined' errors)
   const user = freshUser || authUser;
   const wallet = walletData?.wallet || {};
   const transactions = transactionsData || [];
   const activeCopies = copiesData?.data || [];
-
-  // --- CURRENCY LOGIC: Priority is Wallet -> Fresh User -> Auth Fallback ---
   const liveCurrency = wallet?.currency || user?.currency || "USD";
   const currencySymbol = getSymbol(liveCurrency);
 
-  // 2. Formatting Stats for the Wallet Engine
+  // Formatting Helper
+  const fNum = (val) =>
+    `${currencySymbol}${(val || 0).toLocaleString(undefined, {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })}`;
+
   const stats = [
     {
       label: "Total Equity",
-      value: `${currencySymbol}${(wallet?.totalBalance || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}`,
-      subText: `Total Account Value (${liveCurrency})`,
-      icon: <HiOutlineWallet className="text-sky-500" size={24} />,
+      value: fNum(wallet.totalBalance),
+      subText: "Net Account Value",
+      icon: <HiOutlineWallet size={24} />,
       color: "border-sky-500/20",
-      glow: "shadow-sky-500/5",
+      accent: "bg-sky-500",
     },
     {
-      label: "Available Cash",
-      value: `${currencySymbol}${(wallet?.freeBalance || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}`,
-      subText: "Ready to invest/withdraw",
-      icon: <HiOutlineArrowsRightLeft className="text-emerald-500" size={24} />,
+      label: "Available Funds",
+      value: fNum(wallet.freeBalance),
+      subText: "Ready to Withdraw",
+      icon: <HiOutlineBanknotes size={24} />,
+      color: "border-indigo-500/20",
+      accent: "bg-indigo-500",
+    },
+    {
+      label: "In-Trade Capital",
+      value: fNum(wallet.allocatedBalance),
+      subText: "Currently Allocated",
+      icon: <HiOutlineChartBar size={24} />,
+      color: "border-purple-500/20",
+      accent: "bg-purple-500",
+    },
+    {
+      label: "Total Profits",
+      value: fNum(wallet.totalProfits),
+      subText: "Lifetime Results",
+      icon: <HiOutlineArrowTrendingUp size={24} />,
       color: "border-emerald-500/20",
-      glow: "shadow-emerald-500/5",
+      accent: "bg-emerald-500",
     },
     {
-      label: "Allocated Capital",
-      value: `${currencySymbol}${(wallet?.allocatedBalance || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}`,
-      subText: "Currently following traders",
-      icon: <HiOutlineLockClosed className="text-amber-500" size={24} />,
+      label: "Total Deposits",
+      value: fNum(wallet.totalDeposits),
+      subText: "Cumulative Inflow",
+      icon: <HiOutlineBanknotes size={24} />,
       color: "border-amber-500/20",
-      glow: "shadow-amber-500/5",
+      accent: "bg-amber-500",
+    },
+    {
+      label: "Total Withdrawn",
+      value: fNum(wallet.totalWithdrawals),
+      subText: "Cumulative Outflow",
+      icon: <HiOutlineArrowsRightLeft size={24} />,
+      color: "border-rose-500/20",
+      accent: "bg-rose-500",
     },
   ];
 
-  if (userLoading || walletLoading) {
+  if (userLoading || walletLoading || copiesLoading) {
     return (
       <div className="h-screen flex items-center justify-center bg-app-bg">
         <div className="text-sky-500 animate-pulse font-black tracking-widest uppercase text-xs">
@@ -73,16 +102,18 @@ const DashboardHome = () => {
   }
 
   return (
-    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700 max-w-[1600px] mx-auto">
+    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700 max-w-[1600px] mx-auto p-4">
       {/* --- HEADER --- */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold text-text-main tracking-tight">
-            Executive Terminal
+            Portfolio Overview
           </h1>
           <p className="text-gray-500 text-sm mt-1">
             Real-time tracking for{" "}
-            <span className="text-sky-500 font-bold">{user?.username}</span>
+            <span className="text-sky-500 font-bold">
+              {user?.firstName} {user?.lastName}
+            </span>
           </p>
         </div>
         <div className="bg-card-bg border border-app-border px-4 py-2 rounded-xl flex items-center gap-2 shadow-sm self-start">
@@ -97,37 +128,56 @@ const DashboardHome = () => {
         </div>
       </div>
 
-      {/* --- WALLET STATS --- */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {/* --- STAT CARDS --- */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {stats.map((stat, index) => (
           <div
             key={index}
-            className={`bg-card-bg p-6 rounded-2xl border ${stat.color} ${stat.glow} shadow-xl relative overflow-hidden group`}
+            className={`group relative bg-card-bg rounded-[2rem] border ${stat.color} p-1 transition-all duration-500 hover:-translate-y-1 shadow-xl hover:shadow-2xl`}
           >
-            <div className="flex justify-between items-start relative z-10">
-              <div>
-                <p className="text-gray-500 text-[10px] uppercase tracking-widest font-bold">
-                  {stat.label}
-                </p>
-                <h3 className="text-3xl font-bold mt-2 text-text-main tracking-tight">
-                  {stat.value}
-                </h3>
+            <div
+              className={`absolute inset-0 opacity-0 group-hover:opacity-10 transition-opacity duration-500 rounded-[2rem] ${stat.accent}`}
+            />
+            <div className="relative bg-card-bg rounded-[1.9rem] p-6 h-full flex flex-col justify-between overflow-hidden">
+              <div className="flex justify-between items-start">
+                <div className="space-y-1">
+                  <p className="text-gray-500 text-[10px] uppercase tracking-[0.2em] font-black">
+                    {stat.label}
+                  </p>
+                  <h3 className="text-2xl xl:text-3xl font-bold text-text-main tracking-tight">
+                    {stat.value}
+                  </h3>
+                </div>
+                <div
+                  className={`p-3 rounded-2xl border border-app-border bg-gray-50 dark:bg-white/5 transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3 ${stat.accent.replace("bg-", "text-")}`}
+                >
+                  {stat.icon}
+                </div>
               </div>
-              <div className="p-3 bg-gray-100 dark:bg-white/5 rounded-xl border border-app-border">
-                {stat.icon}
+              <div className="mt-8">
+                <div className="flex items-center gap-2 mb-3">
+                  <span
+                    className={`flex h-1.5 w-1.5 rounded-full ${stat.accent} opacity-50`}
+                  />
+                  <p className="text-gray-400 text-[10px] font-bold italic tracking-wide">
+                    {stat.subText}
+                  </p>
+                </div>
+                <div className="h-1 w-full bg-gray-100 dark:bg-white/5 rounded-full overflow-hidden">
+                  <div
+                    className={`h-full ${stat.accent} opacity-40 w-full transform -translate-x-[30%] group-hover:translate-x-0 transition-transform duration-1000 ease-in-out`}
+                  />
+                </div>
               </div>
             </div>
-            <p className="text-gray-400 text-[10px] mt-6 flex items-center gap-2 font-medium italic">
-              {stat.subText}
-            </p>
           </div>
         ))}
       </div>
 
       {/* --- MAIN CONTENT GRID --- */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        {/* LEFT: Copy Portfolio (Active Traders) */}
-        <div className="lg:col-span-8 space-y-6">
+        {/* LEFT: Copy Portfolio */}
+        <div className="lg:col-span-8">
           <div className="bg-card-bg border border-app-border rounded-3xl p-6 shadow-2xl">
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-text-main font-bold text-lg flex items-center gap-2">
@@ -138,7 +188,6 @@ const DashboardHome = () => {
                 {activeCopies.length} Active
               </span>
             </div>
-
             <div className="overflow-x-auto">
               {activeCopies.length > 0 ? (
                 <table className="w-full text-left">
@@ -169,7 +218,7 @@ const DashboardHome = () => {
                         </td>
                         <td className="py-4 text-sm font-medium text-text-main">
                           {currencySymbol}
-                          {copy.allocatedAmount.toLocaleString()}
+                          {copy.allocatedAmount?.toLocaleString()}
                         </td>
                         <td className="py-4">
                           <span className="text-[9px] bg-emerald-500/10 text-emerald-500 px-2 py-0.5 rounded border border-emerald-500/20 uppercase font-black tracking-tighter">
@@ -181,17 +230,17 @@ const DashboardHome = () => {
                   </tbody>
                 </table>
               ) : (
-                <div className="py-20 text-center opacity-30">
-                  <p className="text-sm">No active copy trades found.</p>
+                <div className="py-20 text-center opacity-30 italic text-sm">
+                  No active copy trades found.
                 </div>
               )}
             </div>
           </div>
         </div>
 
-        {/* RIGHT: Live Transaction Feed */}
-        <div className="lg:col-span-4 flex flex-col gap-6">
-          <div className="bg-card-bg border border-app-border rounded-3xl p-6 flex flex-col shadow-2xl h-full">
+        {/* RIGHT: Activity Logs */}
+        <div className="lg:col-span-4">
+          <div className="bg-card-bg border border-app-border rounded-3xl p-6 shadow-2xl h-full flex flex-col">
             <h3 className="text-text-main font-bold text-lg mb-6">
               Activity Logs
             </h3>
@@ -210,11 +259,7 @@ const DashboardHome = () => {
                             : "bg-red-500/10 text-red-500"
                         }`}
                       >
-                        {tx.type === "deposit" || tx.type === "profit" ? (
-                          <HiOutlineWallet size={18} />
-                        ) : (
-                          <HiOutlineArrowTrendingUp size={18} />
-                        )}
+                        <HiOutlineWallet size={18} />
                       </div>
                       <div>
                         <p className="text-sm text-text-main font-bold capitalize">
@@ -227,25 +272,15 @@ const DashboardHome = () => {
                     </div>
                     <div className="text-right">
                       <p
-                        className={`text-sm font-bold ${
-                          tx.type === "deposit" || tx.type === "profit"
-                            ? "text-emerald-500"
-                            : "text-text-main"
-                        }`}
+                        className={`text-sm font-bold ${tx.type === "deposit" || tx.type === "profit" ? "text-emerald-500" : "text-text-main"}`}
                       >
                         {tx.type === "deposit" || tx.type === "profit"
                           ? "+"
                           : "-"}
                         {currencySymbol}
-                        {tx.amount.toLocaleString()}
+                        {tx.amount?.toLocaleString()}
                       </p>
-                      <p
-                        className={`text-[9px] uppercase font-bold ${
-                          tx.status === "completed"
-                            ? "text-gray-500"
-                            : "text-amber-500"
-                        }`}
-                      >
+                      <p className="text-[9px] uppercase font-bold text-gray-500">
                         {tx.status}
                       </p>
                     </div>
@@ -257,9 +292,12 @@ const DashboardHome = () => {
                 </p>
               )}
             </div>
-            <button className="w-full mt-auto pt-6 text-sky-500 text-[10px] font-black uppercase tracking-widest hover:underline">
+            <Link
+              to="/dashboard/transactions"
+              className="w-full mt-auto pt-6 text-sky-500 text-[10px] font-black uppercase tracking-widest hover:underline"
+            >
               View Detailed Ledger
-            </button>
+            </Link>
           </div>
         </div>
       </div>
