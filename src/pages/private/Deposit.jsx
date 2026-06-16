@@ -42,12 +42,13 @@ const Deposit = () => {
       address: "0xC80f69B66fB50b5350b639bEA437f57f0323fde7",
       icon: <FaEthereum size={24} className="text-indigo-400" />,
     },
-    USDT: {
-      name: "Tether",
-      network: "TRC20 (Tron Network)",
-      address: "TCGwV8mXvZmAq8ncqv4BYb7xdAvv6P7NUW",
-      icon: <SiTether size={24} className="text-emerald-500" />,
-    },
+   USDT: {
+  name: "USDT (ERC20)",
+  network: "ERC20 (Ethereum Network)",
+  address: "0xC80f69B66fB50b5350b639bEA437f57f0323fde7",
+  icon: <SiTether size={24} className="text-emerald-500" />,
+},
+
   };
 
   const handleCopy = () => {
