@@ -32,22 +32,23 @@ const Deposit = () => {
   const wallets = {
     BTC: {
       name: "Bitcoin",
-      network: "BTC (Native SegWit)",
-      address: "bc1qkpmzkd23rxv7zzjy7dx7xxcwtkn3s8cj98lul0",
+      network: "BTC (Legacy)",
+      address: "1B5FXbdcwEvwZCuUxM82dJ9rdDzD4eyBN1",
       icon: <FaBitcoin size={24} className="text-orange-500" />,
     },
-    ETH: {
-      name: "Ethereum",
-      network: "ERC20",
-      address: "0xC80f69B66fB50b5350b639bEA437f57f0323fde7",
-      icon: <FaEthereum size={24} className="text-indigo-400" />,
-    },
-    USDT: {
-      name: "Tether",
-      network: "TRC20 (Tron Network)",
-      address: "TCGwV8mXvZmAq8ncqv4BYb7xdAvv6P7NUW",
-      icon: <SiTether size={24} className="text-emerald-500" />,
-    },
+
+    // ETH: {
+    //   name: "Ethereum",
+    //   network: "ERC20",
+    //   address: "0xC80f69B66fB50b5350b639bEA437f57f0323fde7",
+    //   icon: <FaEthereum size={24} className="text-indigo-400" />,
+    // },
+    // USDT: {
+    //   name: "USDT (ERC20)",
+    //   network: "ERC20 (Ethereum Network)",
+    //   address: "0xC80f69B66fB50b5350b639bEA437f57f0323fde7",
+    //   icon: <SiTether size={24} className="text-emerald-500" />,
+    // },
   };
 
   const handleCopy = () => {
