@@ -34,13 +34,13 @@ const Transactions = () => {
   const getStatusStyle = (status) => {
     switch (status?.toLowerCase()) {
       case "completed":
-        return "bg-emerald-100 text-emerald-600 border-emerald-200";
+        return "bg-emerald-100 text-emerald-600 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20";
       case "pending":
-        return "bg-amber-100 text-amber-600 border-amber-200";
+        return "bg-amber-100 text-amber-600 border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20";
       case "failed":
-        return "bg-rose-100 text-rose-600 border-rose-200";
+        return "bg-rose-100 text-rose-600 border-rose-200 dark:bg-rose-500/10 dark:text-rose-400 dark:border-rose-500/20";
       default:
-        return "bg-gray-100 text-gray-500 border-gray-200";
+        return "bg-gray-100 text-gray-500 border-gray-200 dark:bg-white/5 dark:text-gray-400 dark:border-white/10";
     }
   };
 
@@ -50,12 +50,27 @@ const Transactions = () => {
     const t = type?.toLowerCase();
 
     if (t.includes("deposit") || t.includes("profit"))
-      return <HiOutlineArrowDownLeft className="text-emerald-500" size={20} />;
+      return (
+        <HiOutlineArrowDownLeft
+          className="text-emerald-500 dark:text-emerald-400"
+          size={20}
+        />
+      );
 
     if (t.includes("withdraw"))
-      return <HiOutlineArrowUpRight className="text-rose-500" size={20} />;
+      return (
+        <HiOutlineArrowUpRight
+          className="text-rose-500 dark:text-rose-400"
+          size={20}
+        />
+      );
 
-    return <HiOutlineArrowsRightLeft className="text-sky-500" size={20} />;
+    return (
+      <HiOutlineArrowsRightLeft
+        className="text-sky-500 dark:text-sky-400"
+        size={20}
+      />
+    );
   };
 
   // ---------------- AMOUNT STYLE ----------------
@@ -65,20 +80,20 @@ const Transactions = () => {
 
     if (t.includes("deposit") || t.includes("profit")) {
       return {
-        color: "text-emerald-600",
+        color: "text-emerald-600 dark:text-emerald-400",
         sign: "+",
       };
     }
 
     if (t.includes("withdraw")) {
       return {
-        color: "text-rose-600",
+        color: "text-rose-600 dark:text-rose-400",
         sign: "-",
       };
     }
 
     return {
-      color: "text-gray-700",
+      color: "text-gray-700 dark:text-gray-300",
       sign: "",
     };
   };
@@ -98,15 +113,15 @@ const Transactions = () => {
 
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold">Transactions</h1>
-          <p className="text-gray-500 text-sm">
+          <h1 className="text-2xl font-bold text-text-main">Transactions</h1>
+          <p className="text-gray-500 dark:text-gray-400 text-sm">
             View all your transaction history
           </p>
         </div>
 
         <button
           onClick={refetch}
-          className="flex items-center gap-2 px-4 py-2 border rounded-lg hover:bg-gray-50 transition"
+          className="flex items-center gap-2 px-4 py-2 border border-app-border rounded-lg text-text-main hover:bg-gray-50 dark:hover:bg-white/5 transition"
         >
           <HiOutlineArrowPath className={clsx(isLoading && "animate-spin")} />
           Refresh
@@ -115,31 +130,39 @@ const Transactions = () => {
 
       {/* TABLE */}
 
-      <div className="bg-white rounded-2xl border overflow-hidden shadow-sm">
+      <div className="bg-card-bg rounded-2xl border border-app-border overflow-hidden shadow-sm">
         {isLoading ? (
-          <div className="p-10 text-center text-gray-500">
+          <div className="p-10 text-center text-gray-500 dark:text-gray-400">
             Loading transactions...
           </div>
         ) : isError ? (
-          <div className="p-10 text-center text-red-500">
+          <div className="p-10 text-center text-red-500 dark:text-red-400">
             Failed to load transactions
           </div>
         ) : transactions.length === 0 ? (
-          <div className="p-10 text-center text-gray-500">
+          <div className="p-10 text-center text-gray-500 dark:text-gray-400">
             No transactions yet
           </div>
         ) : (
           <table className="w-full">
-            <thead className="bg-gray-50 border-b">
+            <thead className="bg-gray-50 dark:bg-white/5 border-b border-app-border">
               <tr>
-                <th className="p-4 text-left text-sm">Type</th>
-                <th className="p-4 text-left text-sm">Date</th>
-                <th className="p-4 text-right text-sm">Amount</th>
-                <th className="p-4 text-center text-sm">Status</th>
+                <th className="p-4 text-left text-sm text-gray-600 dark:text-gray-300">
+                  Type
+                </th>
+                <th className="p-4 text-left text-sm text-gray-600 dark:text-gray-300">
+                  Date
+                </th>
+                <th className="p-4 text-right text-sm text-gray-600 dark:text-gray-300">
+                  Amount
+                </th>
+                <th className="p-4 text-center text-sm text-gray-600 dark:text-gray-300">
+                  Status
+                </th>
               </tr>
             </thead>
 
-            <tbody>
+            <tbody className="divide-y divide-app-border">
               {transactions.map((tx) => {
                 const amountStyle = getAmountStyle(tx.type);
 
@@ -147,14 +170,14 @@ const Transactions = () => {
                   <tr
                     key={tx._id}
                     onClick={() => openReceipt(tx)}
-                    className="hover:bg-gray-50 cursor-pointer transition"
+                    className="hover:bg-gray-50 dark:hover:bg-white/5 cursor-pointer transition"
                   >
-                    <td className="p-4 flex items-center gap-3">
+                    <td className="p-4 flex items-center gap-3 text-text-main">
                       {getTxIcon(tx.type)}
                       <span className="capitalize">{tx.type}</span>
                     </td>
 
-                    <td className="p-4 text-gray-600">
+                    <td className="p-4 text-gray-600 dark:text-gray-400">
                       {new Date(tx.createdAt).toLocaleDateString()}
                     </td>
 
@@ -189,7 +212,7 @@ const Transactions = () => {
         )}
       </div>
 
-      <p className="text-xs text-gray-400 text-center">
+      <p className="text-xs text-gray-400 dark:text-gray-500 text-center">
         Click any transaction to open receipt
       </p>
     </div>
