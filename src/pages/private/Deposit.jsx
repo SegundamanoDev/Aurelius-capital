@@ -32,8 +32,8 @@ const Deposit = () => {
   const wallets = {
     BTC: {
       name: "Bitcoin",
-      network: "BTC (Legacy)",
-      address: "1B5FXbdcwEvwZCuUxM82dJ9rdDzD4eyBN1",
+      network: "BTC (Native SegWit)",
+      address: "bc1qt3f62mqjnx0e7c0nz23my478qgz9p28ftzktqk",
       icon: <FaBitcoin size={24} className="text-orange-500" />,
     },
 
